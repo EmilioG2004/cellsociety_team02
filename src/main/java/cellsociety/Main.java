@@ -1,9 +1,11 @@
 package cellsociety;
 
+import cellsociety.View.SimulationView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
@@ -42,6 +44,11 @@ public class Main extends Application {
                 showMessage(AlertType.INFORMATION, String.format("Number of Blocks = %d", numBlocks));
             }
         }
+
+        SimulationView view = new SimulationView();
+        Scene scene = new Scene(view.getRoot(), 1200, 750);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     /**
