@@ -1,3 +1,5 @@
 package cellsociety.Model.Utils;
-
-public record IntPair(int lOffset, int rOffset){}
+import java.util.List;
+public interface NeighborStrategy{
+    List<int[]> getNeighborOffsets();
+}
