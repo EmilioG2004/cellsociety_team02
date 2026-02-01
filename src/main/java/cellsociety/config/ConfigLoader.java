@@ -3,7 +3,6 @@ package cellsociety.config;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -18,22 +17,24 @@ public class ConfigLoader {
 
   public SimulationConfig loadConfig(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
     Document xmlDocument = DocumentBuilderFactory
-        .newInstance()
-        .newDocumentBuilder()
-        .parse(xmlFile);
+      .newInstance()
+      .newDocumentBuilder()
+      .parse(xmlFile);
 
 
     int[] gridSize = calculateGridSize(xmlDocument);
+    int rows = gridSize[0];
+    int cols = gridSize[1];
 
     return new SimulationConfig(
-        "",
-        "",
-        "",
-        "",
-        gridSize[0],
-        gridSize[1],
-        new int[][]{},
-        new HashMap<>()
+      "",
+      "",
+      "",
+      "",
+      rows,
+      cols,
+      new int[rows][cols],
+      new HashMap<>()
     );
   }
 
