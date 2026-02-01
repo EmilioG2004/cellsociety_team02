@@ -15,12 +15,21 @@ import org.xml.sax.SAXException;
  */
 public class ConfigLoader {
 
+  private static final String CONFIG_TITLE = "title";
+  private static final String CONFIG_AUTHOR = "author";
+  private static final String CONFIG_DESCRIPTION = "description";
+
+
   public SimulationConfig loadConfig(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
     Document xmlDocument = DocumentBuilderFactory
       .newInstance()
       .newDocumentBuilder()
       .parse(xmlFile);
 
+    Element metadata = getMetadata(xmlDocument);
+    String title = getChildText(metadata, CONFIG_TITLE);
+    String author = getChildText(metadata, CONFIG_AUTHOR);
+    String description = getChildText(metadata, CONFIG_DESCRIPTION);
 
     int[] gridSize = calculateGridSize(xmlDocument);
     int rows = gridSize[0];
@@ -28,9 +37,9 @@ public class ConfigLoader {
 
     return new SimulationConfig(
       "",
-      "",
-      "",
-      "",
+      title,
+      author,
+      description,
       rows,
       cols,
       new int[rows][cols],
@@ -38,6 +47,20 @@ public class ConfigLoader {
     );
   }
 
+  private Element getMetadata(Document xmlDocument) {
+    Element root = xmlDocument.getDocumentElement();
+    Element metadata = (Element) root.getElementsByTagName("metadata").item(0);
+    if (metadata == null) {
+      throw new IllegalArgumentException("Missing <metadata> element");
+    }
+    return metadata;
+  }
+
+  private String getChildText(Element parent, String tagName) {
+    Element child = (Element) parent.getElementsByTagName(tagName).item(0);
+    if (child == null) return "";
+    return child.getTextContent().trim();
+  }
 
   private int[] calculateGridSize(Document xmlDocument) {
     try {
