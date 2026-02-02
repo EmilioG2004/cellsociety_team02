@@ -15,6 +15,7 @@ public class SimulationView {
   private final Button myUploadButton = new Button("Upload XML Configuartion");
 
   private final Button myStartButton = new Button("Start Simulation");
+  private final Button myPauseButton = new Button("Pause Simulation");
   private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
@@ -22,9 +23,12 @@ public class SimulationView {
 
   private final Region myGridView = new Region();
 
+  private boolean isRunning;
+
   public SimulationView(){
     buildTop();
     buildCenter();
+    isRunning = false;
 
     myRoot.setPadding(new Insets(12));
     myRoot.setStyle("-fx-background-color: #f6f7fb;");
@@ -47,7 +51,7 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, mySpeedUpButton, mySlowDownButton, mySaveButton, mySpeedLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, mySpeedLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Label configLabel = new Label("Configuration: ");
@@ -96,7 +100,35 @@ public class SimulationView {
     myRoot.setCenter(center);
   }
 
-  public Parent getRoot(){ return myRoot; }
+  public Parent getRoot(){
+    return myRoot;
+  }
 
+  public boolean isRunning() {
+    return isRunning;
+  }
 
+  public Button getMyUploadButton(){
+    return myUploadButton;
+  }
+
+  public Button getMyStartButton(){
+    return myStartButton;
+  }
+
+  public Button getMyPauseButton(){
+    return myPauseButton;
+  }
+
+  public Button getMySpeedUpButton(){
+    return mySpeedUpButton;
+  }
+
+  public Button getMySlowDownButton(){
+    return mySlowDownButton;
+  }
+
+  public Button getMySaveButton(){
+    return mySaveButton;
+  }
 }
