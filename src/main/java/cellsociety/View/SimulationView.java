@@ -135,4 +135,6 @@ public class SimulationView {
   public Button getMySaveButton(){
     return mySaveButton;
   }
+
+  public GridView getMyGridView() { return myGridView; }
 }
