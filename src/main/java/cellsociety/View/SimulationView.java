@@ -2,6 +2,7 @@ package cellsociety.View;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -21,7 +22,11 @@ public class SimulationView {
   private final Button mySaveButton = new Button("Save State");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
 
-  private final Region myGridView = new Region();
+  private final int myCols = 8;
+  private final int myRows = 8;
+  private final double myCellSize = 20.0;
+
+  private final GridView myGridView = new GridPaneView(myRows, myCols, myCellSize);
 
   private boolean isRunning;
 
@@ -91,9 +96,8 @@ public class SimulationView {
             -fx-border-color: black;
         """);
 
-    myGridView.setPrefSize(720,480);
-    myGridView.setStyle("-fx-background-color: #f9fafb; -fx-background-radius: 10; -fx-border-color: #eef0f6; -fx-border-radius: 10;");
-    card.getChildren().add(myGridView);
+    Node GridNode = myGridView.getNode();
+    card.getChildren().add(GridNode);
 
     StackPane center = new StackPane(card);
     center.setPadding(new Insets(18,0,18,0));
