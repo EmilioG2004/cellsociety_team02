@@ -13,6 +13,9 @@ public class Cell implements ReadOnlyCell {
   public int getState() {
     return this.currentState;
   }
+  public void setState(int state) {
+    this.currentState = state;
+  }
 
   public void updateState() {
     this.currentState = nextState;
