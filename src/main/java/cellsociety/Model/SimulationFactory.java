@@ -1,5 +1,7 @@
 package cellsociety.Model;
 import cellsociety.config.SimulationConfig;
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.Utils.MooreNeighborStrategy;
 public class SimulationFactory {
     public static Grid createInitialGrid(SimulationConfig config) {
         int rows = config.getRows();
@@ -18,5 +20,6 @@ public class SimulationFactory {
         if (simulationType.equals("GameOfLife")) {
             return new ConwayGameOfLifeRule(config.getParameters());
         }
+        throw new IllegalArgumentException("Invalid simulation type: " + simulationType);
     }
 }
