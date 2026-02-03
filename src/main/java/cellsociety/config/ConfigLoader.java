@@ -17,9 +17,16 @@ import org.xml.sax.SAXException;
  */
 public class ConfigLoader {
 
+  private static final String CONFIG_METADATA = "metadata";
+  private static final String CONFIG_GRID = "grid";
+
   private static final String CONFIG_TITLE = "title";
   private static final String CONFIG_AUTHOR = "author";
   private static final String CONFIG_DESCRIPTION = "description";
+
+  private static final String CONFIG_ROWS = "rows";
+  private static final String CONFIG_COLUMNS = "cols";
+  private static final String CONFIG_STATES = "states";
 
 
   public SimulationConfig loadConfig(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
@@ -51,11 +58,15 @@ public class ConfigLoader {
     );
   }
 
-  private Element getMetadata(Document xmlDocument) {
+  private Element getDocElement(Document xmlDocument, String element) {
     Element root = xmlDocument.getDocumentElement();
-    Element metadata = (Element) root.getElementsByTagName("metadata").item(0);
+    return (Element)root.getElementsByTagName(element).item(0);
+  }
+
+  private Element getMetadata(Document xmlDocument) {
+    Element metadata = getDocElement(xmlDocument, CONFIG_METADATA);
     if (metadata == null) {
-      throw new IllegalArgumentException("Missing <metadata> element");
+      throw new IllegalArgumentException("Missing <" + CONFIG_METADATA + "> element");
     }
     return metadata;
   }
@@ -67,12 +78,11 @@ public class ConfigLoader {
   }
 
   private int[] getGridSize(Document xmlDocument) {
-    Element root = xmlDocument.getDocumentElement();
-    Element grid = (Element) root.getElementsByTagName("grid").item(0);
-    if (grid == null) throw new IllegalArgumentException("Missing <grid> element");
+    Element grid = getDocElement(xmlDocument, CONFIG_GRID);
+    if (grid == null) throw new IllegalArgumentException("Missing <" + CONFIG_GRID + "> element");
 
-    String rowsStr = grid.getAttribute("rows");
-    String colsStr = grid.getAttribute("cols");
+    String rowsStr = grid.getAttribute(CONFIG_ROWS);
+    String colsStr = grid.getAttribute(CONFIG_COLUMNS);
     if (rowsStr.isBlank() || colsStr.isBlank()) {
       throw new IllegalArgumentException("Missing grid rows/cols attributes");
     }
@@ -87,13 +97,12 @@ public class ConfigLoader {
   }
 
   private int[][] getStates(Document xmlDocument, int rows, int cols) {
-    Element root = xmlDocument.getDocumentElement();
-    Element grid = (Element) root.getElementsByTagName("grid").item(0);
+    Element grid = getDocElement(xmlDocument, CONFIG_GRID);
     if (grid == null) throw new IllegalArgumentException("Missing <grid> element");
 
-    Element statesElement = (Element) grid.getElementsByTagName("states").item(0);
+    Element statesElement = (Element) grid.getElementsByTagName(CONFIG_STATES).item(0);
     if (statesElement == null) {
-      throw new IllegalArgumentException("Missing <states> element");
+      throw new IllegalArgumentException("Missing <" + CONFIG_STATES + "> element");
     }
 
     String rawText = statesElement.getTextContent();
@@ -113,7 +122,7 @@ public class ConfigLoader {
   private int[][] iterateThroughRows(List<String> lines, int rows, int cols) {
     if (lines.size() != rows) {
       throw new IllegalArgumentException(
-          "Expected " + rows + " rows in <states>, but got " + lines.size());
+          "Expected " + rows + " rows in <" + CONFIG_STATES + ">, but got " + lines.size());
     }
 
     int[][] states = new int[rows][cols];
