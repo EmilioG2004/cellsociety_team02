@@ -14,6 +14,9 @@ public class Simulation {
         myGrid.updateAllCells(myRule);
         myGrid.commitAllStates();
     }
+    public GameRule getRule() {
+        return myRule;
+    }
     public ReadOnlyGrid getGrid() {
         return myGrid;
     }
