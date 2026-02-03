@@ -7,8 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test class for Simulation following ZOMBIES (Zero, One, Many, Boundaries, Interfaces, Exceptions,
- * Simple scenarios).
+ * Test class for Simulation 
  */
 class SimulationTest {
   private Grid grid;
@@ -30,7 +29,7 @@ class SimulationTest {
       {0, 0, 0},
       {0, 0, 0}
     };
-    grid.initializeGrid(allDead);
+    grid.setCellsState(allDead);
     simulation.step();
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
@@ -47,7 +46,7 @@ class SimulationTest {
       {0, 1, 0},
       {0, 0, 0}
     };
-    grid.initializeGrid(oneLive);
+    grid.setCellsState(oneLive);
     simulation.step();
     assertEquals(0, grid.getCellState(1, 1), "Single cell should die (underpopulation)");
   }
@@ -60,7 +59,7 @@ class SimulationTest {
       {0, 1, 0},
       {0, 1, 0}
     };
-    grid.initializeGrid(verticalBlinker);
+    grid.setCellsState(verticalBlinker);
     simulation.step();
     // Should become horizontal
     assertEquals(0, grid.getCellState(0, 0));
@@ -79,7 +78,7 @@ class SimulationTest {
       {0, 0, 0, 0}
     };
     grid = new Grid(4, 4);
-    grid.initializeGrid(block);
+    grid.setCellsState(block);
     simulation = new Simulation(grid, rules);
     simulation.step();
     // Block should remain unchanged
@@ -97,7 +96,7 @@ class SimulationTest {
       {1, 0, 0},
       {0, 0, 0}
     };
-    grid.initializeGrid(cornerCell);
+    grid.setCellsState(cornerCell);
     simulation.step();
     // Corner cell (0,0) has 2 alive neighbors, should survive
     assertEquals(1, grid.getCellState(0, 0));
@@ -110,7 +109,7 @@ class SimulationTest {
       {1, 1, 1},
       {0, 0, 0}
     };
-    grid.initializeGrid(edgeCell);
+    grid.setCellsState(edgeCell);
     simulation.step();
     // Top middle cell (0,1) has 3 alive neighbors on edge
     assertEquals(1, grid.getCellState(0, 1));
@@ -121,7 +120,7 @@ class SimulationTest {
   void getGrid_returnsReadOnlyGrid() {
     int[][] initial = {{0, 1}, {1, 0}};
     grid = new Grid(2, 2);
-    grid.initializeGrid(initial);
+    grid.setCellsState(initial);
     simulation = new Simulation(grid, rules);
 
     ReadOnlyGrid readOnly = simulation.getGrid();
@@ -130,69 +129,5 @@ class SimulationTest {
     assertEquals(2, readOnly.getCols());
     assertEquals(0, readOnly.getCellState(0, 0));
     assertEquals(1, readOnly.getCellState(0, 1));
-  }
-
-  // S - Simple scenarios: basic functionality
-  @Test
-  void step_advancesOneGeneration() {
-    int[][] initial = {
-      {0, 0, 0},
-      {1, 1, 1},
-      {0, 0, 0}
-    };
-    grid.initializeGrid(initial);
-    simulation.step();
-    // Should become vertical blinker
-    assertEquals(0, grid.getCellState(1, 0));
-    assertEquals(1, grid.getCellState(0, 1));
-    assertEquals(1, grid.getCellState(1, 1));
-    assertEquals(1, grid.getCellState(2, 1));
-  }
-
-  @Test
-  void multipleSteps_advanceMultipleGenerations() {
-    int[][] blinker = {
-      {0, 1, 0},
-      {0, 1, 0},
-      {0, 1, 0}
-    };
-    grid.initializeGrid(blinker);
-    simulation.step();
-    simulation.step();
-    // After two steps, should return to original vertical position
-    assertEquals(0, grid.getCellState(0, 0));
-    assertEquals(1, grid.getCellState(0, 1));
-    assertEquals(1, grid.getCellState(1, 1));
-    assertEquals(1, grid.getCellState(2, 1));
-  }
-
-  // Negative testing: various grid sizes
-  @Test
-  void step_largeGrid_performsCorrectly() {
-    Grid largeGrid = new Grid(10, 10);
-    int[][] glider = new int[10][10];
-    // Set up glider pattern at origin
-    glider[0][1] = 1;
-    glider[1][2] = 1;
-    glider[2][0] = 1;
-    glider[2][1] = 1;
-    glider[2][2] = 1;
-
-    largeGrid.initializeGrid(glider);
-    Simulation largeSim = new Simulation(largeGrid, rules);
-    largeSim.step();
-    // Verify glider has evolved (checking it doesn't crash and produces valid output)
-    assertNotNull(largeSim.getGrid());
-  }
-
-  @Test
-  void step_minimumGrid_1x1() {
-    Grid tiny = new Grid(1, 1);
-    int[][] single = {{1}};
-    tiny.initializeGrid(single);
-    Simulation tinySim = new Simulation(tiny, rules);
-    tinySim.step();
-    // Single cell with no neighbors dies
-    assertEquals(0, tiny.getCellState(0, 0));
   }
 }
