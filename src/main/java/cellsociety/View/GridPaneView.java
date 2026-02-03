@@ -55,11 +55,10 @@ public class GridPaneView implements GridView{
   }
 
   @Override
-  public void render(ReadOnlyGrid grid, Map<String,String> stateColors){
+  public void render(ReadOnlyGrid grid, Map<Integer,String> stateColors){
     for (int r = 0; r < grid.getRows(); r++){
       for (int c = 0; c < grid.getCols(); c++){
         int cellState = grid.getCellState(r,c);
-
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }

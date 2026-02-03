@@ -88,6 +88,7 @@ public class SimulationController {
         Simulation mySim = SimulationFactory.createSimulation(myConfig);
         myDriver.setSimulation(mySim);
         mySimView.setGrid(mySim.getGrid().getRows(), mySim.getGrid().getCols(), cellSize);
+        mySimView.getMyGridView().render(mySim.getGrid(), mySim.getRule().getStateColors());
       } catch (ParserConfigurationException | SAXException | IOException ex) {
         throw new RuntimeException(ex);
       }
