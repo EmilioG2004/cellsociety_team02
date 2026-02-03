@@ -18,25 +18,24 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final SimulationDriver myDriver;
   private final ConfigLoader myConfigLoader;
-  private final SimulationFactory myFactory;
+  private final static double cellSize = 20.0;
 
   public SimulationController(SimulationView simView){
     this.mySimView = simView;
     this.myDriver = new SimulationDriver();
     this.myConfigLoader = new ConfigLoader();
-    this.myFactory = new SimulationFactory();
     wireButtons();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getGrid());
+      mySimView.getMyGridView().render(mySim.getGrid(), mySim.getRule().getStateColors());
     })
     );
   }
 
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getGrid());
+    mySimView.getMyGridView().render(sim.getGrid(), sim.getRule().getStateColors());
   }
 
   private void wireButtons(){
@@ -86,7 +85,9 @@ public class SimulationController {
       File myFile = mySimView.showOpenConfigDialog();
       try {
         SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
-        myDriver.setSimulation(SimulationFactory.createSimulation(myConfig));
+        Simulation mySim = SimulationFactory.createSimulation(myConfig);
+        myDriver.setSimulation(mySim);
+        mySimView.setGrid(mySim.getGrid().getRows(), mySim.getGrid().getCols(), cellSize);
       } catch (ParserConfigurationException | SAXException | IOException ex) {
         throw new RuntimeException(ex);
       }

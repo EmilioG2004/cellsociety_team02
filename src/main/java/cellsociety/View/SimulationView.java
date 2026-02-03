@@ -24,6 +24,7 @@ public class SimulationView {
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
+  private StackPane centerPane;
 
   private final int myCols = 8;
   private final int myRows = 8;
@@ -89,22 +90,25 @@ public class SimulationView {
   }
 
   private void buildCenter(){
+    if (centerPane == null) {
+      centerPane = new StackPane();
+      centerPane.setPadding(new Insets(18,0,18,0));
+      myRoot.setCenter(centerPane);
+    }
+
     StackPane card = new StackPane();
     card.setPadding(new Insets(18));
     card.setPrefSize(760,520);
     card.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
     card.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: black;
-        """);
+      -fx-background-color: white;
+      -fx-border-color: black;
+  """);
 
-    Node GridNode = myGridView.getNode();
-    card.getChildren().add(GridNode);
+    card.getChildren().add(myGridView.getNode());
 
-    StackPane center = new StackPane(card);
-    center.setPadding(new Insets(18,0,18,0));
-    myRoot.setCenter(center);
+    centerPane.getChildren().setAll(card);
   }
 
   public File showOpenConfigDialog() {
@@ -154,5 +158,6 @@ public class SimulationView {
 
   public void setGrid(int rows, int cols, double cellSize){
     this.myGridView = new GridPaneView(rows, cols, cellSize);
+    buildCenter();
   }
 }

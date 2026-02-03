@@ -1,5 +1,6 @@
 package cellsociety.View;
 
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
@@ -57,14 +58,8 @@ public class GridPaneView implements GridView{
   public void render(ReadOnlyGrid grid, Map<String,String> stateColors){
     for (int r = 0; r < grid.getRows(); r++){
       for (int c = 0; c < grid.getCols(); c++){
-        String stateString = "";
-        int cellState = grid.getCellState(r, c);
-        if (cellState == ALIVE) {
-          stateString = "ALIVE";
-        } else {
-          stateString = "DEAD";
-        }
-        myCells[r][c].setFill(Paint.valueOf(stateColors.get(stateString)));
+        String cellState = grid.getCellStateColor(r,c, new ConwayGameOfLifeRule());
+        myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }
   }
