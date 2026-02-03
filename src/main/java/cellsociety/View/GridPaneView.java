@@ -14,7 +14,6 @@ public class GridPaneView implements GridView{
   private final Rectangle[][] myCells;
   private final int myRows;
   private final int myCols;
-  private final static int DEAD = 0;
   private final static int ALIVE = 1;
 
   public GridPaneView(int rows, int cols, double cellSize){
@@ -56,7 +55,6 @@ public class GridPaneView implements GridView{
 
   @Override
   public void render(ReadOnlyGrid grid, Map<String,String> stateColors){
-    Map<String,String> colorMap = stateColors;
     for (int r = 0; r < grid.getRows(); r++){
       for (int c = 0; c < grid.getCols(); c++){
         String stateString = "";

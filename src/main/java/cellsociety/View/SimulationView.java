@@ -29,7 +29,7 @@ public class SimulationView {
   private final int myRows = 8;
   private final double myCellSize = 20.0;
 
-  private final GridView myGridView = new GridPaneView(myRows, myCols, myCellSize);
+  private GridView myGridView;
 
   private boolean isRunning;
 
@@ -151,4 +151,8 @@ public class SimulationView {
   }
 
   public GridView getMyGridView() { return myGridView; }
+
+  public void setGrid(int rows, int cols, double cellSize){
+    this.myGridView = new GridPaneView(rows, cols, cellSize);
+  }
 }
