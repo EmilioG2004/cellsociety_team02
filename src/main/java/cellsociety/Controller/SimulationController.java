@@ -1,30 +1,42 @@
 package cellsociety.Controller;
 
+import cellsociety.Model.Simulation;
+import cellsociety.Model.SimulationDriver;
+import cellsociety.Model.SimulationFactory;
 import cellsociety.View.SimulationView;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
+import cellsociety.config.ConfigLoader;
+import cellsociety.config.SimulationConfig;
+import java.io.File;
+import java.io.IOException;
+import javafx.application.Platform;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 public class SimulationController {
 
-  // will hold simulation, simulationdriver as well once made
 
   private final SimulationView mySimView;
-  private Timeline myAnimation;
-  private double speedMultiplier = 1.0;
-  private final double baseFPS = 1.0;
+  private final SimulationDriver myDriver;
+  private final ConfigLoader myConfigLoader;
+  private final SimulationFactory myFactory;
 
   public SimulationController(SimulationView simView){
     this.mySimView = simView;
-    buildTimeline();
+    this.myDriver = new SimulationDriver();
+    this.myConfigLoader = new ConfigLoader();
+    this.myFactory = new SimulationFactory();
     wireButtons();
+
+    myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
+      Simulation mySim = myDriver.getSimulation();
+      mySimView.getMyGridView().render(mySim.getGrid(), );
+    })
+    );
   }
 
-  private void buildTimeline(){
-    double tickSpeed = 1.0 / (baseFPS * speedMultiplier);
-
-    myAnimation = new Timeline(new KeyFrame(Duration.seconds(tickSpeed), e -> onTick()));
-    myAnimation.setCycleCount(Timeline.INDEFINITE);
+  public void setSimulation(Simulation sim) {
+    myDriver.setSimulation(sim);
+    mySimView.getMyGridView().render(sim.getGrid());
   }
 
   private void wireButtons(){
@@ -39,23 +51,29 @@ public class SimulationController {
   private void wireStart(){
     mySimView.getMyStartButton().setOnAction(e -> {
       System.out.println("Start pressed");
-      myAnimation.play();
+      myDriver.start();
     });
   }
 
   private void wirePause(){
     mySimView.getMyPauseButton().setOnAction(e -> {
       System.out.println("Pause pressed");
-      myAnimation.pause();
+      myDriver.pause();
     });
   }
 
   private void wireSpeedUp(){
-    mySimView.getMySpeedUpButton().setOnAction(e -> {System.out.println("Speeding Up");});
+    mySimView.getMySpeedUpButton().setOnAction(e -> {
+      System.out.println("Speeding Up");
+      myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
+    });
   }
 
   private void wireSlowDown(){
-    mySimView.getMySlowDownButton().setOnAction(e -> {System.out.println("Slowing Down");});
+    mySimView.getMySlowDownButton().setOnAction(e -> {
+      System.out.println("Slowing Down");
+      myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
+    });
   }
 
   private void wireSave(){
@@ -63,13 +81,15 @@ public class SimulationController {
   }
 
   private void wireUpload(){
-    mySimView.getMyUploadButton().setOnAction(e -> {System.out.println("Uploading File");});
+    mySimView.getMyUploadButton().setOnAction(e -> {
+      System.out.println("Uploading File");
+      File myFile = mySimView.showOpenConfigDialog();
+      try {
+        SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
+        myDriver.setSimulation(SimulationFactory.createSimulation(myConfig));
+      } catch (ParserConfigurationException | SAXException | IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    });
   }
-
-  private void onTick(){
-
-    // need simulation, simulationdriver
-    mySimView.render(mySimulation.getGrid());
-  }
-
 }
