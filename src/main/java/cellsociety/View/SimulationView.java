@@ -26,8 +26,6 @@ public class SimulationView {
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private StackPane centerPane;
 
-  private final int myCols = 8;
-  private final int myRows = 8;
   private final double myCellSize = 20.0;
 
   private GridView myGridView;
