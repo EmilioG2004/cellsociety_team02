@@ -17,6 +17,9 @@ import org.xml.sax.SAXException;
  */
 public class ConfigLoader {
 
+  private static final String CONFIG_SIMULATION = "simulation";
+  private static final String CONFIG_SIM_TYPE_ATTR = "type";
+
   private static final String CONFIG_METADATA = "metadata";
   private static final String CONFIG_GRID = "grid";
 
@@ -35,6 +38,8 @@ public class ConfigLoader {
       .newDocumentBuilder()
       .parse(xmlFile);
 
+    String simulationType = getSimulationType(xmlDocument);
+
     Element metadata = getMetadata(xmlDocument);
     String title = getChildText(metadata, CONFIG_TITLE);
     String author = getChildText(metadata, CONFIG_AUTHOR);
@@ -47,7 +52,7 @@ public class ConfigLoader {
     int[][] states = getStates(xmlDocument, rows, cols);
 
     return new SimulationConfig(
-      "",
+      simulationType,
       title,
       author,
       description,
@@ -58,17 +63,34 @@ public class ConfigLoader {
     );
   }
 
-  private Element getDocElement(Document xmlDocument, String element) {
+  private Element getFirstElementByTag(Document xmlDocument, String tag) {
     Element root = xmlDocument.getDocumentElement();
-    return (Element)root.getElementsByTagName(element).item(0);
+    Element element = (Element)root.getElementsByTagName(tag).item(0);
+    if (element == null) {
+      throw new IllegalArgumentException("Missing <" + tag + "> element");
+    }
+    return element;
+  }
+
+  private String getSimulationType(Document xmlDocument) {
+    Element simulation = getFirstElementByTag(xmlDocument, CONFIG_SIMULATION);
+
+    String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR);
+    if (!typeAttr.isBlank()) {
+      return typeAttr.trim();
+    }
+
+    // if no attributes try plaintext
+    String text = simulation.getTextContent();
+    if (text != null && !text.isBlank()) {
+      return text.trim();
+    }
+
+    throw new IllegalArgumentException("Simulation type not specified");
   }
 
   private Element getMetadata(Document xmlDocument) {
-    Element metadata = getDocElement(xmlDocument, CONFIG_METADATA);
-    if (metadata == null) {
-      throw new IllegalArgumentException("Missing <" + CONFIG_METADATA + "> element");
-    }
-    return metadata;
+    return getFirstElementByTag(xmlDocument, CONFIG_METADATA);
   }
 
   private String getChildText(Element parent, String tagName) {
@@ -78,8 +100,7 @@ public class ConfigLoader {
   }
 
   private int[] getGridSize(Document xmlDocument) {
-    Element grid = getDocElement(xmlDocument, CONFIG_GRID);
-    if (grid == null) throw new IllegalArgumentException("Missing <" + CONFIG_GRID + "> element");
+    Element grid = getFirstElementByTag(xmlDocument, CONFIG_GRID);
 
     String rowsStr = grid.getAttribute(CONFIG_ROWS);
     String colsStr = grid.getAttribute(CONFIG_COLUMNS);
@@ -97,8 +118,7 @@ public class ConfigLoader {
   }
 
   private int[][] getStates(Document xmlDocument, int rows, int cols) {
-    Element grid = getDocElement(xmlDocument, CONFIG_GRID);
-    if (grid == null) throw new IllegalArgumentException("Missing <grid> element");
+    Element grid = getFirstElementByTag(xmlDocument, CONFIG_GRID);
 
     Element statesElement = (Element) grid.getElementsByTagName(CONFIG_STATES).item(0);
     if (statesElement == null) {
