@@ -2,18 +2,29 @@ package cellsociety.Controller;
 
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
+import cellsociety.Model.SimulationFactory;
 import cellsociety.View.SimulationView;
+import cellsociety.config.ConfigLoader;
+import cellsociety.config.SimulationConfig;
+import java.io.File;
+import java.io.IOException;
 import javafx.application.Platform;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 public class SimulationController {
 
 
   private final SimulationView mySimView;
   private final SimulationDriver myDriver;
+  private final ConfigLoader myConfigLoader;
+  private SimulationFactory myFactory;
 
   public SimulationController(SimulationView simView){
     this.mySimView = simView;
     this.myDriver = new SimulationDriver();
+    this.myConfigLoader = new ConfigLoader();
+    this.myFactory = new SimulationFactory();
     wireButtons();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
@@ -25,7 +36,7 @@ public class SimulationController {
 
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.render(sim.getGrid());
+    mySimView.getMyGridView().render(sim.getGrid());
   }
 
   private void wireButtons(){
@@ -70,6 +81,15 @@ public class SimulationController {
   }
 
   private void wireUpload(){
-    mySimView.getMyUploadButton().setOnAction(e -> {System.out.println("Uploading File");});
+    mySimView.getMyUploadButton().setOnAction(e -> {
+      System.out.println("Uploading File");
+      File myFile = mySimView.showOpenConfigDialog();
+      try {
+        SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
+        myDriver.setSimulation(SimulationFactory.createSimulation(myConfig));
+      } catch (ParserConfigurationException | SAXException | IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    });
   }
 }

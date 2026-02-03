@@ -7,6 +7,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+import java.io.File;
 
 public class SimulationView {
 
@@ -102,6 +105,17 @@ public class SimulationView {
     StackPane center = new StackPane(card);
     center.setPadding(new Insets(18,0,18,0));
     myRoot.setCenter(center);
+  }
+
+  public File showOpenConfigDialog() {
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Open Simulation Configuration");
+    chooser.getExtensionFilters().add(
+        new FileChooser.ExtensionFilter("XML Files", "*.xml")
+    );
+
+    Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
+    return chooser.showOpenDialog(w);
   }
 
   public Parent getRoot(){
