@@ -13,8 +13,9 @@ public class ConwayGameOfLifeRule extends GameRule {
   public ConwayGameOfLifeRule(){
     super(new MooreNeighborStrategy());
   }
-  public String getStateColor(int state) {}
-
+  public ConwayGameOfLifeRule(Map<String, String> parameters) {
+    super(new MooreNeighborStrategy(), parameters);
+  }
   @Override
   public int getNextState(int currentState, List<ReadOnlyCell> neighbors) {
     int aliveNeighbors = countNeighborsWithState(neighbors, ALIVE);
