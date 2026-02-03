@@ -2,7 +2,9 @@ package cellsociety.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -35,6 +37,8 @@ public class ConfigLoader {
     int rows = gridSize[0];
     int cols = gridSize[1];
 
+    int[][] states = getStates(xmlDocument, rows, cols);
+
     return new SimulationConfig(
       "",
       title,
@@ -42,7 +46,7 @@ public class ConfigLoader {
       description,
       rows,
       cols,
-      new int[rows][cols],
+      states,
       new HashMap<>()
     );
   }
@@ -80,5 +84,66 @@ public class ConfigLoader {
     }
 
     return new int[]{rows, cols};
+  }
+
+  private int[][] getStates(Document xmlDocument, int rows, int cols) {
+    Element root = xmlDocument.getDocumentElement();
+    Element grid = (Element) root.getElementsByTagName("grid").item(0);
+    if (grid == null) throw new IllegalArgumentException("Missing <grid> element");
+
+    Element statesElement = (Element) grid.getElementsByTagName("states").item(0);
+    if (statesElement == null) {
+      throw new IllegalArgumentException("Missing <states> element");
+    }
+
+    String rawText = statesElement.getTextContent();
+    List<String> lines = nonEmptyLines(rawText);
+    return iterateThroughRows(lines, rows, cols);
+  }
+
+  private List<String> nonEmptyLines(String rawText) {
+    List<String> rows = new ArrayList<>();
+    for (String line : rawText.split("\\R")) {
+      line = line.trim();
+      if (!line.isEmpty()) rows.add(line);
+    }
+    return rows;
+  }
+
+  private int[][] iterateThroughRows(List<String> lines, int rows, int cols) {
+    if (lines.size() != rows) {
+      throw new IllegalArgumentException(
+          "Expected " + rows + " rows in <states>, but got " + lines.size());
+    }
+
+    int[][] states = new int[rows][cols];
+    for (int r = 0; r < rows; r++) {
+      states[r] = parseRow(lines.get(r), cols, r);
+    }
+    return states;
+  }
+
+  private int[] parseRow(String line, int cols, int currentRow) {
+    String[] tokens = line.split(",");
+    validateTokens(tokens, cols, currentRow);
+
+    int[] row = new int[cols];
+    for (int c = 0; c < cols; c++) {
+      try {
+        row[c] = Integer.parseInt(tokens[c].trim());
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException(
+            "Invalid state value at row " + currentRow + ", col " + c);
+      }
+    }
+    return row;
+  }
+
+  private void validateTokens(String[] tokens, int cols, int currentRow) {
+    if (tokens.length != cols) {
+      throw new IllegalArgumentException(
+          "Row " + currentRow + " has " + tokens.length +
+              " columns, expected " + cols);
+    }
   }
 }
