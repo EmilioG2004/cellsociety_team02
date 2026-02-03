@@ -31,7 +31,7 @@ public class ConfigLoader {
     String author = getChildText(metadata, CONFIG_AUTHOR);
     String description = getChildText(metadata, CONFIG_DESCRIPTION);
 
-    int[] gridSize = calculateGridSize(xmlDocument);
+    int[] gridSize = getGridSize(xmlDocument);
     int rows = gridSize[0];
     int cols = gridSize[1];
 
@@ -62,19 +62,23 @@ public class ConfigLoader {
     return child.getTextContent().trim();
   }
 
-  private int[] calculateGridSize(Document xmlDocument) {
-    try {
-      Element root = xmlDocument.getDocumentElement();
-      Element grid = (Element) root.getElementsByTagName("grid").item(0);
+  private int[] getGridSize(Document xmlDocument) {
+    Element root = xmlDocument.getDocumentElement();
+    Element grid = (Element) root.getElementsByTagName("grid").item(0);
+    if (grid == null) throw new IllegalArgumentException("Missing <grid> element");
 
-      int rows = Integer.parseInt(grid.getAttribute("rows"));
-      int cols = Integer.parseInt(grid.getAttribute("cols"));
+    String rowsStr = grid.getAttribute("rows");
+    String colsStr = grid.getAttribute("cols");
+    if (rowsStr.isBlank() || colsStr.isBlank()) {
+      throw new IllegalArgumentException("Missing grid rows/cols attributes");
+    }
 
-      return new int[]{rows, cols};
+    int rows = Integer.parseInt(rowsStr);
+    int cols = Integer.parseInt(colsStr);
+    if (rows <= 0 || cols <= 0) {
+      throw new IllegalArgumentException("Grid rows/cols must be positive");
     }
-    catch (Exception e) {
-      System.err.println("Invalid grid configuration");
-      return new int[]{0, 0};
-    }
+
+    return new int[]{rows, cols};
   }
 }
