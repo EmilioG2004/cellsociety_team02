@@ -58,7 +58,8 @@ public class GridPaneView implements GridView{
   public void render(ReadOnlyGrid grid, Map<String,String> stateColors){
     for (int r = 0; r < grid.getRows(); r++){
       for (int c = 0; c < grid.getCols(); c++){
-        String cellState = grid.getCellStateColor(r,c, new ConwayGameOfLifeRule());
+        int cellState = grid.getCellState(r,c);
+
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }
