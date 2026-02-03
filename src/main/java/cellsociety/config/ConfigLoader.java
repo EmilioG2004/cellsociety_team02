@@ -73,7 +73,14 @@ public class ConfigLoader {
   }
 
   private String getSimulationType(Document xmlDocument) {
-    Element simulation = getFirstElementByTag(xmlDocument, CONFIG_SIMULATION);
+    Element root = xmlDocument.getDocumentElement();
+
+    Element simulation;
+    if (root != null && root.getTagName().equals("simulation")) {
+      simulation = root;
+    } else {
+      simulation = getFirstElementByTag(xmlDocument, "simulation");
+    }
 
     String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR);
     if (!typeAttr.isBlank()) {
