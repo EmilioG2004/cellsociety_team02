@@ -1,5 +1,6 @@
 package cellsociety;
 
+import cellsociety.Controller.SimulationController;
 import cellsociety.View.SimulationView;
 import java.io.File;
 import java.io.IOException;
@@ -36,16 +37,8 @@ public class Main extends Application {
      */
     @Override
     public void start (Stage primaryStage) {
-        showMessage(AlertType.INFORMATION, String.format("Version: %s", getVersion()));
-        File dataFile = FILE_CHOOSER.showOpenDialog(primaryStage);
-        if (dataFile != null) {
-            int numBlocks = calculateNumBlocks(dataFile);
-            if (numBlocks != 0) {
-                showMessage(AlertType.INFORMATION, String.format("Number of Blocks = %d", numBlocks));
-            }
-        }
-
         SimulationView view = new SimulationView();
+        SimulationController controller = new SimulationController(view);
         Scene scene = new Scene(view.getRoot(), 1200, 750);
         primaryStage.setScene(scene);
         primaryStage.show();

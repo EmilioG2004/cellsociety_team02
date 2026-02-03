@@ -34,7 +34,6 @@ public class SimulationView {
 
   public SimulationView(){
     buildTop();
-    buildCenter();
     isRunning = false;
 
     myRoot.setPadding(new Insets(12));
@@ -88,6 +87,7 @@ public class SimulationView {
   }
 
   private void buildCenter(){
+    if (myGridView == null) return;
     if (centerPane == null) {
       centerPane = new StackPane();
       centerPane.setPadding(new Insets(18,0,18,0));
@@ -104,8 +104,8 @@ public class SimulationView {
       -fx-border-color: black;
   """);
 
-    card.getChildren().add(myGridView.getNode());
-
+    Node gridNode = myGridView.getNode();
+    card.getChildren().setAll(gridNode);
     centerPane.getChildren().setAll(card);
   }
 
