@@ -1,0 +1,20 @@
+<simulation type="GameOfLife">
+  <metadata>
+    <title>Test Glider</title>
+    <author>Ixa Sigler</author>
+    <description>A glider pattern that moves diagonally across the grid. This is a test config for ConfigLoader.</description>
+  </metadata>
+
+  <grid rows="5" cols="20">
+    <states>
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

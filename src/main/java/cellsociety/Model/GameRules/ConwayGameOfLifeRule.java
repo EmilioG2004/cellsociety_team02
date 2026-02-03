@@ -9,10 +9,11 @@ import java.util.Map;
 public class ConwayGameOfLifeRule extends GameRule {
   public static final int DEAD = 0;
   public static final int ALIVE = 1;
-
+  
   public ConwayGameOfLifeRule(){
     super(new MooreNeighborStrategy());
   }
+  public String getStateColor(int state) {
 
   @Override
   public int getNextState(int currentState, List<ReadOnlyCell> neighbors) {
@@ -27,10 +28,7 @@ public class ConwayGameOfLifeRule extends GameRule {
   }
 
   @Override
-  public Map<String, String> getStateColors() {
-    return Map.of(
-        "ALIVE", "#90EE90",
-        "DEAD", "#FFFFFF"
-    );
+  public Map<Integer, String> getStateColors() {
+    return Map.of(DEAD, "WHITE", ALIVE, "GREEN");
   }
 }
