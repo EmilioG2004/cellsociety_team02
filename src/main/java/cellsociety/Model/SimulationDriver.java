@@ -121,7 +121,9 @@ public class SimulationDriver {
       onStepCallback.run();
     }
   }
-
+    /**
+   * Schedules steps to occur at the current speed.
+   */
   private void scheduleNextStep() {
     if (!isRunning || simulation == null) {
       return;
