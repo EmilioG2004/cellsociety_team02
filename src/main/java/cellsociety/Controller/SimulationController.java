@@ -18,7 +18,7 @@ public class SimulationController {
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
-      mySimView.render(mySim.getGrid());
+      mySimView.getMyGridView().render(mySim.getGrid());
     })
     );
   }

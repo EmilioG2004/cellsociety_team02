@@ -1,5 +1,6 @@
 package cellsociety.View;
 
+import cellsociety.Model.ReadOnlyGrid;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
