@@ -13,7 +13,7 @@ public class ConwayGameOfLifeRule extends GameRule {
   public ConwayGameOfLifeRule(){
     super(new MooreNeighborStrategy());
   }
-  public String getStateColor(int state) {
+  public String getStateColor(int state) {}
 
   @Override
   public int getNextState(int currentState, List<ReadOnlyCell> neighbors) {
