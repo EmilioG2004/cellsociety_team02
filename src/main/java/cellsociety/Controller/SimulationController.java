@@ -18,7 +18,7 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final SimulationDriver myDriver;
   private final ConfigLoader myConfigLoader;
-  private SimulationFactory myFactory;
+  private final SimulationFactory myFactory;
 
   public SimulationController(SimulationView simView){
     this.mySimView = simView;
@@ -29,7 +29,7 @@ public class SimulationController {
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getGrid());
+      mySimView.getMyGridView().render(mySim.getGrid(), );
     })
     );
   }
