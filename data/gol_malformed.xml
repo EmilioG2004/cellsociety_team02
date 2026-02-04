@@ -1,0 +1,16 @@
+<simulation type="GameOfLife">
+  <metadata>
+    <title>Test Malformed</title>
+    <author>Ixa Sigler</author>
+    <description>A malformed grid. This is a test config for ConfigLoader.</description>
+  </metadata>
+
+  <grid rows="5" cols="5">
+    <states>
+      0,0,0,
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
