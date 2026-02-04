@@ -1,11 +1,13 @@
 package cellsociety.Model;
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit
+.jupiter.api.Test;
 
 /**
  * Test class for Cell
@@ -172,8 +174,8 @@ class CellTest {
     }
 
     @Override
-    public java.util.Map<String, String> getStateColors() {
-      return java.util.Map.of();
+    public java.util.Map<Integer, String> getStateColors() {
+      return java.util.Map.of(0, "WHITE", 1, "GREEN");
     }
   }
 
@@ -189,8 +191,8 @@ class CellTest {
     }
 
     @Override
-    public java.util.Map<String, String> getStateColors() {
-      return java.util.Map.of();
+    public java.util.Map<Integer, String> getStateColors() {
+      return java.util.Map.of(0, "WHITE", 1, "GREEN");
     }
   }
 }

@@ -17,7 +17,7 @@ public class SimulationView {
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
   private final Button myUploadButton = new Button("Upload XML Configuartion");
-
+  private final Button myStepButton = new Button("Step Simulation");
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
   private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
@@ -57,7 +57,7 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, mySpeedLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myStepButton, mySpeedLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Label configLabel = new Label("Configuration: ");
@@ -146,6 +146,10 @@ public class SimulationView {
 
   public Button getMySlowDownButton(){
     return mySlowDownButton;
+  }
+
+  public Button getMyStepButton(){
+    return myStepButton;
   }
 
   public Button getMySaveButton(){
