@@ -1,5 +1,5 @@
 package cellsociety.Model;
-
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
