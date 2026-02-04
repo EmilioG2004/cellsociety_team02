@@ -1,0 +1,35 @@
+<simulation type="GameOfLife">
+  <metadata>
+    <title>Test Blinker</title>
+    <author>Ixa Sigler</author>
+    <description>A blinker pattern that flashes at different spots on the grid. This is a test config for ConfigLoader.</description>
+  </metadata>
+
+  <grid rows="20" cols="5">
+    <states>
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,1,1,1,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,1,0,0
+      0,0,1,0,0
+      0,0,1,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
