@@ -37,8 +37,9 @@ public class SimulationController {
     myDriver.setSimulation(sim);
     mySimView.getMyGridView().render(sim.getGrid(), sim.getRule().getStateColors());
   }
-
+ 
   private void wireButtons(){
+    wireStep();
     wireStart();
     wirePause();
     wireSave();
@@ -46,7 +47,12 @@ public class SimulationController {
     wireSpeedUp();
     wireSlowDown();
   }
-
+  private void wireStep(){
+    mySimView.getMyStepButton().setOnAction(e -> {
+      System.out.println("Stepping");
+      myDriver.step();
+    });
+  }
   private void wireStart(){
     mySimView.getMyStartButton().setOnAction(e -> {
       System.out.println("Start pressed");
