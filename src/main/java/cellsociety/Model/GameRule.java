@@ -13,7 +13,7 @@ public abstract class GameRule {
   /** Defines which offsets from a cell's position count as neighbors (e.g., Moore, Von Neumann). */
   protected final NeighborStrategy neighborStrategy;
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
-  protected final Map<String, Double> parameters;
+  protected final Map<String, String> parameters;
 
   /**
    * Constructs a GameRule with the given neighbor strategy and no parameters.
@@ -30,7 +30,7 @@ public abstract class GameRule {
    * @param neighborStrategy strategy defining which cells are neighbors
    * @param parameters simulation-specific parameters (e.g., probCatch, threshold)
    */
-  public GameRule(NeighborStrategy neighborStrategy, Map<String, Double> parameters) {
+  public GameRule(NeighborStrategy neighborStrategy, Map<String, String> parameters) {
     this.neighborStrategy = neighborStrategy;
     this.parameters = parameters;
   }
@@ -58,7 +58,7 @@ public abstract class GameRule {
    *
    * @return map of state name to color string
    */
-  public abstract Map<String, String> getStateColors();
+  public abstract Map<Integer, String> getStateColors();
 
   /**
    * Counts how many neighbors have the specified state. Useful for rules like Game of Life
