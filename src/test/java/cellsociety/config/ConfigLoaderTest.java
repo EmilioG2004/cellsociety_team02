@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test;
 public class ConfigLoaderTest {
 
   private static final String GOL_GLIDER =
-      "src/main/resources/cellsociety/configs/gol_glider.xml";
+      "data/gol_glider.xml";
+
+  private static final String GOL_MALFORMED =
+      "data/gol_malformed.xml";
 
   @Test
   public void loadConfig_validGameOfLifeConfig_createsCorrectGrid() throws Exception {
@@ -49,6 +52,25 @@ public class ConfigLoaderTest {
     assertEquals(20, states[0].length);
 
     assertEquals(0, states[0][0]);
+  }
+
+  @Test
+  public void loadConfig_malformedGridSize_throwsException() {
+    File file = new File(GOL_MALFORMED);
+
+    ConfigLoader loader = new ConfigLoader();
+
+    Exception e = assertThrows(Exception.class, () -> loader.loadConfig(file));
+
+    // Optional: sanity check the error message is about dimensions/size
+    assertTrue(
+        e.getMessage() == null
+            || e.getMessage().toLowerCase().contains("row")
+            || e.getMessage().toLowerCase().contains("col")
+            || e.getMessage().toLowerCase().contains("dimension")
+            || e.getMessage().toLowerCase().contains("size"),
+        "Expected error message to mention grid size/dimensions, but was: " + e.getMessage()
+    );
   }
 
 }
