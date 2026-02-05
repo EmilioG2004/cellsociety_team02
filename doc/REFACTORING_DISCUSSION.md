@@ -46,7 +46,7 @@ Michael: My interpretation of the LSP is that classes should be replacable by th
     
 
 * Improved embodiment of principles
-
+    
 
 
 ### New Abstractions
