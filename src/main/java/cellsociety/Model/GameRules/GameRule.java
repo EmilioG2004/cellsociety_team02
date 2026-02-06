@@ -5,6 +5,8 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Abstract base class for cellular automaton transition rules. Each simulation type (e.g.,
@@ -45,8 +47,9 @@ public abstract class GameRule {
    * @param neighbors list of neighboring cells (read-only)
    * @return the state the cell should transition to in the next generation
    */
-  public abstract CellState getNextState(CellState currentState, List<ReadOnlyCell> neighbors);
 
+  // public abstract CellState getNextState(CellState currentState, List<ReadOnlyCell> neighbors);
+  public abstract CellState[][] getNextStates(CellState[][] currentStates);
   /**
    * Returns the neighbor strategy used by this rule. The grid calls this when building
    * the neighbor list for each cell during {@code updateAllCells}.
@@ -80,10 +83,21 @@ public abstract class GameRule {
    * @param targetState the state to count
    * @return number of neighbors in the target state
    */
-  protected int countNeighborsWithState(List<ReadOnlyCell> neighbors, CellState targetState) {
+  protected List<CellState> getNeighbors(CellState[][] currentStates, int row, int col) {
+    List<CellState> neighbors = new ArrayList<CellState>();
+    for (int[] offset : neighborStrategy.getNeighborOffsets()) {
+      int nr = row + offset[0];
+      int nc = col + offset[1];
+      if (nr >= 0 && nr < currentStates.length && nc >= 0 && nc < currentStates[0].length) {
+        neighbors.add(currentStates[nr][nc]);
+      }
+    }
+    return neighbors;
+  }
+  protected static int countNeighborsWithState(List<CellState> neighbors, CellState targetState) {
     int count = 0;
-    for (ReadOnlyCell cell : neighbors) {
-      if (cell.getState() == targetState) {
+    for (CellState cell : neighbors) {
+      if (cell == targetState) {
         count++;
       }
     }

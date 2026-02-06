@@ -1,7 +1,7 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
-
+import java.util.Collection;
 public interface ReadOnlyGrid {
 
   int getRows();
@@ -9,4 +9,6 @@ public interface ReadOnlyGrid {
   int getCols();
 
   CellState getCellState(int row, int col);
+
+  CellState[][] getCellStates();
 }

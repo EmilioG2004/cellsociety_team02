@@ -4,8 +4,9 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Collection;
 /**
  * Stores a rectangular arrangement of cells, applies neighbor logic using the strategy from
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
@@ -73,6 +74,15 @@ public class Grid implements ReadOnlyGrid {
     return cells[row][col].getState();
   }
 
+  public CellState[][] getCellStates() {
+    CellState[][] states = new CellState[rows][cols];
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        states[r][c] = cells[r][c].getState();
+      }
+    }
+    return states;
+  }
   /**
    * Returns the position of the cell.
    */
