@@ -1,35 +1,41 @@
 package cellsociety.Model.GameRules;
 
-import cellsociety.Model.GameRule;
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.ReadOnlyCell;
 import cellsociety.Model.Utils.MooreNeighborStrategy;
 import java.util.List;
 import java.util.Map;
 
 public class ConwayGameOfLifeRule extends GameRule {
-  public static final int DEAD = 0;
-  public static final int ALIVE = 1;
-  
-  public ConwayGameOfLifeRule(){
+
+  public ConwayGameOfLifeRule() {
     super(new MooreNeighborStrategy());
   }
+
   public ConwayGameOfLifeRule(Map<String, String> parameters) {
     super(new MooreNeighborStrategy(), parameters);
   }
-  @Override
-  public int getNextState(int currentState, List<ReadOnlyCell> neighbors) {
-    int aliveNeighbors = countNeighborsWithState(neighbors, ALIVE);
 
-    if (currentState == ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)){
-      return ALIVE;
-    } else if (currentState == DEAD && aliveNeighbors == 3){
-      return ALIVE;
+  @Override
+  public CellState getNextState(CellState currentState, List<ReadOnlyCell> neighbors) {
+    int aliveNeighbors = countNeighborsWithState(neighbors, GameOfLifeState.ALIVE);
+
+    if (currentState == GameOfLifeState.ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
+      return GameOfLifeState.ALIVE;
+    } else if (currentState == GameOfLifeState.DEAD && aliveNeighbors == 3) {
+      return GameOfLifeState.ALIVE;
     }
-    return DEAD;
+    return GameOfLifeState.DEAD;
   }
 
   @Override
-  public Map<Integer, String> getStateColors() {
-    return Map.of(DEAD, "WHITE", ALIVE, "GREEN");
+  public Map<CellState, String> getStateColors() {
+    return Map.of(GameOfLifeState.DEAD, "WHITE", GameOfLifeState.ALIVE, "GREEN");
+  }
+
+  @Override
+  public CellState fromInt(int value) {
+    return GameOfLifeState.fromInt(value);
   }
 }

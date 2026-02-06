@@ -1,5 +1,7 @@
-package cellsociety.Model;
+package cellsociety.Model.GameRules;
 
+import cellsociety.Model.ReadOnlyCell;
+import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.Map;
  * logic and neighbor semantics.
  */
 public abstract class GameRule {
+
   /** Defines which offsets from a cell's position count as neighbors (e.g., Moore, Von Neumann). */
   protected final NeighborStrategy neighborStrategy;
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
@@ -42,7 +45,7 @@ public abstract class GameRule {
    * @param neighbors list of neighboring cells (read-only)
    * @return the state the cell should transition to in the next generation
    */
-  public abstract int getNextState(int currentState, List<ReadOnlyCell> neighbors);
+  public abstract CellState getNextState(CellState currentState, List<ReadOnlyCell> neighbors);
 
   /**
    * Returns the neighbor strategy used by this rule. The grid calls this when building
@@ -53,12 +56,21 @@ public abstract class GameRule {
   public NeighborStrategy getNeighborStrategy() {
     return neighborStrategy;
   }
+
   /**
    * Returns a map from state display keys to CSS/hex colors for rendering the grid.
    *
-   * @return map of state name to color string
+   * @return map of state to color string
    */
-  public abstract Map<Integer, String> getStateColors();
+  public abstract Map<CellState, String> getStateColors();
+
+  /**
+   * Converts an integer value (from XML config) to the appropriate CellState enum.
+   *
+   * @param value the integer state value from the config
+   * @return the corresponding CellState
+   */
+  public abstract CellState fromInt(int value);
 
   /**
    * Counts how many neighbors have the specified state. Useful for rules like Game of Life
@@ -68,10 +80,10 @@ public abstract class GameRule {
    * @param targetState the state to count
    * @return number of neighbors in the target state
    */
-  protected int countNeighborsWithState(List<ReadOnlyCell> neighbors, int targetState) {
+  protected int countNeighborsWithState(List<ReadOnlyCell> neighbors, CellState targetState) {
     int count = 0;
     for (ReadOnlyCell cell : neighbors) {
-      if (cell.getState()==targetState) {
+      if (cell.getState() == targetState) {
         count++;
       }
     }
