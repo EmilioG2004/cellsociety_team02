@@ -1,5 +1,7 @@
 package cellsociety.Model;
 
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +11,14 @@ import java.util.List;
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
  * Does not store a NeighborStrategy; obtains it from GameRule during updates.
  */
-public class Grid implements ReadOnlyGrid{
+public class Grid implements ReadOnlyGrid {
+
   private final Cell[][] cells;
   private final int rows;
   private final int cols;
 
   /**
-   * Constructs a grid with the given dimensions. Call {@link #initializeGrid(int[][])} to populate.
+   * Constructs a grid with the given dimensions. Call {@link #setCellsState(CellState[][])} to populate.
    */
   public Grid(int rows, int cols) {
     this.rows = rows;
@@ -24,13 +27,12 @@ public class Grid implements ReadOnlyGrid{
   }
 
   /**
-   * Initializes the grid with cells from the given State. State values are integers
-   * (e.g., 0 = DEAD, 1 = ALIVE for Game of Life). Dimensions must match rows and cols.
+   * Initializes the grid with cells from the given state array. Dimensions must match rows and cols.
    *
-   * @param State 2D array of state values, row-major order
+   * @param state 2D array of CellState values, row-major order
    * @throws IllegalArgumentException if dimensions don't match
    */
-  public void setCellsState(int[][] state) {
+  public void setCellsState(CellState[][] state) {
     if (state.length != rows || (rows > 0 && state[0].length != cols)) {
       throw new IllegalArgumentException(
           "Initial state dimensions " + state.length + "x"
@@ -67,8 +69,22 @@ public class Grid implements ReadOnlyGrid{
    *
    * @throws IndexOutOfBoundsException if coordinates are out of bounds
    */
-  public int getCellState(int row, int col) {
+  public CellState getCellState(int row, int col) {
     return cells[row][col].getState();
+  }
+
+  /**
+   * Returns the position of the cell.
+   */
+  public int[] getCellPosition(ReadOnlyCell cell) {
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        if (cells[r][c].equals(cell)) {
+          return new int[]{r, c};
+        }
+      }
+    }
+    throw new IllegalArgumentException("Cell not found in grid");
   }
 
   /**

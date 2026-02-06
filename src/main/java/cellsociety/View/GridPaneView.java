@@ -1,6 +1,6 @@
 package cellsociety.View;
 
-import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
@@ -9,15 +9,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-public class GridPaneView implements GridView{
+public class GridPaneView implements GridView {
+
   private final GridPane myGrid = new GridPane();
   private final double myCellSize;
   private final Rectangle[][] myCells;
   private final int myRows;
   private final int myCols;
-  private final static int ALIVE = 1;
 
-  public GridPaneView(int rows, int cols, double cellSize){
+  public GridPaneView(int rows, int cols, double cellSize) {
     this.myCellSize = cellSize;
     this.myCols = cols;
     this.myRows = rows;
@@ -27,16 +27,16 @@ public class GridPaneView implements GridView{
   }
 
   @Override
-  public Node getNode(){
+  public Node getNode() {
     return myGrid;
   }
 
-  private void buildGrid(){
+  private void buildGrid() {
     myGrid.setGridLinesVisible(true);
 
-    for (int r = 0; r < myRows; r++){
-      for (int c = 0; c < myCols; c++){
-        Rectangle cell = new Rectangle(myCellSize,myCellSize);
+    for (int r = 0; r < myRows; r++) {
+      for (int c = 0; c < myCols; c++) {
+        Rectangle cell = new Rectangle(myCellSize, myCellSize);
         cell.setFill(Color.WHITE);
         cell.setStroke(Color.BLACK);
 
@@ -45,34 +45,23 @@ public class GridPaneView implements GridView{
       }
     }
   }
+
   @Override
-  public void clear(){
-    for (int r = 0; r < myRows; r++){
-      for (int c = 0; c < myCols; c++){
+  public void clear() {
+    for (int r = 0; r < myRows; r++) {
+      for (int c = 0; c < myCols; c++) {
         myCells[r][c].setFill(Color.WHITE);
       }
     }
   }
 
   @Override
-  public void render(ReadOnlyGrid grid, Map<Integer,String> stateColors){
-    for (int r = 0; r < grid.getRows(); r++){
-      for (int c = 0; c < grid.getCols(); c++){
-        int cellState = grid.getCellState(r,c);
+  public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+    for (int r = 0; r < grid.getRows(); r++) {
+      for (int c = 0; c < grid.getCols(); c++) {
+        CellState cellState = grid.getCellState(r, c);
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }
   }
-
-  private Color getStateColor(int myState){
-    if (myState == 1){
-      return Color.LIGHTGREEN;
-    }
-    else {
-      return Color.WHITE;
-    }
-  }
-
-
-
 }
