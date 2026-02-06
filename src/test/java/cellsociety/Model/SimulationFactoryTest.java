@@ -1,6 +1,7 @@
 package cellsociety.Model;
 
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.GameRules.GameRule;
 import cellsociety.config.SimulationConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

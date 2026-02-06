@@ -1,6 +1,10 @@
 package cellsociety.Model;
 
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.CellState.CellState;
+import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
+import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -73,7 +77,7 @@ class SimulationDriverTest {
       {0, 1, 0},
       {0, 1, 0}
     };
-    grid.setCellsState(blinker);
+    grid.setCellsState(new CellState[][] {{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
 
     driver.step();
@@ -104,10 +108,10 @@ class SimulationDriverTest {
   // M - Many: multiple operations
   @Test
   void step_multipleTimes_advancesMultipleGenerations() {
-    int[][] blinker = {
-      {0, 1, 0},
-      {0, 1, 0},
-      {0, 1, 0}
+    CellState[][] blinker = {
+      {DEAD, ALIVE, DEAD},
+      {DEAD, ALIVE, DEAD},
+      {DEAD, ALIVE, DEAD}
     };
     grid.setCellsState(blinker);
     driver.setSimulation(simulation);
@@ -151,8 +155,7 @@ class SimulationDriverTest {
 
   @Test
   void step_whilePaused_stillWorks() {
-    int[][] initial = {{0, 1, 0}, {0, 1, 0}, {0, 1, 0}};
-    grid.setCellsState(initial);
+    grid.setCellsState(new CellState[][] {{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
     driver.start();
     driver.pause();
@@ -199,7 +202,7 @@ class SimulationDriverTest {
   // I - Interfaces: integration with Simulation
   @Test
   void periodicStepping_invokesCallbackMultipleTimes() throws InterruptedException {
-    grid.setCellsState(new int[][] {{0, 1, 0}, {0, 1, 0}, {0, 1, 0}});
+    grid.setCellsState(new CellState[][] {{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
     driver.setSpeed(50); // 50 steps per second
     AtomicInteger callCount = new AtomicInteger(0);
@@ -215,7 +218,7 @@ class SimulationDriverTest {
   // S - Simple: typical flows
   @Test
   void fullFlow_setSimulation_step_pause() {
-    grid.setCellsState(new int[][] {{0, 1, 0}, {0, 1, 0}, {0, 1, 0}});
+    grid.setCellsState(new CellState[][] {{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
 
     driver.step();

@@ -1,5 +1,11 @@
 package cellsociety.Model;
+
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+
+import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
+import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -7,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GridTest {
+
   private Grid grid;
   private ConwayGameOfLifeRule rules;
 
@@ -24,29 +31,29 @@ class GridTest {
 
   @Test
   void initializeGrid_populatesCells() {
-    int[][] initial = {
-      {0, 1, 0},
-      {0, 1, 0},
-      {0, 1, 0}
+    CellState[][] initial = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
     };
     grid.setCellsState(initial);
-    assertEquals(0, grid.getCellState(0, 0));
-    assertEquals(1, grid.getCellState(0, 1));
-    assertEquals(1, grid.getCellState(1, 1));
+    assertEquals(DEAD, grid.getCellState(0, 0));
+    assertEquals(ALIVE, grid.getCellState(0, 1));
+    assertEquals(ALIVE, grid.getCellState(1, 1));
   }
 
   @Test
   void initializeGrid_wrongDimensions_throws() {
-    int[][] wrongSize = {{0, 1}, {1, 0}};
+    CellState[][] wrongSize = {{DEAD, ALIVE}, {ALIVE, DEAD}};
     assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(wrongSize));
   }
 
   @Test
   void getCellNeighbors_centerCell_returnsEightNeighbors() {
-    int[][] initial = {
-      {0, 0, 0},
-      {0, 0, 0},
-      {0, 0, 0}
+    CellState[][] initial = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
     };
     grid.setCellsState(initial);
     var neighbors = grid.getCellNeighbors(1, 1, rules);
@@ -55,10 +62,10 @@ class GridTest {
 
   @Test
   void getCellNeighbors_cornerCell_returnsThreeNeighbors() {
-    int[][] initial = {
-      {0, 0, 0},
-      {0, 0, 0},
-      {0, 0, 0}
+    CellState[][] initial = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
     };
     grid.setCellsState(initial);
     var neighbors = grid.getCellNeighbors(0, 0, rules);
@@ -68,30 +75,30 @@ class GridTest {
   @Test
   void updateAllCellsAndCommit_advancesGeneration() {
     // Blinker: vertical bar
-    int[][] initial = {
-      {0, 1, 0},
-      {0, 1, 0},
-      {0, 1, 0}
+    CellState[][] initial = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
     };
     grid.setCellsState(initial);
     grid.updateAllCells(rules);
     grid.commitAllStates();
     // After one step, blinker becomes horizontal
-    assertEquals(0, grid.getCellState(0, 0));
-    assertEquals(1, grid.getCellState(1, 0));
-    assertEquals(1, grid.getCellState(1, 1));
-    assertEquals(1, grid.getCellState(1, 2));
+    assertEquals(DEAD, grid.getCellState(0, 0));
+    assertEquals(ALIVE, grid.getCellState(1, 0));
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+    assertEquals(ALIVE, grid.getCellState(1, 2));
   }
 
   @Test
   void gridImplementsReadOnlyGrid() {
-    int[][] initial = {{0, 1}, {1, 0}};
+    CellState[][] initial = {{DEAD, ALIVE}, {ALIVE, DEAD}};
     grid = new Grid(2, 2);
     grid.setCellsState(initial);
     ReadOnlyGrid readOnly = grid;
     assertEquals(2, readOnly.getRows());
     assertEquals(2, readOnly.getCols());
-    assertEquals(0, readOnly.getCellState(0, 0));
-    assertEquals(1, readOnly.getCellState(0, 1));
+    assertEquals(DEAD, readOnly.getCellState(0, 0));
+    assertEquals(ALIVE, readOnly.getCellState(0, 1));
   }
 }
