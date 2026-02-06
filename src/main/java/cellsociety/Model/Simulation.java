@@ -1,5 +1,7 @@
 package cellsociety.Model;
 
+import cellsociety.Model.GameRules.GameRule;
+
 public class Simulation {
     private Grid myGrid;
     private GameRule myRule;
