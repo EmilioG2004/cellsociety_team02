@@ -1,6 +1,8 @@
 package cellsociety.Model;
 
+import cellsociety.Model.CellState.CellState;
+
 public interface ReadOnlyCell {
-    public int getState();
-} 
-    
+
+  CellState getState();
+}

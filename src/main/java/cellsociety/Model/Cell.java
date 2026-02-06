@@ -1,25 +1,30 @@
 package cellsociety.Model;
 
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GameRules.GameRule;
+
 import java.util.List;
 
 public class Cell implements ReadOnlyCell {
-  private int currentState;
-  private int nextState = -1;
 
-  public Cell(int state) {
+  private CellState currentState;
+  private CellState nextState = null;
+
+  public Cell(CellState state) {
     this.currentState = state;
   }
 
-  public int getState() {
+  public CellState getState() {
     return this.currentState;
   }
-  public void setState(int state) {
+
+  public void setState(CellState state) {
     this.currentState = state;
   }
 
   public void updateState() {
     this.currentState = nextState;
-    this.nextState = -1;
+    this.nextState = null;
   }
 
   public void updateNextState(GameRule rules, List<ReadOnlyCell> neighbors) {
