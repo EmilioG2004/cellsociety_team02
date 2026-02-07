@@ -28,14 +28,14 @@ public class SimulationController {
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getGrid(), mySim.getRule().getStateColors());
+      mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
     })
     );
   }
 
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getGrid(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().render(sim.getGridHandler(), sim.getRule().getStateColors());
   }
  
   private void wireButtons(){
@@ -93,8 +93,8 @@ public class SimulationController {
         SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
         Simulation mySim = SimulationFactory.createSimulation(myConfig);
         myDriver.setSimulation(mySim);
-        mySimView.setGrid(mySim.getGrid().getRows(), mySim.getGrid().getCols(), cellSize);
-        mySimView.getMyGridView().render(mySim.getGrid(), mySim.getRule().getStateColors());
+        mySimView.setGrid(mySim.getGridHandler().getRows(), mySim.getGridHandler().getCols(), cellSize);
+        mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
       } catch (ParserConfigurationException | SAXException | IOException ex) {
         throw new RuntimeException(ex);
       }
