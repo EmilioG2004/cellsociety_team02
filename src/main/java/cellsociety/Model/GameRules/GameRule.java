@@ -1,6 +1,5 @@
 package cellsociety.Model.GameRules;
 
-import cellsociety.Model.ReadOnlyCell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.List;
@@ -18,7 +17,7 @@ public abstract class GameRule {
   /** Defines which offsets from a cell's position count as neighbors (e.g., Moore, Von Neumann). */
   protected final NeighborStrategy neighborStrategy;
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
-  protected final Map<String, String> parameters;
+  protected Map<String, String> parameters;
 
   /**
    * Constructs a GameRule with the given neighbor strategy and no parameters.
@@ -59,7 +58,12 @@ public abstract class GameRule {
   public NeighborStrategy getNeighborStrategy() {
     return neighborStrategy;
   }
-
+  public void setParameters(Map<String, String> parameters) {
+    this.parameters = parameters;
+  }
+  public Map<String, String> getParameters() {
+    return parameters;
+  }
   /**
    * Returns a map from state display keys to CSS/hex colors for rendering the grid.
    *
