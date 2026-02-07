@@ -5,12 +5,11 @@ import cellsociety.Model.GameRules.GameRule;
 public class Simulation {
     private Grid myGrid;
     private GameRule myRule;
-    //private SimulationConfig myConfig;
-
+    private GridHandler myGridHandler;
     public Simulation(Grid grid, GameRule rule) {
+        this.myGridHandler = new GridHandler(grid);
         this.myGrid = grid;
         this.myRule = rule;
-        //this.myConfig = config;
     }
     public void step() {
         CellState[][] currentStates = myGrid.getCellStates();
@@ -20,7 +19,7 @@ public class Simulation {
     public GameRule getRule() {
         return myRule;
     }
-    public ReadOnlyGrid getGrid() {
-        return myGrid;
+    public GridHandler getGridHandler() {
+        return myGridHandler;
     }
 }

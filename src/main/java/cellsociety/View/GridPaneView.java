@@ -1,7 +1,7 @@
 package cellsociety.View;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.ReadOnlyGrid;
+import cellsociety.Model.GridHandler;
 import java.util.Map;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
@@ -56,10 +56,10 @@ public class GridPaneView implements GridView {
   }
 
   @Override
-  public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
-    for (int r = 0; r < grid.getRows(); r++) {
-      for (int c = 0; c < grid.getCols(); c++) {
-        CellState cellState = grid.getCellState(r, c);
+  public void render(GridHandler myGridHandler, Map<CellState, String> stateColors) {
+    for (int r = 0; r < myGridHandler.getRows(); r++) {
+      for (int c = 0; c < myGridHandler.getCols(); c++) {
+        CellState cellState = myGridHandler.getCellState(r, c);
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }
