@@ -177,14 +177,11 @@ public class SimulationController {
                 SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
                 setInitialConfig(myConfig);
                 Simulation mySim = SimulationFactory.createSimulation(myConfig);
-                myDriver.setSimulation(mySim);
                 mySimView.setGrid(
                     mySim.getGrid().getRows(),
                     mySim.getGrid().getCols(),
                     cellSize);
-                mySimView
-                    .getMyGridView()
-                    .render(mySim.getGrid(), mySim.getRule().getStateColors());
+                setSimulation(mySim);
               } catch (ParserConfigurationException | SAXException | IOException ex) {
                 throw new RuntimeException(ex);
               }
@@ -193,6 +190,17 @@ public class SimulationController {
 
   public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
 
+
+  /**
+   * Wires the reset button to allow the simulation to be reset to its original state.
+   *
+   * Purpose:
+   * Allows users to reset the current simulation to its original state while maintaining runtime
+   * settings like speed.
+   *
+   * Assumptions:
+   * - The initial config is not null and has a value
+   */
   public void wireReset(){
     mySimView.getMyResetButton()
         .setOnAction(e -> {
