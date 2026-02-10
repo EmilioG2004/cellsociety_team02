@@ -46,8 +46,6 @@ import javafx.stage.Window;
  * SimulationController controller = new SimulationController(view);
  *
  * @author Emilio Garcia
- * @author Michael Lei
- * @author Ixa Sigler
  */
 public class SimulationView {
 
