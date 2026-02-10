@@ -1,6 +1,5 @@
 package cellsociety.View;
 
-import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
@@ -15,7 +14,6 @@ public class GridPaneView implements GridView{
   private final Rectangle[][] myCells;
   private final int myRows;
   private final int myCols;
-  private final static int ALIVE = 1;
 
   public GridPaneView(int rows, int cols, double cellSize){
     this.myCellSize = cellSize;
@@ -63,16 +61,4 @@ public class GridPaneView implements GridView{
       }
     }
   }
-
-  private Color getStateColor(int myState){
-    if (myState == 1){
-      return Color.LIGHTGREEN;
-    }
-    else {
-      return Color.WHITE;
-    }
-  }
-
-
-
 }
