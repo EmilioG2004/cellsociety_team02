@@ -17,4 +17,9 @@ final class ConfigXmlConstants {
   static final String CONFIG_ROWS = "rows";
   static final String CONFIG_COLUMNS = "cols";
   static final String CONFIG_STATES = "states";
+
+  static final String CONFIG_PARAMETERS = "parameters";
+  static final String CONFIG_PARAM = "param";
+  static final String CONFIG_PARAM_NAME_ATTR = "name";
+  static final String CONFIG_PARAM_VALUE_ATTR = "value";
 }

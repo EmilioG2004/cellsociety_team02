@@ -34,6 +34,8 @@ public class ConfigLoader {
 
     int[][] states = getStates(xmlDocument, rows, cols);
 
+    HashMap<String, String> parameters = getParameters(xmlDocument);
+
     return new SimulationConfig(
       simulationType,
       title,
@@ -42,7 +44,7 @@ public class ConfigLoader {
       rows,
       cols,
       states,
-      new HashMap<>()
+      parameters
     );
   }
 
@@ -165,4 +167,36 @@ public class ConfigLoader {
               " columns, expected " + cols);
     }
   }
+
+  private HashMap<String, String> getParameters(Document xmlDocument) {
+    HashMap<String, String> params = new HashMap<>();
+
+    Element root = xmlDocument.getDocumentElement();
+    if (root == null) return params;
+
+    Element parametersElement =
+        (Element) root.getElementsByTagName(CONFIG_PARAMETERS).item(0);
+    if (parametersElement == null) return params;
+
+    var paramNodes = parametersElement.getElementsByTagName(CONFIG_PARAM);
+    for (int i = 0; i < paramNodes.getLength(); i++) {
+      Element paramElement = (Element) paramNodes.item(i);
+
+      String name = paramElement.getAttribute(CONFIG_PARAM_NAME_ATTR).trim();
+      String value = paramElement.getAttribute(CONFIG_PARAM_VALUE_ATTR).trim();
+
+      if (name.isEmpty()) {
+        throw new IllegalArgumentException("<param> missing 'name' attribute");
+      }
+      if (value.isEmpty()) {
+        throw new IllegalArgumentException(
+            "Parameter '" + name + "' missing 'value' attribute");
+      }
+
+      params.put(name, value);
+    }
+
+    return params;
+  }
+
 }
