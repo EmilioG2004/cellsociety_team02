@@ -1,16 +1,54 @@
 package cellsociety.View;
 
+import java.io.File;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import java.io.File;
 
+/**
+ * Builds and exposes the main JavaFX UI layout for the Cell Society application.
+ *
+ * Purpose:
+ * This class creates the visual structure of the application (title, control buttons,
+ * configuration upload button, and a central region for displaying a grid). It also
+ * provides accessors for UI controls so that a controller can attach event handlers
+ * without the view needing to know simulation logic.
+ *
+ * Assumptions:
+ * - This class is used within a JavaFX Application and will be attached to a Scene.
+ * - A GridView will be provided through setGrid before the simulation is expected to render.
+ * - The UI is primarily controlled externally (e.g., by SimulationController) through the
+ *   provided getters for buttons and the grid view.
+ *
+ * Dependencies:
+ * - JavaFX layout and control classes for building the UI.
+ * - FileChooser and Window for selecting configuration files.
+ * - GridView and GridPaneView for displaying the simulation grid.
+ *
+ * Example usage:
+ * SimulationView view = new SimulationView();
+ * Scene scene = new Scene(view.getRoot(), 1200, 750);
+ * primaryStage.setScene(scene);
+ * primaryStage.show();
+ *
+ * SimulationController controller = new SimulationController(view);
+ *
+ * @author Emilio Garcia
+ * @author Michael Lei
+ * @author Ixa Sigler
+ */
 public class SimulationView {
 
   private final BorderPane myRoot = new BorderPane();
@@ -20,10 +58,11 @@ public class SimulationView {
 
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
-  private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
+  private final Button mySpeedUpButton = new Button("Speed Up Simulation");
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
+
   private StackPane centerPane;
 
   private final double myCellSize = 20.0;
@@ -32,7 +71,18 @@ public class SimulationView {
 
   private boolean isRunning;
 
-  public SimulationView(){
+  /**
+   * Constructs the main application view and builds the top UI components.
+   *
+   * Purpose:
+   * Initializes the layout container and creates the title/control regions so the view
+   * is ready to be placed into a Scene.
+   *
+   * Assumptions:
+   * - This view will eventually be attached to a Scene before operations that require a Window
+   *   (such as opening a FileChooser).
+   */
+  public SimulationView() {
     buildTop();
     isRunning = false;
 
@@ -40,15 +90,25 @@ public class SimulationView {
     myRoot.setStyle("-fx-background-color: #f6f7fb;");
   }
 
-  private void buildTop(){
+  /**
+   * Builds the top section of the UI: title, upload row, and control bar.
+   *
+   * Purpose:
+   * Creates and arranges the UI elements that remain visible regardless of which simulation
+   * is currently loaded.
+   *
+   * Assumptions:
+   * - Buttons created as fields are available for layout and later wiring by a controller.
+   */
+  private void buildTop() {
     myTitle.setFont(Font.font(28));
-    VBox.setMargin(myTitle, new Insets(8,0,6,0));
+    VBox.setMargin(myTitle, new Insets(8, 0, 6, 0));
     myTitle.setMaxWidth(Double.MAX_VALUE);
     myTitle.setAlignment(Pos.CENTER);
 
     HBox myUploadRow = new HBox(myUploadButton);
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
-    myUploadRow.setPadding(new Insets(6,0,10,0));
+    myUploadRow.setPadding(new Insets(6, 0, 10, 0));
 
     HBox myControlBar = buildControlBar();
     VBox myTopBox = new VBox(myTitle, myUploadRow, myControlBar);
@@ -56,8 +116,28 @@ public class SimulationView {
     myRoot.setTop(myTopBox);
   }
 
-  private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, mySpeedLabel);
+  /**
+   * Builds the control bar containing simulation controls and status labels.
+   *
+   * Purpose:
+   * Groups simulation action buttons into a single consistent layout region that a controller
+   * can wire to simulation behavior.
+   *
+   * Assumptions:
+   * - Visual styling is applied via inline CSS strings and is expected to be supported by JavaFX.
+   *
+   * @return an HBox containing the simulation control UI elements
+   */
+  private HBox buildControlBar() {
+    HBox leftBox =
+        new HBox(
+            12,
+            myStartButton,
+            myPauseButton,
+            mySpeedUpButton,
+            mySlowDownButton,
+            mySaveButton,
+            mySpeedLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Label configLabel = new Label("Configuration: ");
@@ -71,35 +151,48 @@ public class SimulationView {
     bar.setPadding(new Insets(14));
     bar.setMinHeight(64);
 
-    bar.setStyle("""
+    bar.setStyle(
+        """
             -fx-background-color: white;
             -fx-border-color: black;
         """);
 
-    myStartButton.setStyle("""
+    myStartButton.setStyle(
+        """
             -fx-background-color: black;
             -fx-text-fill: white;
         """);
 
-
-
     return bar;
   }
 
-  private void buildCenter(){
+  /**
+   * Builds or refreshes the center section of the UI that displays the grid view.
+   *
+   * Purpose:
+   * Places the current GridView's Node into a styled "card" container so that
+   * the grid is visually centered and consistently framed within the application.
+   *
+   * Assumptions:
+   * - myGridView is non-null when this method is invoked.
+   * - The GridView's node is safe to insert into the JavaFX scene graph.
+   */
+  private void buildCenter() {
     if (myGridView == null) return;
+
     if (centerPane == null) {
       centerPane = new StackPane();
-      centerPane.setPadding(new Insets(18,0,18,0));
+      centerPane.setPadding(new Insets(18, 0, 18, 0));
       myRoot.setCenter(centerPane);
     }
 
     StackPane card = new StackPane();
     card.setPadding(new Insets(18));
-    card.setPrefSize(760,520);
+    card.setPrefSize(760, 520);
     card.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-    card.setStyle("""
+    card.setStyle(
+        """
       -fx-background-color: white;
       -fx-border-color: black;
   """);
@@ -109,52 +202,137 @@ public class SimulationView {
     centerPane.getChildren().setAll(card);
   }
 
+  /**
+   * Opens a file chooser dialog configured to select simulation configuration files.
+   *
+   * Purpose:
+   * Provides a view-layer method for selecting a configuration file without requiring the
+   * controller to construct its own JavaFX FileChooser.
+   *
+   * Assumptions:
+   * - If this view is not attached to a Scene/Window, the dialog may not have an owner window.
+   *
+   * @return the selected configuration file, or null if the user cancels the dialog
+   */
   public File showOpenConfigDialog() {
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Open Simulation Configuration");
-    chooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("XML Files", "*.xml")
-    );
+    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML Files", "*.xml"));
 
     Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
     return chooser.showOpenDialog(w);
   }
 
-  public Parent getRoot(){
+  /**
+   * Returns the root node for this view.
+   *
+   * Purpose:
+   * Allows application code to place this view into a Scene without exposing the internal layout.
+   *
+   * @return the root Parent node of this view
+   */
+  public Parent getRoot() {
     return myRoot;
   }
 
+  /**
+   * Returns whether this view currently considers the simulation to be running.
+   *
+   * Purpose:
+   * Provides a simple state query for UI logic that may depend on whether the simulation is
+   * currently playing.
+   *
+   * Assumptions:
+   * - This flag reflects view-side state and may be managed externally by a controller.
+   *
+   * @return true if the view believes the simulation is running, false otherwise
+   */
   public boolean isRunning() {
     return isRunning;
   }
 
-  public Button getMyUploadButton(){
+  /**
+   * Provides access to the Upload button so a controller can attach behavior.
+   *
+   * @return the button used to open a configuration file
+   */
+  public Button getMyUploadButton() {
     return myUploadButton;
   }
 
-  public Button getMyStartButton(){
+  /**
+   * Provides access to the Start button so a controller can attach behavior.
+   *
+   * @return the button used to start the simulation
+   */
+  public Button getMyStartButton() {
     return myStartButton;
   }
 
-  public Button getMyPauseButton(){
+  /**
+   * Provides access to the Pause button so a controller can attach behavior.
+   *
+   * @return the button used to pause the simulation
+   */
+  public Button getMyPauseButton() {
     return myPauseButton;
   }
 
-  public Button getMySpeedUpButton(){
+  /**
+   * Provides access to the Speed Up button so a controller can attach behavior.
+   *
+   * @return the button used to increase simulation speed
+   */
+  public Button getMySpeedUpButton() {
     return mySpeedUpButton;
   }
 
-  public Button getMySlowDownButton(){
+  /**
+   * Provides access to the Slow Down button so a controller can attach behavior.
+   *
+   * @return the button used to decrease simulation speed
+   */
+  public Button getMySlowDownButton() {
     return mySlowDownButton;
   }
 
-  public Button getMySaveButton(){
+  /**
+   * Provides access to the Save button so a controller can attach behavior.
+   *
+   * @return the button used to save simulation state
+   */
+  public Button getMySaveButton() {
     return mySaveButton;
   }
 
-  public GridView getMyGridView() { return myGridView; }
+  /**
+   * Returns the current grid view used to render the simulation.
+   *
+   * Purpose:
+   * Allows the controller to trigger rendering without needing to know how the grid is displayed.
+   *
+   * @return the current GridView, or null if no grid has been set
+   */
+  public GridView getMyGridView() {
+    return myGridView;
+  }
 
-  public void setGrid(int rows, int cols, double cellSize){
+  /**
+   * Creates and installs a new GridView with the given dimensions and cell size.
+   *
+   * Purpose:
+   * Replaces the current grid display with one sized to the current simulation, then updates the
+   * center UI region to show it.
+   *
+   * Assumptions:
+   * - rows and cols describe the simulation dimensions that will be rendered.
+   * - cellSize is a positive pixel value for each cell.
+   *
+   * @param rows number of rows in the grid
+   * @param cols number of columns in the grid
+   * @param cellSize size (in pixels) of each cell’s width and height
+   */
+  public void setGrid(int rows, int cols, double cellSize) {
     this.myGridView = new GridPaneView(rows, cols, cellSize);
     buildCenter();
   }
