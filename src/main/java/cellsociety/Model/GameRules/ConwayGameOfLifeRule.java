@@ -1,7 +1,7 @@
 package cellsociety.Model.GameRules;
 
-import cellsociety.Model.GameRule;
-import cellsociety.Model.ReadOnlyCell;
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.Utils.MooreNeighborStrategy;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,6 @@ import java.util.Map;
  *
  * Dependencies:
  * - GameRule, which provides shared rule functionality and helper methods.
- * - ReadOnlyCell for accessing neighbor cell states without allowing mutation.
  * - MooreNeighborStrategy to define the neighborhood used by this simulation.
  *
  * Example usage:
@@ -89,20 +88,31 @@ public class ConwayGameOfLifeRule extends GameRule {
    * - currentState is either DEAD or ALIVE.
    * - neighbors contains only valid ReadOnlyCell objects.
    *
-   * @param currentState the cell’s current state
-   * @param neighbors read-only list of neighboring cells
+   * @param currentStates the cell’s current state
    * @return the computed next state for the cell
    */
   @Override
-  public int getNextState(int currentState, List<ReadOnlyCell> neighbors) {
-    int aliveNeighbors = countNeighborsWithState(neighbors, ALIVE);
-
-    if (currentState == ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
-      return ALIVE;
-    } else if (currentState == DEAD && aliveNeighbors == 3) {
-      return ALIVE;
+  public CellState[][] getNextStates(CellState[][] currentStates) {
+    CellState[][] nextStates = new CellState[currentStates.length][currentStates[0].length];
+    for (int r = 0; r < currentStates.length; r++) {
+      for (int c = 0; c < currentStates[0].length; c++) {
+        CellState currentState = currentStates[r][c];
+        List<CellState> neighbors = getNeighbors(currentStates, r, c);
+        int aliveNeighbors = countNeighborsWithState(neighbors, GameOfLifeState.ALIVE);
+        if (currentState == GameOfLifeState.ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
+          nextStates[r][c] = GameOfLifeState.ALIVE;
+        } else if (currentState == GameOfLifeState.DEAD && aliveNeighbors == 3) {
+          nextStates[r][c] = GameOfLifeState.ALIVE;
+        } else {
+          nextStates[r][c] = GameOfLifeState.DEAD;
+          }
+          }
+      }
+    return nextStates;
     }
-    return DEAD;
+
+  public Map<CellState, String> getStateColors() {
+    return Map.of(GameOfLifeState.DEAD, GameOfLifeState.DEAD.getColor(), GameOfLifeState.ALIVE, GameOfLifeState.ALIVE.getColor());
   }
 
   /**
@@ -118,7 +128,7 @@ public class ConwayGameOfLifeRule extends GameRule {
    * @return a map from state values to color names
    */
   @Override
-  public Map<Integer, String> getStateColors() {
-    return Map.of(DEAD, "WHITE", ALIVE, "GREEN");
+  public CellState fromInt(int value) {
+    return GameOfLifeState.fromInt(value);
   }
 }

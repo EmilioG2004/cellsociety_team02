@@ -76,10 +76,10 @@ public class ConfigLoader {
     Element root = xmlDocument.getDocumentElement();
 
     Element simulation;
-    if (root != null && root.getTagName().equals("simulation")) {
+    if (root != null && root.getTagName().equals(CONFIG_SIMULATION)) {
       simulation = root;
     } else {
-      simulation = getFirstElementByTag(xmlDocument, "simulation");
+      simulation = getFirstElementByTag(xmlDocument, CONFIG_SIMULATION);
     }
 
     String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR);

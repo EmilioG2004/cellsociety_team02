@@ -53,7 +53,7 @@ public class SimulationView {
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
   private final Button myUploadButton = new Button("Upload XML Configuartion");
-
+  private final Button myStepButton = new Button("Step Simulation");
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
   private final Button mySpeedUpButton = new Button("Speed Up Simulation");
@@ -137,7 +137,9 @@ public class SimulationView {
             mySlowDownButton,
             mySaveButton,
             myResetButton,
+            myStepButton,
             mySpeedLabel);
+
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Label configLabel = new Label("Configuration: ");
@@ -301,9 +303,14 @@ public class SimulationView {
    *
    * @return the button used to save simulation state
    */
-  public Button getMySaveButton() {
+  public Button getMySaveButton(){
     return mySaveButton;
   }
+
+  public Button getMyStepButton(){
+    return myStepButton;
+  }
+
 
   /**
    * Returns the current grid view used to render the simulation.

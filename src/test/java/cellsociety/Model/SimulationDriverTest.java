@@ -1,5 +1,11 @@
 package cellsociety.Model;
 
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.CellState.CellState;
+
+import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
+import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,6 +21,7 @@ import org.junit.jupiter.api.Test;
  * Test class for SimulationDriver
  */
 class SimulationDriverTest {
+
   private SimulationDriver driver;
   private Simulation simulation;
   private Grid grid;
@@ -30,7 +37,9 @@ class SimulationDriverTest {
 
   @AfterEach
   void tearDown() {
-    driver.pause();
+    if (driver.isRunning()) {
+      driver.pause();
+    }
   }
 
   // Z - Zero: no simulation, initial state
@@ -57,6 +66,11 @@ class SimulationDriverTest {
     assertEquals(1.0, driver.getStepsPerSecond());
   }
 
+  @Test
+  void isRunning_initiallyFalse() {
+    assertFalse(driver.isRunning());
+  }
+
   // O - One: single operation
   @Test
   void setSimulation_thenGetSimulation_returnsSame() {
@@ -67,23 +81,26 @@ class SimulationDriverTest {
 
   @Test
   void step_withSimulation_advancesOneGeneration() {
-    int[][] blinker = {
-      {0, 1, 0},
-      {0, 1, 0},
-      {0, 1, 0}
+    CellState[][] blinker = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
     };
     grid.setCellsState(blinker);
     driver.setSimulation(simulation);
 
     driver.step();
 
-    assertEquals(1, grid.getCellState(1, 0));
-    assertEquals(1, grid.getCellState(1, 1));
-    assertEquals(1, grid.getCellState(1, 2));
+    CellState[][] result = grid.getCellStates();
+    // Blinker should become horizontal
+    assertEquals(ALIVE, result[1][0]);
+    assertEquals(ALIVE, result[1][1]);
+    assertEquals(ALIVE, result[1][2]);
   }
 
   @Test
   void step_invokesCallback() {
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     AtomicInteger callCount = new AtomicInteger(0);
     driver.setOnStepCallback(callCount::incrementAndGet);
@@ -95,35 +112,38 @@ class SimulationDriverTest {
 
   @Test
   void step_withoutCallback_doesNotThrow() {
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
-    driver.step();
-    assertEquals(1, grid.getCellState(1, 1)); // blinker middle
+    driver.step(); // should not throw
   }
 
   // M - Many: multiple operations
   @Test
   void step_multipleTimes_advancesMultipleGenerations() {
-    int[][] blinker = {
-      {0, 1, 0},
-      {0, 1, 0},
-      {0, 1, 0}
+    CellState[][] blinker = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
     };
     grid.setCellsState(blinker);
     driver.setSimulation(simulation);
     AtomicInteger callCount = new AtomicInteger(0);
     driver.setOnStepCallback(callCount::incrementAndGet);
 
-    driver.step();
-    driver.step();
+    driver.step(); // vertical -> horizontal
+    driver.step(); // horizontal -> vertical
 
     assertEquals(2, callCount.get());
-    assertEquals(1, grid.getCellState(0, 1));
-    assertEquals(1, grid.getCellState(1, 1));
-    assertEquals(1, grid.getCellState(2, 1));
+    CellState[][] result = grid.getCellStates();
+    // Should be back to vertical blinker
+    assertEquals(ALIVE, result[0][1]);
+    assertEquals(ALIVE, result[1][1]);
+    assertEquals(ALIVE, result[2][1]);
   }
 
   @Test
   void start_thenPause_stopsRunning() {
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     driver.start();
     assertTrue(driver.isRunning());
@@ -141,24 +161,30 @@ class SimulationDriverTest {
 
   @Test
   void start_whenAlreadyRunning_isNoOp() {
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     driver.start();
-    driver.start();
+    driver.start(); // second start is no-op
     assertTrue(driver.isRunning());
     driver.pause();
   }
 
   @Test
   void step_whilePaused_stillWorks() {
-    int[][] initial = {{0, 1, 0}, {0, 1, 0}, {0, 1, 0}};
-    grid.setCellsState(initial);
+    CellState[][] blinker = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
+    };
+    grid.setCellsState(blinker);
     driver.setSimulation(simulation);
     driver.start();
     driver.pause();
 
     driver.step();
 
-    assertEquals(1, grid.getCellState(1, 0));
+    CellState[][] result = grid.getCellStates();
+    assertEquals(ALIVE, result[1][0]);
   }
 
   // B - Boundaries: speed, edge values
@@ -181,6 +207,18 @@ class SimulationDriverTest {
   }
 
   @Test
+  void setSpeed_veryLarge_updatesRate() {
+    driver.setSpeed(1000.0);
+    assertEquals(1000.0, driver.getStepsPerSecond());
+  }
+
+  @Test
+  void setSpeed_verySmall_updatesRate() {
+    driver.setSpeed(0.001);
+    assertEquals(0.001, driver.getStepsPerSecond());
+  }
+
+  @Test
   void setSimulation_toNull_clearsSimulation() {
     driver.setSimulation(simulation);
     driver.setSimulation(null);
@@ -191,14 +229,14 @@ class SimulationDriverTest {
   void step_afterSettingSimulationToNull_isNoOp() {
     driver.setSimulation(simulation);
     driver.setSimulation(null);
-    driver.step();
+    driver.step(); // should not throw
     assertNull(driver.getSimulation());
   }
 
-  // I - Interfaces: integration with Simulation
+  // I - Interface: integration with Simulation
   @Test
   void periodicStepping_invokesCallbackMultipleTimes() throws InterruptedException {
-    grid.setCellsState(new int[][] {{0, 1, 0}, {0, 1, 0}, {0, 1, 0}});
+    grid.setCellsState(new CellState[][]{{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
     driver.setSpeed(50); // 50 steps per second
     AtomicInteger callCount = new AtomicInteger(0);
@@ -211,17 +249,56 @@ class SimulationDriverTest {
     assertTrue(callCount.get() >= 1, "Callback should fire at least once");
   }
 
+  @Test
+  void setSpeed_whileRunning_reschedulesAtNewRate() throws InterruptedException {
+    grid.setCellsState(new CellState[][]{{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
+    driver.setSimulation(simulation);
+    AtomicInteger callCount = new AtomicInteger(0);
+    driver.setOnStepCallback(callCount::incrementAndGet);
+
+    driver.setSpeed(2);
+    driver.start();
+    driver.setSpeed(50); // speed up while running
+    Thread.sleep(150);
+    driver.pause();
+
+    assertTrue(callCount.get() >= 1, "Should have stepped after speed change");
+  }
+
+  // E - Exceptional: replacing simulation while running
+  @Test
+  void setSimulation_whileRunning_switchesToNewSimulation() throws InterruptedException {
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    driver.setSimulation(simulation);
+    driver.start();
+
+    Grid newGrid = new Grid(2, 2);
+    newGrid.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}});
+    Simulation newSim = new Simulation(newGrid, new ConwayGameOfLifeRule());
+    driver.setSimulation(newSim);
+
+    assertEquals(newSim, driver.getSimulation());
+    driver.pause();
+  }
+
   // S - Simple: typical flows
   @Test
-  void fullFlow_setSimulation_step_pause() {
-    grid.setCellsState(new int[][] {{0, 1, 0}, {0, 1, 0}, {0, 1, 0}});
+  void fullFlow_setSimulation_step_verifyState() {
+    CellState[][] blinker = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
+    };
+    grid.setCellsState(blinker);
     driver.setSimulation(simulation);
 
     driver.step();
-    assertEquals(1, grid.getCellState(1, 1));
+    CellState[][] afterFirst = grid.getCellStates();
+    assertEquals(ALIVE, afterFirst[1][1]);
 
     driver.step();
-    assertEquals(1, grid.getCellState(0, 1));
+    CellState[][] afterSecond = grid.getCellStates();
+    assertEquals(ALIVE, afterSecond[0][1]);
 
     assertFalse(driver.isRunning());
   }

@@ -60,15 +60,11 @@ public class SimulationController {
     this.myConfigLoader = new ConfigLoader();
     wireButtons();
 
-    myDriver.setOnStepCallback(
-        () ->
-            Platform.runLater(
-                () -> {
-                  Simulation mySim = myDriver.getSimulation();
-                  mySimView
-                      .getMyGridView()
-                      .render(mySim.getGrid(), mySim.getRule().getStateColors());
-                }));
+    myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
+      Simulation mySim = myDriver.getSimulation();
+      mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
+    })
+    );
   }
 
   /**
@@ -85,14 +81,15 @@ public class SimulationController {
    */
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getGrid(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().render(sim.getGridHandler(), sim.getRule().getStateColors());
   }
 
   /**
    * Wires all UI buttons in the view to their corresponding controller actions.
    * This method exists to keep constructor logic concise and organized.
    */
-  private void wireButtons() {
+  private void wireButtons(){
+    wireStep();
     wireStart();
     wirePause();
     wireSave();
@@ -108,8 +105,18 @@ public class SimulationController {
    * Assumptions:
    * - The driver can safely handle a start request at the time the button is pressed.
    */
-  private void wireStart() {
-    mySimView.getMyStartButton().setOnAction(e -> myDriver.start());
+  private void wireStart(){
+    mySimView.getMyStartButton().setOnAction(e -> {
+      System.out.println("Start pressed");
+      myDriver.start();
+    });
+  }
+
+  private void wireStep(){
+    mySimView.getMyStepButton().setOnAction(e -> {
+      System.out.println("Stepping");
+      myDriver.step();
+    });
   }
 
   /**
@@ -178,8 +185,8 @@ public class SimulationController {
                 setInitialConfig(myConfig);
                 Simulation mySim = SimulationFactory.createSimulation(myConfig);
                 mySimView.setGrid(
-                    mySim.getGrid().getRows(),
-                    mySim.getGrid().getCols(),
+                    mySim.getGridHandler().getRows(),
+                    mySim.getGridHandler().getCols(),
                     cellSize);
                 setSimulation(mySim);
               } catch (ParserConfigurationException | SAXException | IOException ex) {
@@ -207,6 +214,6 @@ public class SimulationController {
           if (this.initialConfig == null) { return; }
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
           setSimulation(mySim);
-    });
+        });
   }
 }

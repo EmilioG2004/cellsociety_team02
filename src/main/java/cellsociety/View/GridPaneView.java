@@ -1,6 +1,7 @@
 package cellsociety.View;
 
-import cellsociety.Model.ReadOnlyGrid;
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GridHandler;
 import java.util.Map;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
@@ -20,12 +21,12 @@ import javafx.scene.shape.Rectangle;
  *
  * Assumptions:
  * - The number of rows and columns is fixed for the lifetime of this view.
- * - The provided ReadOnlyGrid has dimensions that match the rows and columns used to
+ * - The provided GridHandler has dimensions that match the rows and columns used to
  *   construct this GridPaneView.
  * - The stateColors map contains a color entry for every possible cell state.
  *
  * Dependencies:
- * - ReadOnlyGrid for accessing simulation state without allowing mutation.
+ * - GridHandler for accessing simulation state without allowing mutation.
  * - JavaFX GridPane and Rectangle for rendering.
  * - JavaFX Color and Paint for visual styling.
  *
@@ -34,6 +35,7 @@ import javafx.scene.shape.Rectangle;
  * Node gridNode = gridView.getNode();
  *
  * @author Emilio Garcia
+ * @author Michael Lei
  */
 public class GridPaneView implements GridView {
 
@@ -134,14 +136,14 @@ public class GridPaneView implements GridView {
    * - The dimensions of the ReadOnlyGrid match this view’s row and column counts.
    * - stateColors contains a valid color string for every state value returned by the grid.
    *
-   * @param grid read-only view of the simulation grid state
+   * @param myGridHandler read-only view of the simulation grid state
    * @param stateColors mapping from cell state values to color strings
    */
   @Override
-  public void render(ReadOnlyGrid grid, Map<Integer, String> stateColors) {
-    for (int r = 0; r < grid.getRows(); r++) {
-      for (int c = 0; c < grid.getCols(); c++) {
-        int cellState = grid.getCellState(r, c);
+  public void render(GridHandler myGridHandler, Map<CellState, String> stateColors) {
+    for (int r = 0; r < myGridHandler.getRows(); r++) {
+      for (int c = 0; c < myGridHandler.getCols(); c++) {
+        CellState cellState = myGridHandler.getCellState(r, c);
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }
