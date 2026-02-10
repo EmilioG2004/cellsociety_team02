@@ -14,6 +14,9 @@ public class ConfigLoaderTest {
   private static final String GOL_MALFORMED =
       "data/gol_malformed.xml";
 
+  private static final String TEST_PARAMETERS =
+      "data/test_parameters.xml";
+
   @Test
   public void loadConfig_validGameOfLifeConfig_createsCorrectGrid() throws Exception {
     File file = new File(GOL_GLIDER);
@@ -71,6 +74,25 @@ public class ConfigLoaderTest {
             || e.getMessage().toLowerCase().contains("size"),
         "Expected error message to mention grid size/dimensions, but was: " + e.getMessage()
     );
+  }
+
+  @Test
+  public void loadConfig_validConfig_readsParametersIntoMap() throws Exception {
+    File file = new File(TEST_PARAMETERS);
+
+    ConfigLoader loader = new ConfigLoader();
+    SimulationConfig config = loader.loadConfig(file);
+
+    var params = config.getParameters();
+
+    assertNotNull(params);
+    assertEquals(2, params.size());
+
+    assertTrue(params.containsKey("Apple"));
+    assertEquals("1", params.get("Apple"));
+
+    assertTrue(params.containsKey("Banana"));
+    assertEquals("fruit", params.get("Banana"));
   }
 
 }
