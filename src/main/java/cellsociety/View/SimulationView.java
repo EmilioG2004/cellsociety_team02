@@ -60,6 +60,7 @@ public class SimulationView {
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
+  private final Button myResetButton = new Button("Reset Grid");
 
   private StackPane centerPane;
 
@@ -135,6 +136,7 @@ public class SimulationView {
             mySpeedUpButton,
             mySlowDownButton,
             mySaveButton,
+            myResetButton,
             mySpeedLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -333,5 +335,9 @@ public class SimulationView {
   public void setGrid(int rows, int cols, double cellSize) {
     this.myGridView = new GridPaneView(rows, cols, cellSize);
     buildCenter();
+  }
+
+  public Button getMyResetButton() {
+    return myResetButton;
   }
 }

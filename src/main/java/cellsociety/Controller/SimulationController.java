@@ -41,6 +41,7 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final SimulationDriver myDriver;
   private final ConfigLoader myConfigLoader;
+  private SimulationConfig initialConfig;
   private static final double cellSize = 20.0;
 
   /**
@@ -98,6 +99,7 @@ public class SimulationController {
     wireUpload();
     wireSpeedUp();
     wireSlowDown();
+    wireReset();
   }
 
   /**
@@ -173,6 +175,7 @@ public class SimulationController {
               File myFile = mySimView.showOpenConfigDialog();
               try {
                 SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
+                setInitialConfig(myConfig);
                 Simulation mySim = SimulationFactory.createSimulation(myConfig);
                 myDriver.setSimulation(mySim);
                 mySimView.setGrid(
@@ -186,5 +189,16 @@ public class SimulationController {
                 throw new RuntimeException(ex);
               }
             });
+  }
+
+  public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
+
+  public void wireReset(){
+    mySimView.getMyResetButton()
+        .setOnAction(e -> {
+          if (this.initialConfig == null) { return; }
+          Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
+          setSimulation(mySim);
+    });
   }
 }
