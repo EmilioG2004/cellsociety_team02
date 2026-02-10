@@ -10,27 +10,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import static cellsociety.config.ConfigXmlConstants.*;
 
 
-/**
- * Feel free to completely change this code or delete it entirely.
- */
 public class ConfigLoader {
-
-  private static final String CONFIG_SIMULATION = "simulation";
-  private static final String CONFIG_SIM_TYPE_ATTR = "type";
-
-  private static final String CONFIG_METADATA = "metadata";
-  private static final String CONFIG_GRID = "grid";
-
-  private static final String CONFIG_TITLE = "title";
-  private static final String CONFIG_AUTHOR = "author";
-  private static final String CONFIG_DESCRIPTION = "description";
-
-  private static final String CONFIG_ROWS = "rows";
-  private static final String CONFIG_COLUMNS = "cols";
-  private static final String CONFIG_STATES = "states";
-
 
   public SimulationConfig loadConfig(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
     Document xmlDocument = DocumentBuilderFactory
