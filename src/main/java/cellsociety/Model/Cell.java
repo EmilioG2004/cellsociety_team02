@@ -1,28 +1,23 @@
 package cellsociety.Model;
 
-import java.util.List;
+import cellsociety.Model.CellState.CellState;
 
-public class Cell implements ReadOnlyCell {
-  private int currentState;
-  private int nextState = -1;
+public class Cell {
 
-  public Cell(int state) {
+  private CellState currentState;
+
+
+  public Cell(CellState state) {
     this.currentState = state;
   }
 
-  public int getState() {
+  public CellState getState() {
     return this.currentState;
   }
-  public void setState(int state) {
+
+  public void setState(CellState state) {
     this.currentState = state;
   }
 
-  public void updateState() {
-    this.currentState = nextState;
-    this.nextState = -1;
-  }
 
-  public void updateNextState(GameRule rules, List<ReadOnlyCell> neighbors) {
-    this.nextState = rules.getNextState(this.currentState, neighbors);
-  }
 }
