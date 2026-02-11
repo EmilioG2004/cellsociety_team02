@@ -17,7 +17,7 @@ public final class SimulationConfig {
   private final int[][] initialStates;
 
   // parameters
-  private final Map<String, String> parameters;
+  private final Map<String, Double> parameters;
 
   public SimulationConfig(
       String simulationType,
@@ -27,7 +27,7 @@ public final class SimulationConfig {
       int rows,
       int cols,
       int[][] initialStates,
-      Map<String, String> parameters
+      Map<String, Double> parameters
   ) {
     this.simulationType = simulationType;
     this.title = title;
@@ -69,7 +69,7 @@ public final class SimulationConfig {
     return initialStates;
   }
 
-  public Map<String, String> getParameters() {
+  public Map<String, Double> getParameters() {
     return parameters;
   }
 }

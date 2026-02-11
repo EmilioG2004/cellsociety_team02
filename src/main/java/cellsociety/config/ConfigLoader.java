@@ -34,7 +34,7 @@ public class ConfigLoader {
 
     int[][] states = getStates(xmlDocument, rows, cols);
 
-    HashMap<String, String> parameters = getParameters(xmlDocument);
+    HashMap<String, Double> parameters = getParameters(xmlDocument);
 
     return new SimulationConfig(
       simulationType,
@@ -168,8 +168,8 @@ public class ConfigLoader {
     }
   }
 
-  private HashMap<String, String> getParameters(Document xmlDocument) {
-    HashMap<String, String> params = new HashMap<>();
+  private HashMap<String, Double> getParameters(Document xmlDocument) {
+    HashMap<String, Double> params = new HashMap<>();
 
     Element root = xmlDocument.getDocumentElement();
     if (root == null) return params;
@@ -193,10 +193,20 @@ public class ConfigLoader {
             "Parameter '" + name + "' missing 'value' attribute");
       }
 
-      params.put(name, value);
+      params.put(name, tryParseParameterValue(value, name));
     }
 
     return params;
+  }
+
+  private double tryParseParameterValue(String value, String name) {
+    try {
+      return Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(
+          "Invalid numeric value for parameter '" + name + "': " + value
+      );
+    }
   }
 
 }
