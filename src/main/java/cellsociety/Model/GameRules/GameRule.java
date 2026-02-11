@@ -61,6 +61,9 @@ public abstract class GameRule {
   public void setParameters(Map<String, String> parameters) {
     this.parameters = parameters;
   }
+  public void setParameter(String key, String value) {
+    parameters.put(key, value);
+  }
   public Map<String, String> getParameters() {
     return parameters;
   }

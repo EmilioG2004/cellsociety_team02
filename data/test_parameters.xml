@@ -1,0 +1,18 @@
+<simulation type="GameOfLife">
+  <metadata>
+    <title>Test Parameters</title>
+    <author>Ixa Sigler</author>
+    <description>This is a test config for ConfigLoader.</description>
+  </metadata>
+
+  <grid rows="1" cols="5">
+    <states>
+      0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+    <param name="Apple" value="1"/>
+    <param name="Banana" value="fruit"/>
+  </parameters>
+</simulation>

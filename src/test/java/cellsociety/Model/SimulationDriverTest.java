@@ -31,6 +31,12 @@ class SimulationDriverTest {
   void setUp() {
     driver = new SimulationDriver();
     grid = new Grid(3, 3);
+    CellState[][] initial = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    grid.setCellsState(initial);
     rules = new ConwayGameOfLifeRule();
     simulation = new Simulation(grid, rules);
   }
@@ -86,7 +92,7 @@ class SimulationDriverTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(blinker);
+    simulation.setState(blinker);
     driver.setSimulation(simulation);
 
     driver.step();
@@ -100,7 +106,7 @@ class SimulationDriverTest {
 
   @Test
   void step_invokesCallback() {
-    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     AtomicInteger callCount = new AtomicInteger(0);
     driver.setOnStepCallback(callCount::incrementAndGet);
@@ -112,7 +118,7 @@ class SimulationDriverTest {
 
   @Test
   void step_withoutCallback_doesNotThrow() {
-    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     driver.step(); // should not throw
   }
@@ -125,7 +131,7 @@ class SimulationDriverTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(blinker);
+    simulation.setState(blinker);
     driver.setSimulation(simulation);
     AtomicInteger callCount = new AtomicInteger(0);
     driver.setOnStepCallback(callCount::incrementAndGet);
@@ -143,7 +149,7 @@ class SimulationDriverTest {
 
   @Test
   void start_thenPause_stopsRunning() {
-    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     driver.start();
     assertTrue(driver.isRunning());
@@ -161,7 +167,7 @@ class SimulationDriverTest {
 
   @Test
   void start_whenAlreadyRunning_isNoOp() {
-    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     driver.start();
     driver.start(); // second start is no-op
@@ -176,7 +182,7 @@ class SimulationDriverTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(blinker);
+    simulation.setState(blinker);
     driver.setSimulation(simulation);
     driver.start();
     driver.pause();
@@ -236,7 +242,7 @@ class SimulationDriverTest {
   // I - Interface: integration with Simulation
   @Test
   void periodicStepping_invokesCallbackMultipleTimes() throws InterruptedException {
-    grid.setCellsState(new CellState[][]{{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
     driver.setSpeed(50); // 50 steps per second
     AtomicInteger callCount = new AtomicInteger(0);
@@ -251,7 +257,7 @@ class SimulationDriverTest {
 
   @Test
   void setSpeed_whileRunning_reschedulesAtNewRate() throws InterruptedException {
-    grid.setCellsState(new CellState[][]{{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}, {DEAD, ALIVE, DEAD}});
     driver.setSimulation(simulation);
     AtomicInteger callCount = new AtomicInteger(0);
     driver.setOnStepCallback(callCount::incrementAndGet);
@@ -268,7 +274,7 @@ class SimulationDriverTest {
   // E - Exceptional: replacing simulation while running
   @Test
   void setSimulation_whileRunning_switchesToNewSimulation() throws InterruptedException {
-    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
     driver.setSimulation(simulation);
     driver.start();
 
@@ -289,7 +295,7 @@ class SimulationDriverTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(blinker);
+    simulation.setState(blinker);
     driver.setSimulation(simulation);
 
     driver.step();
@@ -299,6 +305,12 @@ class SimulationDriverTest {
     driver.step();
     CellState[][] afterSecond = grid.getCellStates();
     assertEquals(ALIVE, afterSecond[0][1]);
+    driver.stepBack();
+    CellState[][] afterFirstBack = grid.getCellStates();
+    assertEquals(ALIVE, afterFirstBack[1][1]);
+    driver.stepBack();
+    CellState[][] afterSecondBack = grid.getCellStates();
+    assertEquals(ALIVE, afterSecondBack[0][1], "Second stepBack restores to initial blinker (setState)");
 
     assertFalse(driver.isRunning());
   }

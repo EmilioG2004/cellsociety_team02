@@ -1,14 +1,16 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,12 @@ class SimulationTest {
   @BeforeEach
   void setUp() {
     grid = new Grid(3, 3);
+    CellState[][] initial = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    grid.setCellsState(initial);
     rules = new ConwayGameOfLifeRule();
     simulation = new Simulation(grid, rules);
   }
@@ -37,14 +45,20 @@ class SimulationTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(allDead);
+    simulation.setState(allDead);
     simulation.step();
     CellState[][] result = grid.getCellStates();
-    for (int r = 0; r < 3; r++) {
-      for (int c = 0; c < 3; c++) {
-        assertEquals(DEAD, result[r][c], "All cells should remain dead");
-      }
-    }
+    assertAll(
+        () -> assertEquals(DEAD, result[0][0]),
+        () -> assertEquals(DEAD, result[0][1]),
+        () -> assertEquals(DEAD, result[0][2]),
+        () -> assertEquals(DEAD, result[1][0]),
+        () -> assertEquals(DEAD, result[1][1]),
+        () -> assertEquals(DEAD, result[1][2]),
+        () -> assertEquals(DEAD, result[2][0]),
+        () -> assertEquals(DEAD, result[2][1]),
+        () -> assertEquals(DEAD, result[2][2])
+    );
   }
 
   @Test
@@ -54,7 +68,7 @@ class SimulationTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(allDead);
+    simulation.setState(allDead);
     simulation.step();
     simulation.step();
     simulation.step();
@@ -74,9 +88,124 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(oneLive);
+    simulation.setState(oneLive);
     simulation.step();
     assertEquals(DEAD, grid.getCellStates()[1][1], "Single cell should die (underpopulation)");
+  }
+  @Test
+  void step_singleAliveCell_dies_thenBack_returnsToOriginal() {
+    CellState[][] oneLive = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+
+    simulation.setState(oneLive);
+    simulation.step();
+    assertEquals(DEAD, grid.getCellStates()[1][1], "Single cell should die (underpopulation)");
+    simulation.stepBack();
+
+    assertEquals(ALIVE, grid.getCellStates()[1][1], "Single cell should return to alive");
+  }
+
+  @Test
+  void stepBack_fromInitialState_throws() {
+    IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> simulation.stepBack());
+    assertTrue(thrown.getMessage().contains("Cannot step back from initial state"));
+  }
+
+  @Test
+  void stepBack_multipleSteps_restoresToInitial() {
+    CellState[][] oneLive = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    simulation.setState(oneLive);
+    simulation.step();
+    simulation.step();
+    simulation.step();
+    simulation.stepBack();
+    simulation.stepBack();
+    simulation.stepBack();
+    CellState[][] result = grid.getCellStates();
+    assertEquals(ALIVE, result[1][1], "After 3 stepBack should restore single live cell");
+    for (int r = 0; r < 3; r++) {
+      for (int c = 0; c < 3; c++) {
+        if (r != 1 || c != 1) {
+          assertEquals(DEAD, result[r][c]);
+        }
+      }
+    }
+  }
+
+  @Test
+  void stepBack_twice_afterBlinkerTwoSteps_restoresVerticalBlinker() {
+    CellState[][] verticalBlinker = {
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, ALIVE, DEAD}
+    };
+    simulation.setState(verticalBlinker);
+    simulation.step(); // -> horizontal
+    simulation.step(); // -> vertical again
+    simulation.stepBack();
+    simulation.stepBack();
+    CellState[][] result = grid.getCellStates();
+    assertAll(
+        () -> assertEquals(ALIVE, result[0][1]),
+        () -> assertEquals(ALIVE, result[1][1]),
+        () -> assertEquals(ALIVE, result[2][1]),
+        () -> assertEquals(DEAD, result[1][0]),
+        () -> assertEquals(DEAD, result[1][2])
+    );
+  }
+
+  // setState and undo history
+  @Test
+  void setState_clearsUndoHistory_stepBackOnceRestoresToNewState() {
+    CellState[][] oneLive = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    simulation.setState(oneLive);
+    simulation.step(); // cell dies
+    simulation.stepBack();
+    assertEquals(ALIVE, grid.getCellStates()[1][1], "stepBack after setState should restore to setState snapshot");
+  }
+
+  @Test
+  void setState_afterSteps_replacesHistory_stepBackFromStateOnly() {
+    CellState[][] oneLive = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    simulation.setState(oneLive);
+    simulation.step();
+    simulation.step();
+    CellState[][] other = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, ALIVE}
+    };
+    simulation.setState(other);
+    simulation.step(); // corner cell dies
+    simulation.stepBack();
+    assertEquals(ALIVE, grid.getCellStates()[2][2], "stepBack should restore to last setState (other), not earlier");
+  }
+
+  @Test
+  void setState_thenStepBackFromInitial_throws() {
+    CellState[][] oneLive = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    simulation.setState(oneLive);
+    assertThrows(IllegalStateException.class, () -> simulation.stepBack(),
+        "Cannot step back when only one state on stack (current)");
   }
 
   @Test
@@ -86,7 +215,7 @@ class SimulationTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(cornerLive);
+    simulation.setState(cornerLive);
     simulation.step();
     assertEquals(DEAD, grid.getCellStates()[0][0], "Corner cell with no neighbors should die");
   }
@@ -99,7 +228,7 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(verticalBlinker);
+    simulation.setState(verticalBlinker);
     simulation.step();
     CellState[][] result = grid.getCellStates();
     // Should become horizontal
@@ -121,7 +250,7 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(verticalBlinker);
+    simulation.setState(verticalBlinker);
     simulation.step();
     simulation.step();
     CellState[][] result = grid.getCellStates();
@@ -165,7 +294,7 @@ class SimulationTest {
         {ALIVE, ALIVE, ALIVE},
         {ALIVE, ALIVE, ALIVE}
     };
-    grid.setCellsState(allAlive);
+    simulation.setState(allAlive);
     simulation.step();
     CellState[][] result = grid.getCellStates();
     // Corners have 3 neighbors -> survive
@@ -190,7 +319,7 @@ class SimulationTest {
         {ALIVE, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(cornerCell);
+    simulation.setState(cornerCell);
     simulation.step();
     CellState[][] result = grid.getCellStates();
     // Corner (0,0) has 2 alive neighbors -> survives
@@ -204,7 +333,7 @@ class SimulationTest {
         {ALIVE, ALIVE, ALIVE},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(edgeCell);
+    simulation.setState(edgeCell);
     simulation.step();
     CellState[][] result = grid.getCellStates();
     // (0,1) has 3 alive neighbors -> survives
@@ -221,6 +350,48 @@ class SimulationTest {
     assertEquals(DEAD, tinyGrid.getCellStates()[0][0], "Alone cell should die");
   }
 
+  @Test
+  void step_1x2Grid_bothAlive_bothDie() {
+    Grid thinGrid = new Grid(1, 2);
+    CellState[][] twoAlive = {{ALIVE, ALIVE}};
+    thinGrid.setCellsState(twoAlive);
+    Simulation thinSim = new Simulation(thinGrid, rules);
+    thinSim.step();
+    CellState[][] result = thinGrid.getCellStates();
+    assertEquals(DEAD, result[0][0], "Each has 1 neighbor -> underpopulation");
+    assertEquals(DEAD, result[0][1]);
+  }
+
+  @Test
+  void step_2x2Grid_blockStaysStable() {
+    Grid smallGrid = new Grid(2, 2);
+    CellState[][] block = {{ALIVE, ALIVE}, {ALIVE, ALIVE}};
+    smallGrid.setCellsState(block);
+    Simulation smallSim = new Simulation(smallGrid, rules);
+    smallSim.step();
+    CellState[][] result = smallGrid.getCellStates();
+    assertAll(
+        () -> assertEquals(ALIVE, result[0][0]),
+        () -> assertEquals(ALIVE, result[0][1]),
+        () -> assertEquals(ALIVE, result[1][0]),
+        () -> assertEquals(ALIVE, result[1][1])
+    );
+  }
+
+  @Test
+  void step_thenStepBack_thenStep_consistentWithTwoSteps() {
+    CellState[][] oneLive = {
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    };
+    simulation.setState(oneLive);
+    simulation.step();       // cell dies
+    simulation.stepBack();    // back to one live
+    simulation.step();        // cell dies again
+    assertEquals(DEAD, grid.getCellStates()[1][1], "Step after stepBack should match normal step from same state");
+  }
+
   // I - Interface: getGridHandler and getRule contracts
   @Test
   void getGridHandler_returnsNonNull() {
@@ -232,6 +403,13 @@ class SimulationTest {
     assertNotNull(handler);
     assertEquals(2, handler.getRows());
     assertEquals(2, handler.getCols());
+  }
+
+  @Test
+  void getGridHandler_dimensionsMatchGrid() {
+    GridHandler handler = simulation.getGridHandler();
+    assertEquals(grid.getRows(), handler.getRows());
+    assertEquals(grid.getCols(), handler.getCols());
   }
 
   @Test
@@ -252,7 +430,7 @@ class SimulationTest {
         {ALIVE, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(lShape);
+    simulation.setState(lShape);
     simulation.step();
     CellState[][] result = grid.getCellStates();
     // (1,1) is dead but has exactly 3 alive neighbors -> becomes alive
@@ -267,7 +445,7 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(initial);
+    simulation.setState(initial);
     simulation.step();
     CellState[][] result = grid.getCellStates();
     // Verify blinker rotated

@@ -3,11 +3,14 @@ package cellsociety.Model;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.GameRules.SpreadingOfFireRule;
 import cellsociety.config.SimulationConfig;
 import java.util.Map;
 
 public class SimulationFactory {
-  public static final Map<String, GameRule> GAME_RULES = Map.of("GameOfLife", new ConwayGameOfLifeRule());
+  public static final Map<String, GameRule> GAME_RULES = Map.of(
+      "GameOfLife", new ConwayGameOfLifeRule(),
+      "SpreadingOfFire", new SpreadingOfFireRule());
   public static Simulation createSimulation(SimulationConfig config) throws IllegalArgumentException {
     try {
       String simulationType = config.getSimulationType();

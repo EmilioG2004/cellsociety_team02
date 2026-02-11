@@ -1,5 +1,7 @@
 package cellsociety.Model;
 
+import cellsociety.Model.CellState.CellState;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -13,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class SimulationDriver {
   private Simulation simulation;
   private boolean isRunning;
+  private boolean isForward = true;
   private double stepsPerSecond;
   private Runnable onStepCallback;
 
@@ -35,6 +38,16 @@ public class SimulationDriver {
    */
   public void setSimulation(Simulation simulation) {
     this.simulation = simulation;
+  }
+
+  /**
+   * Sets the simulation's grid to the given state and updates its undo stack. Use this instead of
+   * setting cell state on the grid directly so stepBack() stays correct. No-op if no simulation set.
+   */
+  public void setState(CellState[][] state) {
+    if (simulation != null) {
+      simulation.setState(state);
+    }
   }
 
   /**
@@ -121,6 +134,29 @@ public class SimulationDriver {
       onStepCallback.run();
     }
   }
+  public void setDirection(boolean forward) {
+    if (forward == isForward) {
+      return;
+    }
+    this.isForward = forward;
+    
+  }
+  /**
+   * Goes back one generation and notifies the step callback. Use when paused for single-step back. No-op if no simulation set.
+   */
+  public void stepBack() {
+    if (simulation == null) {
+      return;
+    }
+    try {
+      simulation.stepBack();
+      if (onStepCallback != null) {
+        onStepCallback.run();
+      }
+    } catch (IllegalStateException e) {
+      pause();
+    }
+  }
     /**
    * Schedules steps to occur at the current speed.
    */
@@ -140,6 +176,10 @@ public class SimulationDriver {
     if (!isRunning) {
       return;
     }
-    step();
+    if (isForward) {
+      step();
+    } else {
+      stepBack();
+    }
   }
 }
