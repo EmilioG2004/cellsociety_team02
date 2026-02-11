@@ -10,27 +10,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import static cellsociety.config.ConfigXmlConstants.*;
 
 
-/**
- * Feel free to completely change this code or delete it entirely.
- */
 public class ConfigLoader {
-
-  private static final String CONFIG_SIMULATION = "simulation";
-  private static final String CONFIG_SIM_TYPE_ATTR = "type";
-
-  private static final String CONFIG_METADATA = "metadata";
-  private static final String CONFIG_GRID = "grid";
-
-  private static final String CONFIG_TITLE = "title";
-  private static final String CONFIG_AUTHOR = "author";
-  private static final String CONFIG_DESCRIPTION = "description";
-
-  private static final String CONFIG_ROWS = "rows";
-  private static final String CONFIG_COLUMNS = "cols";
-  private static final String CONFIG_STATES = "states";
-
 
   public SimulationConfig loadConfig(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
     Document xmlDocument = DocumentBuilderFactory
@@ -51,6 +34,8 @@ public class ConfigLoader {
 
     int[][] states = getStates(xmlDocument, rows, cols);
 
+    HashMap<String, Double> parameters = getParameters(xmlDocument);
+
     return new SimulationConfig(
       simulationType,
       title,
@@ -59,7 +44,7 @@ public class ConfigLoader {
       rows,
       cols,
       states,
-      new HashMap<>()
+      parameters
     );
   }
 
@@ -182,4 +167,46 @@ public class ConfigLoader {
               " columns, expected " + cols);
     }
   }
+
+  private HashMap<String, Double> getParameters(Document xmlDocument) {
+    HashMap<String, Double> params = new HashMap<>();
+
+    Element root = xmlDocument.getDocumentElement();
+    if (root == null) return params;
+
+    Element parametersElement =
+        (Element) root.getElementsByTagName(CONFIG_PARAMETERS).item(0);
+    if (parametersElement == null) return params;
+
+    var paramNodes = parametersElement.getElementsByTagName(CONFIG_PARAM);
+    for (int i = 0; i < paramNodes.getLength(); i++) {
+      Element paramElement = (Element) paramNodes.item(i);
+
+      String name = paramElement.getAttribute(CONFIG_PARAM_NAME_ATTR).trim();
+      String value = paramElement.getAttribute(CONFIG_PARAM_VALUE_ATTR).trim();
+
+      if (name.isEmpty()) {
+        throw new IllegalArgumentException("<param> missing 'name' attribute");
+      }
+      if (value.isEmpty()) {
+        throw new IllegalArgumentException(
+            "Parameter '" + name + "' missing 'value' attribute");
+      }
+
+      params.put(name, tryParseParameterValue(value, name));
+    }
+
+    return params;
+  }
+
+  private double tryParseParameterValue(String value, String name) {
+    try {
+      return Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(
+          "Invalid numeric value for parameter '" + name + "': " + value
+      );
+    }
+  }
+
 }
