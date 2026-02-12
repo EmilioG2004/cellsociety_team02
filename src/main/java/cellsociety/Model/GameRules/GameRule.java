@@ -17,7 +17,7 @@ public abstract class GameRule {
   /** Defines which offsets from a cell's position count as neighbors (e.g., Moore, Von Neumann). */
   protected final NeighborStrategy neighborStrategy;
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
-  protected Map<String, String> parameters;
+  protected Map<String, Double> parameters;
 
   /**
    * Constructs a GameRule with the given neighbor strategy and no parameters.
@@ -34,7 +34,7 @@ public abstract class GameRule {
    * @param neighborStrategy strategy defining which cells are neighbors
    * @param parameters simulation-specific parameters (e.g., probCatch, threshold)
    */
-  public GameRule(NeighborStrategy neighborStrategy, Map<String, String> parameters) {
+  public GameRule(NeighborStrategy neighborStrategy, Map<String, Double> parameters) {
     this.neighborStrategy = neighborStrategy;
     this.parameters = parameters;
   }
@@ -58,13 +58,13 @@ public abstract class GameRule {
   public NeighborStrategy getNeighborStrategy() {
     return neighborStrategy;
   }
-  public void setParameters(Map<String, String> parameters) {
+  public void setParameters(Map<String, Double> parameters) {
     this.parameters = parameters;
   }
-  public void setParameter(String key, String value) {
+  public void setParameter(String key, Double value) {
     parameters.put(key, value);
   }
-  public Map<String, String> getParameters() {
+  public Map<String, Double> getParameters() {
     return parameters;
   }
   /**
