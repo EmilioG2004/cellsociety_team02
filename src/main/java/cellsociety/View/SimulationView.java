@@ -53,7 +53,7 @@ public class SimulationView {
   private final BorderPane myRoot = new BorderPane();
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
-  private final Button myUploadButton = new Button("Upload XML Configuartion");
+  private final Button myUploadButton = new Button("Upload XML Configuration");
   private final Button myForwardButton = new Button("Step Forward");
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
