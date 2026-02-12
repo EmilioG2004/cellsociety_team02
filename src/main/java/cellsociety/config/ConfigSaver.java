@@ -21,6 +21,8 @@ public class ConfigSaver {
     if (config == null) throw new IllegalArgumentException("config cannot be null");
     if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
 
+    validateConfig(config);
+
     try {
       Document doc = newDocument();
       Element simulationEl = buildSimulationElement(doc, config);
@@ -28,6 +30,25 @@ public class ConfigSaver {
       writeXml(doc, outFile);
     } catch (Exception e) {
       throw new RuntimeException("Failed to save config to " + outFile.getPath(), e);
+    }
+  }
+
+  private void validateConfig(SimulationConfig config) {
+    if (trimmed(config.getSimulationType()).isEmpty())
+      throw new IllegalArgumentException("simulation type is blank");
+
+    int rows = config.getRows();
+    int cols = config.getCols();
+    if (rows <= 0 || cols <= 0)
+      throw new IllegalArgumentException("rows/cols must be positive");
+
+    int[][] states = config.getInitialStates();
+    if (states == null || states.length != rows)
+      throw new IllegalArgumentException("initialStates row count does not match rows");
+
+    for (int r = 0; r < rows; r++) {
+      if (states[r] == null || states[r].length != cols)
+        throw new IllegalArgumentException("initialStates col count does not match cols at row " + r);
     }
   }
 
