@@ -17,11 +17,7 @@ public class SimulationFactory {
       String simulationType = config.getSimulationType();
       GameRule rule = GAME_RULES.get(simulationType);
       if (config.getParameters().size() > 0) {
-        Map<String, Double> parameters = new HashMap<>();
-        for (String key : config.getParameters().keySet()) {
-          parameters.put(key, Double.parseDouble(config.getParameters().get(key)));
-        }
-        rule.setParameters(parameters);
+        rule.setParameters(config.getParameters());
       }
       int rows = config.getRows();
       int cols = config.getCols();
