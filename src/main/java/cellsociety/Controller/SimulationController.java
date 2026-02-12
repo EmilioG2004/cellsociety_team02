@@ -49,7 +49,7 @@ public class SimulationController {
   private ConfigSaver myConfigSaver;
   private static final double cellSize = 20.0;
   private static final boolean forward = true;
-  private static final boolean backward = true;
+  private static final boolean backward = false;
 
   /**
    * Constructs a SimulationController for the given view.
@@ -71,6 +71,7 @@ public class SimulationController {
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
       mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
+      mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
     })
     );
   }
@@ -99,6 +100,7 @@ public class SimulationController {
   private void wireButtons(){
     wireForward();
     wireBackward();
+    wireChangeDirection();
     wireStart();
     wirePause();
     wireSave();
@@ -108,42 +110,48 @@ public class SimulationController {
     wireReset();
   }
 
-  /**
-   * Wires the Start button to begin stepping the simulation.
-   *
-   * Assumptions:
-   * - The driver can safely handle a start request at the time the button is pressed.
-   */
-  private void wireStart(){
-    mySimView.getMyStartButton().setOnAction(e -> {
-      System.out.println("Start pressed");
-      myDriver.start();
-    });
-  }
-
-  /**
-   * Wires the Step Forward button to advance the simulation one generation.
-   */
-  private void wireForward(){
+  private void wireForward() {
     mySimView.getMyForwardButton().setOnAction(e -> {
-      if (myDriver.isRunning()){
+      if (myDriver.isRunning()) {
         myDriver.pause();
       }
       myDriver.setDirection(forward);
       myDriver.step();
+      if (myDriver.getSimulation() != null) {
+        mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
+      }
     });
   }
 
-  /**
-   * Wires the Step Backward button to rewind the simulation one generation.
-   */
-  private void wireBackward(){
+  private void wireBackward() {
     mySimView.getMyBackButton().setOnAction(e -> {
-      if (myDriver.isRunning()){
+      if (myDriver.isRunning()) {
         myDriver.pause();
       }
       myDriver.setDirection(backward);
       myDriver.stepBack();
+      if (myDriver.getSimulation() != null) {
+        mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
+      }
+    });
+  }
+
+  private void wireChangeDirection() {
+    mySimView.getMyChangeDirectionButton().setOnAction(e -> {
+      System.out.println("Changing Direction to " + (myDriver.isForwardDirection() ? "Backward" : "Forward"));
+      myDriver.setDirection(!myDriver.isForwardDirection());
+      if (myDriver.isForwardDirection()) {
+        mySimView.getMyChangeDirectionButton().setText("Forward");
+      } else {
+        mySimView.getMyChangeDirectionButton().setText("Backward");
+      }
+    });
+  }
+
+  private void wireStart(){
+    mySimView.getMyStartButton().setOnAction(e -> {
+      System.out.println("Start pressed");
+      myDriver.start();
     });
   }
 
