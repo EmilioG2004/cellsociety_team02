@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 import java.io.File;
 
@@ -17,7 +18,7 @@ public class SimulationView {
   private double mySpeedMultiplier = 1;
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
-  private final Button myUploadButton = new Button("Upload XML Configuartion");
+  private final Button myUploadButton = new Button("Upload XML Configuration");
   private final Button myForwardButton = new Button("Step Forward");
   private final Button myBackButton = new Button("Step Backward");
   private final Button myStartButton = new Button("Start Simulation");
@@ -29,6 +30,7 @@ public class SimulationView {
   private final Button myChangeDirectionButton = new Button("Change Direction");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
+  private final Button myAboutButton = new Button("About This Configuration");
   private StackPane centerPane;
 
   private final double myCellSize = 20.0;
@@ -51,7 +53,7 @@ public class SimulationView {
     myTitle.setMaxWidth(Double.MAX_VALUE);
     myTitle.setAlignment(Pos.CENTER);
 
-    HBox myUploadRow = new HBox(myUploadButton);
+    HBox myUploadRow = new HBox(myUploadButton, myAboutButton);
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
     myUploadRow.setPadding(new Insets(6,0,10,0));
 
@@ -122,6 +124,17 @@ public class SimulationView {
     return chooser.showOpenDialog(w);
   }
 
+  public File showSaveConfigDialog(){
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Open Simulation Configuration");
+    chooser.getExtensionFilters().add(
+        new ExtensionFilter("XML Files", "*.xml")
+    );
+
+    Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
+    return chooser.showSaveDialog(w);
+  }
+
   public Parent getRoot(){
     return myRoot;
   }
@@ -164,6 +177,10 @@ public class SimulationView {
 
   public Button getMySaveButton(){
     return mySaveButton;
+  }
+
+  public Button getMyAboutButton(){
+    return myAboutButton;
   }
 
   public Label getMyStateStackSizeLabel(){

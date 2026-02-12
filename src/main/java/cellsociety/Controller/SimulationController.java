@@ -224,16 +224,15 @@ public class SimulationController {
       String description = initialConfig.getDescription();
       Map<String, Double> parameters = new HashMap<> (initialConfig.getParameters());
 
-      //SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols, stateSnapshot, parameters);
+      /*
 
-      //File saveDestination = mySimView.showSaveConfigDialog();
-      //if (saveDestination != null){
-        //try {
-          //myConfigSaver.saveConfig(configSnapshot, saveDestination);
-        //} catch (ParserConfigurationException | IOException ex) {
-          //throw new RuntimeException(ex);
-        //}
-      //}
+      SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols, stateSnapshot, parameters);
+
+      File saveDestination = mySimView.showSaveConfigDialog();
+      if (saveDestination != null){
+        myConfigSaver.saveConfig(configSnapshot, saveDestination);
+      }
+       */
 
     });
   }
@@ -295,6 +294,13 @@ public class SimulationController {
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
           setSimulation(mySim);
           mySimView.getMyStateStackSizeLabel().setText("Generation: 0");
+        });
+  }
+
+  public void wireAbout(){
+    mySimView.getMyAboutButton()
+        .setOnAction(e -> {
+
         });
   }
 }
