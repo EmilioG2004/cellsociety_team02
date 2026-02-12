@@ -3,6 +3,7 @@ package cellsociety.Model;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.ReadOnlyGrid;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -361,24 +362,24 @@ class SimulationTest {
     assertEquals(DEAD, grid.getCellStates()[1][1], "Step after stepBack should match normal step from same state");
   }
 
-  // I - Interface: getGridHandler and getRule contracts
+  // I - Interface: getReadOnlyGrid and getRule contracts
   @Test
-  void getGridHandler_returnsNonNull() {
+  void getReadOnlyGrid_returnsNonNullWithCorrectDimensions() {
     CellState[][] initial = {{DEAD, ALIVE}, {ALIVE, DEAD}};
     Grid g = new Grid(2, 2);
     g.setCellsState(initial);
     Simulation sim = new Simulation(g, rules);
-    GridHandler handler = sim.getGridHandler();
-    assertNotNull(handler);
-    assertEquals(2, handler.getRows());
-    assertEquals(2, handler.getCols());
+    ReadOnlyGrid readOnlyGrid = sim.getReadOnlyGrid();
+    assertNotNull(readOnlyGrid);
+    assertEquals(2, readOnlyGrid.getRows());
+    assertEquals(2, readOnlyGrid.getCols());
   }
 
   @Test
-  void getGridHandler_dimensionsMatchGrid() {
-    GridHandler handler = simulation.getGridHandler();
-    assertEquals(grid.getRows(), handler.getRows());
-    assertEquals(grid.getCols(), handler.getCols());
+  void getReadOnlyGrid_dimensionsMatchGrid() {
+    ReadOnlyGrid readOnlyGrid = simulation.getReadOnlyGrid();
+    assertEquals(grid.getRows(), readOnlyGrid.getRows());
+    assertEquals(grid.getCols(), readOnlyGrid.getCols());
   }
 
   @Test
