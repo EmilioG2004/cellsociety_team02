@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -18,5 +19,89 @@ public class ConfigSaver {
       throws ParserConfigurationException, IOException {
     if (config == null) throw new IllegalArgumentException("config cannot be null");
     if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+  }
+
+  private Document newDocument() throws Exception {
+    return DocumentBuilderFactory.newInstance()
+        .newDocumentBuilder()
+        .newDocument();
+  }
+
+  private Element buildSimulationElement(Document doc, SimulationConfig config) {
+    Element simulationEl = doc.createElement(CONFIG_SIMULATION);
+    simulationEl.setAttribute(CONFIG_SIM_TYPE_ATTR, trimmed(config.getSimulationType()));
+
+    simulationEl.appendChild(buildMetadataElement(doc, config));
+    simulationEl.appendChild(buildGridElement(doc, config));
+    appendParametersElementIfAny(doc, simulationEl, config);
+
+    return simulationEl;
+  }
+
+  private Element buildMetadataElement(Document doc, SimulationConfig config) {
+    Element metadataEl = doc.createElement(CONFIG_METADATA);
+    metadataEl.appendChild(textElement(doc, CONFIG_TITLE, config.getTitle()));
+    metadataEl.appendChild(textElement(doc, CONFIG_AUTHOR, config.getAuthor()));
+    metadataEl.appendChild(textElement(doc, CONFIG_DESCRIPTION, config.getDescription()));
+    return metadataEl;
+  }
+
+  private Element buildGridElement(Document doc, SimulationConfig config) {
+    Element gridEl = doc.createElement(CONFIG_GRID);
+    gridEl.setAttribute(CONFIG_ROWS, Integer.toString(config.getRows()));
+    gridEl.setAttribute(CONFIG_COLUMNS, Integer.toString(config.getCols()));
+
+    Element statesEl = doc.createElement(CONFIG_STATES);
+    statesEl.setTextContent(toMultilineCsv(config.getInitialStates(), config.getRows(), config.getCols()));
+    gridEl.appendChild(statesEl);
+
+    return gridEl;
+  }
+
+  private void appendParametersElementIfAny(Document doc, Element simulationEl, SimulationConfig config) {
+    Map<String, Double> params = config.getParameters();
+    if (params == null || params.isEmpty()) return;
+
+    Element parametersEl = doc.createElement(CONFIG_PARAMETERS);
+    for (Map.Entry<String, Double> entry : params.entrySet()) {
+      parametersEl.appendChild(buildParamElement(doc, entry.getKey(), String.valueOf(entry.getValue())));
+    }
+    simulationEl.appendChild(parametersEl);
+  }
+
+  private Element buildParamElement(Document doc, String name, String value) {
+    String n = trimmed(name);
+    String v = trimmed(value);
+
+    if (n.isEmpty()) throw new IllegalArgumentException("Parameter has blank name");
+    if (v.isEmpty()) throw new IllegalArgumentException("Parameter '" + n + "' has blank value");
+
+    Element paramEl = doc.createElement(CONFIG_PARAM);
+    paramEl.setAttribute(CONFIG_PARAM_NAME_ATTR, n);
+    paramEl.setAttribute(CONFIG_PARAM_VALUE_ATTR, v);
+    return paramEl;
+  }
+
+  private Element textElement(Document doc, String tag, String text) {
+    Element el = doc.createElement(tag);
+    el.setTextContent(trimmed(text));
+    return el;
+  }
+
+  // ensures proper formatting for states i.e. 0,0,0,0,0
+  private String toMultilineCsv(int[][] states, int rows, int cols) {
+    StringBuilder sb = new StringBuilder();
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        if (c > 0) sb.append(",");
+        sb.append(states[r][c]);
+      }
+      if (r < rows - 1) sb.append("\n");
+    }
+    return sb.toString();
+  }
+
+  private String trimmed(String s) {
+    return s == null ? "" : s.trim();
   }
 }
