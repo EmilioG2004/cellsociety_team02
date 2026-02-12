@@ -8,6 +8,7 @@ import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
