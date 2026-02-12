@@ -1,0 +1,63 @@
+package cellsociety.Model.GameRules;
+
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.Utils.MooreNeighborStrategy;
+import java.util.Map;
+import java.util.List;
+import cellsociety.Model.CellState.PercolotionState;
+
+public class PercolationRule extends GameRule {
+    private static final int DEFAULT_THRESHOLD = 1;
+    public PercolationRule() {
+        super(new MooreNeighborStrategy());
+    }
+
+    public PercolationRule(Map<String, Double> parameters) {
+        super(new MooreNeighborStrategy(), parameters);
+    }
+    /**
+     * Computes the next state for a cell given its current state and neighbor cells.
+     * reads threshold to use for percolation from parameters, if not present, defaults to 1. Threshold is number of full neighbors required for percolation.
+     * @param currentStates the current state of the grid
+     * @return the next state of the grid
+     */
+    @Override
+    public CellState[][] getNextStates(CellState[][] currentStates) {
+        int rows = currentStates.length;
+        int cols = currentStates[0].length;
+        int threshold;
+        if (parameters != null && parameters.containsKey("threshold")) {
+            threshold = parameters.get("threshold").intValue();
+        } else {
+            threshold = DEFAULT_THRESHOLD;
+        }
+        CellState[][] nextStates = new CellState[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                CellState currentState = currentStates[r][c];
+                if(currentState == PercolotionState.CLOSED) {
+                    nextStates[r][c] = PercolotionState.CLOSED;
+                } else if (currentState == PercolotionState.OPEN) {
+                    List<CellState> neighbors = getNeighbors(currentStates, r, c);
+                    int fullNeighbors = countNeighborsWithState(neighbors, PercolotionState.FULL);
+                    if(fullNeighbors >= threshold) {
+                        nextStates[r][c] = PercolotionState.FULL;
+                    } else {
+                        nextStates[r][c] = PercolotionState.OPEN;
+                    }
+                } else if (currentState == PercolotionState.FULL) {
+                    nextStates[r][c] = PercolotionState.FULL;
+                }
+            }
+        }
+        return nextStates;
+    }
+    @Override
+    public Map<CellState, String> getStateColors() {
+        return Map.of(PercolotionState.CLOSED, PercolotionState.CLOSED.getColor(), PercolotionState.OPEN, PercolotionState.OPEN.getColor(), PercolotionState.FULL, PercolotionState.FULL.getColor());
+    }
+    @Override
+    public CellState fromInt(int value) {
+        return PercolotionState.fromInt(value);
+    }
+}
