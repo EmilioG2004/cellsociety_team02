@@ -1,6 +1,7 @@
 package cellsociety.Controller;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
@@ -70,7 +71,7 @@ public class SimulationController {
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
+      mySimView.getMyGridView().render(mySim.getReadOnlyGrid(), mySim.getRule().getStateColors());
       mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
     })
     );
@@ -90,7 +91,7 @@ public class SimulationController {
    */
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getGridHandler(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
   }
 
   /**
@@ -200,9 +201,10 @@ public class SimulationController {
         myDriver.pause();
       }
 
-      CellState[][] stateSnapshot = myDriver.getSimulation().getGridHandler().getCellStates();
-      int snapshotRows = myDriver.getSimulation().getGridHandler().getRows();
-      int snapshotCols = myDriver.getSimulation().getGridHandler().getCols();
+      ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
+      CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
+      int snapshotRows = grid.getRows();
+      int snapshotCols = grid.getCols();
       String type = initialConfig.getSimulationType();
       String title = initialConfig.getTitle();
       String author = initialConfig.getAuthor();
@@ -249,9 +251,10 @@ public class SimulationController {
                 SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
                 setInitialConfig(myConfig);
                 Simulation mySim = SimulationFactory.createSimulation(myConfig);
+                ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
                 mySimView.setGrid(
-                    mySim.getGridHandler().getRows(),
-                    mySim.getGridHandler().getCols(),
+                    readOnlyGrid.getRows(),
+                    readOnlyGrid.getCols(),
                     cellSize);
                 setSimulation(mySim);
               } catch (ParserConfigurationException | SAXException | IOException ex) {

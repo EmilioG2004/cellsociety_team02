@@ -12,7 +12,7 @@ import java.util.Collection;
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
  * Does not store a NeighborStrategy; obtains it from GameRule during updates.
  */
-public class Grid {
+public class Grid implements ReadOnlyGrid {
 
   private final Cell[][] cells;
   private final int rows;

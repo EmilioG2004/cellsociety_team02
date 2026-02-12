@@ -5,10 +5,9 @@ import cellsociety.Model.GameRules.GameRule;
 public class Simulation {
     private Grid myGrid;
     private GameRule myRule;
-    private GridHandler myGridHandler;
     private Stack<CellState[][]> myStateStack;
+
     public Simulation(Grid grid, GameRule rule) {
-        this.myGridHandler = new GridHandler(grid);
         this.myGrid = grid;
         this.myRule = rule;
         this.myStateStack = new Stack<>();
@@ -45,7 +44,11 @@ public class Simulation {
     public GameRule getRule() {
         return myRule;
     }
-    public GridHandler getGridHandler() {
-        return myGridHandler;
+    /**
+     * Returns a read-only view of the grid so the view and other consumers
+     * can query dimensions and cell state without depending on grid implementation.
+     */
+    public ReadOnlyGrid getReadOnlyGrid() {
+        return myGrid;
     }
 }
