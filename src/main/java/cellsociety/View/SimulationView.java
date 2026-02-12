@@ -51,6 +51,7 @@ import javafx.stage.Window;
 public class SimulationView {
 
   private final BorderPane myRoot = new BorderPane();
+  private double mySpeedMultiplier = 1;
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
   private final Button myUploadButton = new Button("Upload XML Configuration");
@@ -368,5 +369,17 @@ public class SimulationView {
    */
   public Button getMyResetButton() {
     return myResetButton;
+  }
+
+  public double getMySpeedMultiplier(){
+    return mySpeedMultiplier;
+  }
+
+  public void doubleMySpeed() { this.mySpeedMultiplier *= 2; }
+
+  public void halveMySpeed() { this.mySpeedMultiplier /= 2; }
+
+  public void updateSpeedLabel(){
+    mySpeedLabel.setText("Current Speed: " + mySpeedMultiplier + "x");
   }
 }

@@ -163,7 +163,15 @@ public class SimulationController {
   private void wireSpeedUp() {
     mySimView
         .getMySpeedUpButton()
-        .setOnAction(e -> myDriver.setSpeed(myDriver.getStepsPerSecond() * 2));
+        .setOnAction(e -> {
+          if (mySimView.getMySpeedMultiplier() >= 4){
+            return;
+          }
+          myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
+          mySimView.doubleMySpeed();
+          mySimView.updateSpeedLabel();
+
+        });
   }
 
   /**
@@ -175,7 +183,15 @@ public class SimulationController {
   private void wireSlowDown() {
     mySimView
         .getMySlowDownButton()
-        .setOnAction(e -> myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0));
+        .setOnAction(e -> {
+          if (mySimView.getMySpeedMultiplier() <= 0.25){
+            return;
+          }
+          myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
+          mySimView.halveMySpeed();
+          mySimView.updateSpeedLabel();
+
+        });
   }
 
   /**
