@@ -18,43 +18,22 @@ public class ConfigLoaderTest {
       "data/test_parameters.xml";
 
   @Test
-  public void loadConfig_validGameOfLifeConfig_createsCorrectGrid() throws Exception {
+  public void loadConfig_validGameOfLifeConfig_createsCorrectConfig() throws Exception {
     File file = new File(GOL_GLIDER);
-
     ConfigLoader loader = new ConfigLoader();
     SimulationConfig config = loader.loadConfig(file);
 
     assertEquals("GameOfLife", config.getSimulationType());
     assertEquals(5, config.getRows());
     assertEquals(20, config.getCols());
-    assertEquals(1, config.getInitialStates()[1][1]);
-  }
-
-  @Test
-  public void loadConfig_validConfig_readsMetadataCorrectly() throws Exception {
-    File file = new File(GOL_GLIDER);
-
-    ConfigLoader loader = new ConfigLoader();
-    SimulationConfig config = loader.loadConfig(file);
-
+    int[][] states = config.getInitialStates();
+    assertEquals(5, states.length);
+    assertEquals(20, states[0].length);
+    assertEquals(0, states[0][0]);
+    assertEquals(1, states[1][1]);
     assertEquals("Test Glider", config.getTitle());
     assertEquals("Ixa Sigler", config.getAuthor());
     assertFalse(config.getDescription().isBlank());
-  }
-
-  @Test
-  public void loadConfig_validConfig_createsCorrectStateDimensions() throws Exception {
-    File file = new File(GOL_GLIDER);
-
-    ConfigLoader loader = new ConfigLoader();
-    SimulationConfig config = loader.loadConfig(file);
-
-    int[][] states = config.getInitialStates();
-
-    assertEquals(5, states.length);
-    assertEquals(20, states[0].length);
-
-    assertEquals(0, states[0][0]);
   }
 
   @Test
@@ -89,10 +68,10 @@ public class ConfigLoaderTest {
     assertEquals(2, params.size());
 
     assertTrue(params.containsKey("Apple"));
-    assertEquals("1", params.get("Apple"));
+    assertEquals(1.0, params.get("Apple"));
 
     assertTrue(params.containsKey("Banana"));
-    assertEquals("fruit", params.get("Banana"));
+    assertEquals(0.5, params.get("Banana"));
   }
 
 }

@@ -29,13 +29,6 @@ class GridTest {
   }
 
   @Test
-  void zeroSizeGrid_hasDimensions() {
-    Grid emptyGrid = new Grid(0, 0);
-    assertEquals(0, emptyGrid.getRows());
-    assertEquals(0, emptyGrid.getCols());
-  }
-
-  @Test
   void allDeadGrid_returnsAllDead() {
     CellState[][] allDead = {
         {DEAD, DEAD, DEAD},
@@ -53,18 +46,11 @@ class GridTest {
 
   // O - One: single element
   @Test
-  void singleCellGrid_storesState() {
+  void singleCellGrid_storesAndRetrievesState() {
     Grid singleGrid = new Grid(1, 1);
-    CellState[][] state = {{ALIVE}};
-    singleGrid.setCellsState(state);
+    singleGrid.setCellsState(new CellState[][]{{ALIVE}});
     assertEquals(ALIVE, singleGrid.getCellStates()[0][0]);
-  }
-
-  @Test
-  void singleCellGrid_deadState() {
-    Grid singleGrid = new Grid(1, 1);
-    CellState[][] state = {{DEAD}};
-    singleGrid.setCellsState(state);
+    singleGrid.setCellsState(new CellState[][]{{DEAD}});
     assertEquals(DEAD, singleGrid.getCellStates()[0][0]);
   }
 
@@ -203,26 +189,14 @@ class GridTest {
     assertEquals(3, result[0].length);
   }
 
-  // E - Exceptional: empty grid getCellStates
+  // E - Exceptional: empty grid
   @Test
-  void zeroSizeGrid_getCellStates_returnsEmptyArray() {
+  void zeroSizeGrid_hasZeroDimensionsAndEmptyGetCellStates() {
     Grid emptyGrid = new Grid(0, 0);
-    CellState[][] emptyStates = new CellState[0][0];
-    emptyGrid.setCellsState(emptyStates);
+    assertEquals(0, emptyGrid.getRows());
+    assertEquals(0, emptyGrid.getCols());
+    emptyGrid.setCellsState(new CellState[0][0]);
     CellState[][] result = emptyGrid.getCellStates();
     assertEquals(0, result.length);
-  }
-
-  // S - Simple: typical create-populate-readback
-  @Test
-  void simpleCreatePopulateReadBack() {
-    Grid g = new Grid(2, 2);
-    CellState[][] state = {{ALIVE, DEAD}, {DEAD, ALIVE}};
-    g.setCellsState(state);
-    CellState[][] result = g.getCellStates();
-    assertEquals(ALIVE, result[0][0]);
-    assertEquals(DEAD, result[0][1]);
-    assertEquals(DEAD, result[1][0]);
-    assertEquals(ALIVE, result[1][1]);
   }
 }

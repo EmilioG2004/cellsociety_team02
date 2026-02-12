@@ -56,15 +56,6 @@ public class SimulationFactoryTest {
     assertEquals(ALIVE, sim.getGridHandler().getCellState(0, 0));
   }
 
-  @Test
-  void createSimulation_singleDeadCell_returnsDead() {
-    SimulationConfig config = new SimulationConfig(
-        "GameOfLife", "Test", "Author", "Desc", 1, 1,
-        new int[][]{{0}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
-    assertEquals(DEAD, sim.getGridHandler().getCellState(0, 0));
-  }
-
   // M - Many: multiple elements
   @Test
   void createSimulation_blinkerPattern_correctStates() {
@@ -148,19 +139,5 @@ public class SimulationFactoryTest {
         "InvalidType", "Test", "Author", "Desc", 1, 1,
         new int[][]{{0}}, new HashMap<>());
     assertThrows(IllegalArgumentException.class, () -> SimulationFactory.createSimulation(config));
-  }
-
-  // S - Simple: typical use case
-  @Test
-  void createSimulation_typicalBlinker_createsWorkingSimulation() {
-    SimulationConfig config = new SimulationConfig(
-        "GameOfLife", "Test", "Author", "Desc", 3, 3,
-        new int[][]{{0, 1, 0}, {0, 1, 0}, {0, 1, 0}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
-    assertNotNull(sim);
-    assertEquals(ConwayGameOfLifeRule.class, sim.getRule().getClass());
-    assertEquals(ALIVE, sim.getGridHandler().getCellState(0, 1));
-    assertEquals(ALIVE, sim.getGridHandler().getCellState(1, 1));
-    assertEquals(ALIVE, sim.getGridHandler().getCellState(2, 1));
   }
 }

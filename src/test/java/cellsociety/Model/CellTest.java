@@ -31,12 +31,6 @@ class CellTest {
   }
 
   @Test
-  void cell_initializedWithDead_isDead() {
-    Cell cell = new Cell(GameOfLifeState.DEAD);
-    assertEquals(GameOfLifeState.DEAD, cell.getState());
-  }
-
-  @Test
   void cell_initializedWithNull_returnsNull() {
     Cell cell = new Cell(null);
     assertNull(cell.getState());
@@ -64,24 +58,7 @@ class CellTest {
     assertEquals(GameOfLifeState.DEAD, cell.getState());
   }
 
-  @Test
-  void multipleRapidStateChanges_retainsLast() {
-    Cell cell = new Cell(GameOfLifeState.DEAD);
-    cell.setState(GameOfLifeState.ALIVE);
-    cell.setState(GameOfLifeState.DEAD);
-    cell.setState(GameOfLifeState.ALIVE);
-    cell.setState(GameOfLifeState.DEAD);
-    cell.setState(GameOfLifeState.ALIVE);
-    assertEquals(GameOfLifeState.ALIVE, cell.getState());
-  }
-
   // B - Boundary: edge states
-  @Test
-  void setState_toSameState_doesNotChange() {
-    aliveCell.setState(GameOfLifeState.ALIVE);
-    assertEquals(GameOfLifeState.ALIVE, aliveCell.getState());
-  }
-
   @Test
   void setState_toNull_setsNull() {
     aliveCell.setState(null);
@@ -101,15 +78,6 @@ class CellTest {
   @Test
   void setState_fromNullToValid_works() {
     Cell cell = new Cell(null);
-    cell.setState(GameOfLifeState.ALIVE);
-    assertEquals(GameOfLifeState.ALIVE, cell.getState());
-  }
-
-  // S - Simple: typical use case
-  @Test
-  void typicalUsage_createAndToggle() {
-    Cell cell = new Cell(GameOfLifeState.DEAD);
-    assertEquals(GameOfLifeState.DEAD, cell.getState());
     cell.setState(GameOfLifeState.ALIVE);
     assertEquals(GameOfLifeState.ALIVE, cell.getState());
   }

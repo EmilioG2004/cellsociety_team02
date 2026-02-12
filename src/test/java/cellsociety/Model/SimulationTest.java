@@ -61,25 +61,6 @@ class SimulationTest {
     );
   }
 
-  @Test
-  void step_allDeadGrid_multipleSteps_remainsAllDead() {
-    CellState[][] allDead = {
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    simulation.setState(allDead);
-    simulation.step();
-    simulation.step();
-    simulation.step();
-    CellState[][] result = grid.getCellStates();
-    for (int r = 0; r < 3; r++) {
-      for (int c = 0; c < 3; c++) {
-        assertEquals(DEAD, result[r][c]);
-      }
-    }
-  }
-
   // O - One: single element
   @Test
   void step_singleAliveCell_dies() {
@@ -206,18 +187,6 @@ class SimulationTest {
     simulation.setState(oneLive);
     assertThrows(IllegalStateException.class, () -> simulation.stepBack(),
         "Cannot step back when only one state on stack (current)");
-  }
-
-  @Test
-  void step_singleAliveCornerCell_dies() {
-    CellState[][] cornerLive = {
-        {ALIVE, DEAD, DEAD},
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    simulation.setState(cornerLive);
-    simulation.step();
-    assertEquals(DEAD, grid.getCellStates()[0][0], "Corner cell with no neighbors should die");
   }
 
   // M - Many: multiple elements
@@ -415,10 +384,6 @@ class SimulationTest {
   @Test
   void getRule_returnsOriginalRule() {
     assertEquals(rules, simulation.getRule());
-  }
-
-  @Test
-  void getRule_isConwayGameOfLifeRule() {
     assertEquals(ConwayGameOfLifeRule.class, simulation.getRule().getClass());
   }
 

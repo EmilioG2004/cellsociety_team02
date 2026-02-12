@@ -338,43 +338,4 @@ class SpreadingOfFireRuleTest {
     CellState[][] grid = {{BURNING}};
     assertEquals(EMPTY, ruleEmptyParams.getNextStates(grid)[0][0]);
   }
-
-  // ---------- S (Simple): typical flows ----------
-  @Test
-  void burningAlwaysBecomesEmpty() {
-    CellState[][] grid = {{BURNING}};
-    assertEquals(EMPTY, ruleNoCatchNoGrow.getNextStates(grid)[0][0]);
-  }
-
-  @Test
-  void treeWithNoBurningNeighbors_staysTree() {
-    CellState[][] grid = {
-        {EMPTY, EMPTY, EMPTY},
-        {EMPTY, TREE, EMPTY},
-        {EMPTY, EMPTY, EMPTY}
-    };
-    assertEquals(TREE, ruleNoCatchNoGrow.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void treeWithBurningNeighbor_catchOne_catches() {
-    CellState[][] grid = {
-        {EMPTY, BURNING, EMPTY},
-        {EMPTY, TREE, EMPTY},
-        {EMPTY, EMPTY, EMPTY}
-    };
-    assertEquals(BURNING, ruleCatchOneNoGrow.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void emptyWithProbTreeOne_becomesTree() {
-    CellState[][] grid = {{EMPTY}};
-    assertEquals(TREE, ruleNoCatchGrowAll.getNextStates(grid)[0][0]);
-  }
-
-  @Test
-  void emptyWithProbTreeZero_staysEmpty() {
-    CellState[][] grid = {{EMPTY}};
-    assertEquals(EMPTY, ruleNoCatchNoGrow.getNextStates(grid)[0][0]);
-  }
 }

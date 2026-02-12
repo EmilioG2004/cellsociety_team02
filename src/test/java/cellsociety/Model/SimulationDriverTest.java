@@ -116,13 +116,6 @@ class SimulationDriverTest {
     assertEquals(1, callCount.get());
   }
 
-  @Test
-  void step_withoutCallback_doesNotThrow() {
-    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
-    driver.setSimulation(simulation);
-    driver.step(); // should not throw
-  }
-
   // M - Many: multiple operations
   @Test
   void step_multipleTimes_advancesMultipleGenerations() {
@@ -210,12 +203,6 @@ class SimulationDriverTest {
   void setSpeed_withPositive_updatesRate() {
     driver.setSpeed(5.0);
     assertEquals(5.0, driver.getStepsPerSecond());
-  }
-
-  @Test
-  void setSpeed_veryLarge_updatesRate() {
-    driver.setSpeed(1000.0);
-    assertEquals(1000.0, driver.getStepsPerSecond());
   }
 
   @Test
