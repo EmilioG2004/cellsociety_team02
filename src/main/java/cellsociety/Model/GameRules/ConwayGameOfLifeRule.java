@@ -12,7 +12,7 @@ public class ConwayGameOfLifeRule extends GameRule {
     super(new MooreNeighborStrategy());
   }
 
-  public ConwayGameOfLifeRule(Map<String, String> parameters) {
+  public ConwayGameOfLifeRule(Map<String, Double> parameters) {
     super(new MooreNeighborStrategy(), parameters);
   }
   @Override

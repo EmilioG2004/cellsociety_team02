@@ -6,6 +6,7 @@ import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.GameRules.SpreadingOfFireRule;
 import cellsociety.config.SimulationConfig;
 import java.util.Map;
+import java.util.HashMap;
 
 public class SimulationFactory {
   public static final Map<String, GameRule> GAME_RULES = Map.of(
@@ -16,7 +17,11 @@ public class SimulationFactory {
       String simulationType = config.getSimulationType();
       GameRule rule = GAME_RULES.get(simulationType);
       if (config.getParameters().size() > 0) {
-        rule.setParameters(config.getParameters());
+        Map<String, Double> parameters = new HashMap<>();
+        for (String key : config.getParameters().keySet()) {
+          parameters.put(key, Double.parseDouble(config.getParameters().get(key)));
+        }
+        rule.setParameters(parameters);
       }
       int rows = config.getRows();
       int cols = config.getCols();
