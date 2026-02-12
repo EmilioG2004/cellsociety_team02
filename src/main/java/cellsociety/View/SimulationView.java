@@ -17,12 +17,14 @@ public class SimulationView {
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
   private final Button myUploadButton = new Button("Upload XML Configuartion");
-  private final Button myStepButton = new Button("Step Simulation");
+  private final Button myForwardButton = new Button("Step Forward");
+  private final Button myBackButton = new Button("Step Backward");
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
   private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
+  private final Button myResetButton = new Button("Reset Grid");
   private final Button myChangeDirectionButton = new Button("Change Direction");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private final Label myStateStackSizeLabel = new Label("State Stack Size: 0");
@@ -59,17 +61,16 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myChangeDirectionButton, myStepButton, mySpeedLabel, myStateStackSizeLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
-    HBox labelBox = new HBox(12, mySpeedLabel, myStateStackSizeLabel);
-    labelBox.setAlignment(Pos.CENTER_RIGHT);
+
     Label configLabel = new Label("Configuration: ");
     HBox rightBox = new HBox(10, configLabel);
 
     Region spacer = new Region();
     HBox.setHgrow(spacer, Priority.ALWAYS);
 
-    HBox bar = new HBox(12, leftBox, spacer, labelBox, spacer, rightBox);
+    HBox bar = new HBox(12, leftBox, spacer, rightBox);
     bar.setAlignment(Pos.CENTER_LEFT);
     bar.setPadding(new Insets(14));
     bar.setMinHeight(64);
@@ -151,8 +152,12 @@ public class SimulationView {
     return mySlowDownButton;
   }
 
-  public Button getMyStepButton(){
-    return myStepButton;
+  public Button getMyForwardButton(){
+    return myForwardButton;
+  }
+
+  public Button getMyBackButton(){
+    return myBackButton;
   }
 
   public Button getMyChangeDirectionButton(){
@@ -161,6 +166,10 @@ public class SimulationView {
 
   public Button getMySaveButton(){
     return mySaveButton;
+  }
+
+  public Button getMyResetButton(){
+    return myResetButton;
   }
 
   public Label getMyStateStackSizeLabel(){
