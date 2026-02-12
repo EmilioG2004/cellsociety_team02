@@ -43,6 +43,8 @@ public class SimulationController {
   private final ConfigLoader myConfigLoader;
   private SimulationConfig initialConfig;
   private static final double cellSize = 20.0;
+  private static final boolean forward = true;
+  private static final boolean backward = true;
 
   /**
    * Constructs a SimulationController for the given view.
@@ -89,7 +91,8 @@ public class SimulationController {
    * This method exists to keep constructor logic concise and organized.
    */
   private void wireButtons(){
-    wireStep();
+    wireForward();
+    wireBackward();
     wireStart();
     wirePause();
     wireSave();
@@ -112,10 +115,29 @@ public class SimulationController {
     });
   }
 
-  private void wireStep(){
-    mySimView.getMyStepButton().setOnAction(e -> {
-      System.out.println("Stepping");
+  /**
+   * Wires the Step Forward button to advance the simulation one generation.
+   */
+  private void wireForward(){
+    mySimView.getMyForwardButton().setOnAction(e -> {
+      if (myDriver.isRunning()){
+        myDriver.pause();
+      }
+      myDriver.setDirection(forward);
       myDriver.step();
+    });
+  }
+
+  /**
+   * Wires the Step Backward button to rewind the simulation one generation.
+   */
+  private void wireBackward(){
+    mySimView.getMyBackButton().setOnAction(e -> {
+      if (myDriver.isRunning()){
+        myDriver.pause();
+      }
+      myDriver.setDirection(backward);
+      myDriver.stepBack();
     });
   }
 

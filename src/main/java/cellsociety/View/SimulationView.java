@@ -53,7 +53,7 @@ public class SimulationView {
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
   private final Button myUploadButton = new Button("Upload XML Configuartion");
-  private final Button myStepButton = new Button("Step Simulation");
+  private final Button myForwardButton = new Button("Step Forward");
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
   private final Button mySpeedUpButton = new Button("Speed Up Simulation");
@@ -61,14 +61,11 @@ public class SimulationView {
   private final Button mySaveButton = new Button("Save State");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private final Button myResetButton = new Button("Reset Grid");
+  private final Button myBackButton = new Button("Step Backward");
 
   private StackPane centerPane;
 
-  private final double myCellSize = 20.0;
-
   private GridView myGridView;
-
-  private boolean isRunning;
 
   /**
    * Constructs the main application view and builds the top UI components.
@@ -83,8 +80,6 @@ public class SimulationView {
    */
   public SimulationView() {
     buildTop();
-    isRunning = false;
-
     myRoot.setPadding(new Insets(12));
     myRoot.setStyle("-fx-background-color: #f6f7fb;");
   }
@@ -137,7 +132,8 @@ public class SimulationView {
             mySlowDownButton,
             mySaveButton,
             myResetButton,
-            myStepButton,
+            myForwardButton,
+            myBackButton,
             mySpeedLabel);
 
     leftBox.setAlignment(Pos.CENTER_LEFT);
@@ -238,22 +234,6 @@ public class SimulationView {
   }
 
   /**
-   * Returns whether this view currently considers the simulation to be running.
-   *
-   * Purpose:
-   * Provides a simple state query for UI logic that may depend on whether the simulation is
-   * currently playing.
-   *
-   * Assumptions:
-   * - This flag reflects view-side state and may be managed externally by a controller.
-   *
-   * @return true if the view believes the simulation is running, false otherwise
-   */
-  public boolean isRunning() {
-    return isRunning;
-  }
-
-  /**
    * Provides access to the Upload button so a controller can attach behavior.
    *
    * @return the button used to open a configuration file
@@ -307,9 +287,21 @@ public class SimulationView {
     return mySaveButton;
   }
 
-  public Button getMyStepButton(){
-    return myStepButton;
+  /**
+   * Provides access to Step button so a controller can attach behavior.
+   *
+   * @return the button used to visually advance the simulation one generation
+   */
+  public Button getMyForwardButton(){
+    return myForwardButton;
   }
+
+  /**
+   * Provides access to Step button so a controller can attach behavior.
+   *
+   * @return the button used to visually rewind the simulation one generation
+   */
+  public Button getMyBackButton() { return myBackButton; }
 
 
   /**
@@ -344,6 +336,12 @@ public class SimulationView {
     buildCenter();
   }
 
+
+  /**
+   * Provides access to the Reset button so a controller can attach behavior.
+   *
+   * @return the button used to clear and reset the grid to its initial configuration
+   */
   public Button getMyResetButton() {
     return myResetButton;
   }
