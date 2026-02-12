@@ -2,23 +2,33 @@ package cellsociety.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 import static cellsociety.config.ConfigXmlConstants.*;
 
 public class ConfigSaver {
 
-  public void saveConfig(SimulationConfig config, File outFile)
-      throws ParserConfigurationException, IOException {
+  public void saveConfig(SimulationConfig config, File outFile) {
     if (config == null) throw new IllegalArgumentException("config cannot be null");
     if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+
+    try {
+      Document doc = newDocument();
+      Element simulationEl = buildSimulationElement(doc, config);
+      doc.appendChild(simulationEl);
+      writeXml(doc, outFile);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to save config to " + outFile.getPath(), e);
+    }
   }
 
   private Document newDocument() throws Exception {
@@ -86,6 +96,19 @@ public class ConfigSaver {
     Element el = doc.createElement(tag);
     el.setTextContent(trimmed(text));
     return el;
+  }
+
+  private void writeXml(Document doc, File outFile) throws Exception {
+    Transformer transformer = TransformerFactory
+        .newInstance()
+        .newTransformer();
+
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+    transformer.transform(
+        new DOMSource(doc),
+        new StreamResult(outFile)
+    );
   }
 
   // ensures proper formatting for states i.e. 0,0,0,0,0
