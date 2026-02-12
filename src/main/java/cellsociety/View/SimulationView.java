@@ -27,7 +27,7 @@ public class SimulationView {
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
   private final Button myResetButton = new Button("Reset Grid");
-  private final Button myChangeDirectionButton = new Button("Change Direction");
+  private final Button myChangeDirectionButton = new Button("Forward");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
   private final Button myAboutButton = new Button("About This Configuration");
