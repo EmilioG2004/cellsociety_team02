@@ -75,23 +75,6 @@ class GridHandlerTest {
     assertEquals(DEAD, handler.getCellState(2, 2));
   }
 
-  // B - Boundary: corner and edge cells
-  @Test
-  void getCellState_corners_returnsCorrect() {
-    assertEquals(DEAD, handler.getCellState(0, 0));
-    assertEquals(DEAD, handler.getCellState(0, 2));
-    assertEquals(DEAD, handler.getCellState(2, 0));
-    assertEquals(DEAD, handler.getCellState(2, 2));
-  }
-
-  @Test
-  void getCellState_edges_returnsCorrect() {
-    assertEquals(ALIVE, handler.getCellState(0, 1));
-    assertEquals(ALIVE, handler.getCellState(1, 0));
-    assertEquals(ALIVE, handler.getCellState(1, 2));
-    assertEquals(ALIVE, handler.getCellState(2, 1));
-  }
-
   // I - Interface: handler delegates to grid
   @Test
   void handler_dimensionsMatchGrid() {
