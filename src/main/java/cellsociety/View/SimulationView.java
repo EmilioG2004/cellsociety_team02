@@ -15,6 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 
 /**
@@ -219,6 +220,29 @@ public class SimulationView {
 
     Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
     return chooser.showOpenDialog(w);
+  }
+
+  /**
+   * Opens a file chooser dialog configured to select simulation configuration files.
+   *
+   * Purpose:
+   * Provides a view-layer method for saving a configuration file without requiring the controller to
+   * construct its own FileChooser.
+   *
+   * Assumptions:
+   * - If this view is not attached to a Scene/Window, the dialog may not have an owner window.
+   *
+   * @return the saved configuration file
+   */
+  public File showSaveConfigDialog(){
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Save Simulation Configuration");
+    chooser.getExtensionFilters().add(new ExtensionFilter("XML Files", "*.xml"));
+    chooser.setInitialFileName("simulation_snapshot.xml");
+
+    Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
+
+    return chooser.showSaveDialog(w);
   }
 
   /**

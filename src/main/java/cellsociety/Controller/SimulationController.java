@@ -1,13 +1,17 @@
 package cellsociety.Controller;
 
+import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
 import cellsociety.View.SimulationView;
 import cellsociety.config.ConfigLoader;
+import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.application.Platform;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
@@ -42,6 +46,7 @@ public class SimulationController {
   private final SimulationDriver myDriver;
   private final ConfigLoader myConfigLoader;
   private SimulationConfig initialConfig;
+  private ConfigSaver myConfigSaver;
   private static final double cellSize = 20.0;
   private static final boolean forward = true;
   private static final boolean backward = true;
@@ -60,6 +65,7 @@ public class SimulationController {
     this.mySimView = simView;
     this.myDriver = new SimulationDriver();
     this.myConfigLoader = new ConfigLoader();
+    this.myConfigSaver = new ConfigSaver();
     wireButtons();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
@@ -177,7 +183,35 @@ public class SimulationController {
    * This method exists to connect the save control to the controller layer.
    */
   private void wireSave() {
-    mySimView.getMySaveButton().setOnAction(e -> {});
+    mySimView.getMySaveButton().setOnAction(e -> {
+      if (initialConfig == null) {
+        return;
+      }
+
+      if (myDriver.isRunning()){
+        myDriver.pause();
+      }
+
+      CellState[][] stateSnapshot = myDriver.getSimulation().getGridHandler().getCellStates();
+      int snapshotRows = myDriver.getSimulation().getGridHandler().getRows();
+      int snapshotCols = myDriver.getSimulation().getGridHandler().getCols();
+      String type = initialConfig.getSimulationType();
+      String title = initialConfig.getTitle();
+      String author = initialConfig.getAuthor();
+      String description = initialConfig.getDescription();
+      Map<String, Double> parameters = new HashMap<> (initialConfig.getParameters());
+      SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols, stateSnapshot, parameters);
+
+      File saveDestination = mySimView.showSaveConfigDialog();
+      if (saveDestination != null){
+        try {
+          myConfigSaver.saveConfig(configSnapshot, saveDestination);
+        } catch (ParserConfigurationException | IOException ex) {
+          throw new RuntimeException(ex);
+        }
+      }
+
+    });
   }
 
   /**
