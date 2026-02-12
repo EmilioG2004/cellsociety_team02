@@ -1,35 +1,46 @@
 package cellsociety.Model.GameRules;
 
-import cellsociety.Model.GameRule;
-import cellsociety.Model.ReadOnlyCell;
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.Utils.MooreNeighborStrategy;
 import java.util.List;
 import java.util.Map;
 
 public class ConwayGameOfLifeRule extends GameRule {
-  public static final int DEAD = 0;
-  public static final int ALIVE = 1;
-  
-  public ConwayGameOfLifeRule(){
+
+  public ConwayGameOfLifeRule() {
     super(new MooreNeighborStrategy());
   }
+
   public ConwayGameOfLifeRule(Map<String, String> parameters) {
     super(new MooreNeighborStrategy(), parameters);
   }
   @Override
-  public int getNextState(int currentState, List<ReadOnlyCell> neighbors) {
-    int aliveNeighbors = countNeighborsWithState(neighbors, ALIVE);
-
-    if (currentState == ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)){
-      return ALIVE;
-    } else if (currentState == DEAD && aliveNeighbors == 3){
-      return ALIVE;
+  public CellState[][] getNextStates(CellState[][] currentStates) {
+    CellState[][] nextStates = new CellState[currentStates.length][currentStates[0].length];
+    for (int r = 0; r < currentStates.length; r++) {
+      for (int c = 0; c < currentStates[0].length; c++) {
+        CellState currentState = currentStates[r][c];
+        List<CellState> neighbors = getNeighbors(currentStates, r, c);
+        int aliveNeighbors = countNeighborsWithState(neighbors, GameOfLifeState.ALIVE);
+        if (currentState == GameOfLifeState.ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
+          nextStates[r][c] = GameOfLifeState.ALIVE;
+        } else if (currentState == GameOfLifeState.DEAD && aliveNeighbors == 3) {
+          nextStates[r][c] = GameOfLifeState.ALIVE;
+        } else {
+          nextStates[r][c] = GameOfLifeState.DEAD;
+          }
+          }
+      }
+    return nextStates;
     }
-    return DEAD;
+
+  public Map<CellState, String> getStateColors() {
+    return Map.of(GameOfLifeState.DEAD, GameOfLifeState.DEAD.getColor(), GameOfLifeState.ALIVE, GameOfLifeState.ALIVE.getColor());
   }
 
   @Override
-  public Map<Integer, String> getStateColors() {
-    return Map.of(DEAD, "WHITE", ALIVE, "GREEN");
+  public CellState fromInt(int value) {
+    return GameOfLifeState.fromInt(value);
   }
 }

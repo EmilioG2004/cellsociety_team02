@@ -1,21 +1,25 @@
 package cellsociety.Model;
 
+import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Collection;
 /**
  * Stores a rectangular arrangement of cells, applies neighbor logic using the strategy from
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
  * Does not store a NeighborStrategy; obtains it from GameRule during updates.
  */
-public class Grid implements ReadOnlyGrid{
+public class Grid {
+
   private final Cell[][] cells;
   private final int rows;
   private final int cols;
 
   /**
-   * Constructs a grid with the given dimensions. Call {@link #initializeGrid(int[][])} to populate.
+   * Constructs a grid with the given dimensions. Call {@link #setCellsState(CellState[][])} to populate.
    */
   public Grid(int rows, int cols) {
     this.rows = rows;
@@ -24,13 +28,12 @@ public class Grid implements ReadOnlyGrid{
   }
 
   /**
-   * Initializes the grid with cells from the given State. State values are integers
-   * (e.g., 0 = DEAD, 1 = ALIVE for Game of Life). Dimensions must match rows and cols.
+   * Initializes the grid with cells from the given state array. Dimensions must match rows and cols.
    *
-   * @param State 2D array of state values, row-major order
+   * @param state 2D array of CellState values, row-major order
    * @throws IllegalArgumentException if dimensions don't match
    */
-  public void setCellsState(int[][] state) {
+  public void setCellsState(CellState[][] state) {
     if (state.length != rows || (rows > 0 && state[0].length != cols)) {
       throw new IllegalArgumentException(
           "Initial state dimensions " + state.length + "x"
@@ -63,58 +66,23 @@ public class Grid implements ReadOnlyGrid{
   }
 
   /**
-   * Returns the state of the cell at (row, col). For read-only access by the view.
+   * Returns the state of the cell at the given row and column.
    *
-   * @throws IndexOutOfBoundsException if coordinates are out of bounds
+   * @param row the row of the cell
+   * @param col the column of the cell
+   * @return the state of the cell
    */
-  public int getCellState(int row, int col) {
+  public CellState getCellState(int row, int col) {
     return cells[row][col].getState();
   }
-
-  /**
-   * Returns the list of neighbor cells for the cell at (row, col), using the neighbor strategy
-   * from the given rules. Out-of-bounds positions are excluded (finite boundary).
-   */
-  public List<ReadOnlyCell> getCellNeighbors(int row, int col, GameRule rules) {
-    NeighborStrategy strategy = rules.getNeighborStrategy();
-    List<int[]> offsets = strategy.getNeighborOffsets();
-    List<ReadOnlyCell> neighbors = new ArrayList<>();
-
-    for (int[] offset : offsets) {
-      int nr = row + offset[0];
-      int nc = col + offset[1];
-      if (isInBounds(nr, nc)) {
-        neighbors.add(cells[nr][nc]);
-      }
-    }
-    return neighbors;
-  }
-
-  /**
-   * Computes the next state for every cell using the given rules. Does not commit—call
-   * {@link #commitAllStates()} after to advance the generation.
-   */
-  public void updateAllCells(GameRule rules) {
+  public CellState[][] getCellStates() {
+    CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        List<ReadOnlyCell> neighbors = getCellNeighbors(r, c, rules);
-        cells[r][c].updateNextState(rules, neighbors);
+        states[r][c] = cells[r][c].getState();
       }
     }
+    return states;
   }
 
-  /**
-   * Commits all cells' next state to current state. Call after {@link #updateAllCells(GameRule)}.
-   */
-  public void commitAllStates() {
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        cells[r][c].updateState();
-      }
-    }
-  }
-
-  private boolean isInBounds(int row, int col) {
-    return row >= 0 && row < rows && col >= 0 && col < cols;
-  }
 }
