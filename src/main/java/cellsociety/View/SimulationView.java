@@ -28,7 +28,7 @@ public class SimulationView {
   private final Button myResetButton = new Button("Reset Grid");
   private final Button myChangeDirectionButton = new Button("Change Direction");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
-  private final Label myStateStackSizeLabel = new Label("State Stack Size: 0");
+  private final Label myStateStackSizeLabel = new Label("Generation: 0");
   private StackPane centerPane;
 
   private final double myCellSize = 20.0;
@@ -65,13 +65,10 @@ public class SimulationView {
     HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
-    Label configLabel = new Label("Configuration: ");
-    HBox rightBox = new HBox(10, configLabel);
-
     Region spacer = new Region();
     HBox.setHgrow(spacer, Priority.ALWAYS);
 
-    HBox bar = new HBox(12, leftBox, spacer, rightBox);
+    HBox bar = new HBox(12, leftBox, spacer);
     bar.setAlignment(Pos.CENTER_LEFT);
     bar.setPadding(new Insets(14));
     bar.setMinHeight(64);

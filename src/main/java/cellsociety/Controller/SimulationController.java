@@ -71,7 +71,7 @@ public class SimulationController {
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
       mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
-      mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
+      mySimView.getMyStateStackSizeLabel().setText("Generation: "+ mySim.getGeneration());
     })
     );
   }
@@ -115,10 +115,9 @@ public class SimulationController {
       if (myDriver.isRunning()) {
         myDriver.pause();
       }
-      myDriver.setDirection(forward);
       myDriver.step();
       if (myDriver.getSimulation() != null) {
-        mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
+        mySimView.getMyStateStackSizeLabel().setText("Generation: " + myDriver.getSimulation().getGeneration());
       }
     });
   }
@@ -128,10 +127,10 @@ public class SimulationController {
       if (myDriver.isRunning()) {
         myDriver.pause();
       }
-      myDriver.setDirection(backward);
+
       myDriver.stepBack();
       if (myDriver.getSimulation() != null) {
-        mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
+        mySimView.getMyStateStackSizeLabel().setText("Generation: " + myDriver.getSimulation().getGeneration());
       }
     });
   }
@@ -295,6 +294,7 @@ public class SimulationController {
           if (this.initialConfig == null) { return; }
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
           setSimulation(mySim);
+          mySimView.getMyStateStackSizeLabel().setText("Generation: 0");
         });
   }
 }

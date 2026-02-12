@@ -48,4 +48,9 @@ public class Simulation {
     public GridHandler getGridHandler() {
         return myGridHandler;
     }
+
+    public int getGeneration() {
+        return myStateStack.size() - 1;
+    }
+
 }
