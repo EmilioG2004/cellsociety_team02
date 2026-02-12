@@ -29,6 +29,7 @@ public class SimulationController {
     myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
       Simulation mySim = myDriver.getSimulation();
       mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
+      mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
     })
     );
   }
@@ -46,11 +47,24 @@ public class SimulationController {
     wireUpload();
     wireSpeedUp();
     wireSlowDown();
+    wireChangeDirection();
+  }
+  private void wireChangeDirection(){
+    mySimView.getMyChangeDirectionButton().setOnAction(e -> {
+      System.out.println("Changing Direction to " + (myDriver.isForwardDirection() ? "Backward" : "Forward"));
+      myDriver.setDirection(!myDriver.isForwardDirection());
+      if (myDriver.isForwardDirection()) {
+        mySimView.getMyChangeDirectionButton().setText("Forward");
+      } else {
+        mySimView.getMyChangeDirectionButton().setText("Backward");
+      }
+    });
   }
   private void wireStep(){
     mySimView.getMyStepButton().setOnAction(e -> {
       System.out.println("Stepping");
       myDriver.step();
+      mySimView.getMyStateStackSizeLabel().setText(""+myDriver.getSimulation().getStateStackSize());
     });
   }
   private void wireStart(){

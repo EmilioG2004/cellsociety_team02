@@ -141,12 +141,15 @@ public class SimulationDriver {
     this.isForward = forward;
     
   }
+  public boolean isForwardDirection() {
+    return isForward;
+  }
   /**
    * Goes back one generation and notifies the step callback. Use when paused for single-step back. No-op if no simulation set.
    */
-  public void stepBack() {
+  public boolean stepBack() {
     if (simulation == null) {
-      return;
+      return false;
     }
     try {
       simulation.stepBack();
@@ -154,8 +157,9 @@ public class SimulationDriver {
         onStepCallback.run();
       }
     } catch (IllegalStateException e) {
-      pause();
+      return false;
     }
+    return true;
   }
     /**
    * Schedules steps to occur at the current speed.

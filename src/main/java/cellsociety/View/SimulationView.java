@@ -23,7 +23,9 @@ public class SimulationView {
   private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
+  private final Button myChangeDirectionButton = new Button("Change Direction");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
+  private final Label myStateStackSizeLabel = new Label("State Stack Size: 0");
   private StackPane centerPane;
 
   private final double myCellSize = 20.0;
@@ -57,16 +59,17 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myStepButton, mySpeedLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myChangeDirectionButton, myStepButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
-
+    HBox labelBox = new HBox(12, mySpeedLabel, myStateStackSizeLabel);
+    labelBox.setAlignment(Pos.CENTER_RIGHT);
     Label configLabel = new Label("Configuration: ");
     HBox rightBox = new HBox(10, configLabel);
 
     Region spacer = new Region();
     HBox.setHgrow(spacer, Priority.ALWAYS);
 
-    HBox bar = new HBox(12, leftBox, spacer, rightBox);
+    HBox bar = new HBox(12, leftBox, spacer, labelBox, spacer, rightBox);
     bar.setAlignment(Pos.CENTER_LEFT);
     bar.setPadding(new Insets(14));
     bar.setMinHeight(64);
@@ -152,8 +155,16 @@ public class SimulationView {
     return myStepButton;
   }
 
+  public Button getMyChangeDirectionButton(){
+    return myChangeDirectionButton;
+  }
+
   public Button getMySaveButton(){
     return mySaveButton;
+  }
+
+  public Label getMyStateStackSizeLabel(){
+    return myStateStackSizeLabel;
   }
 
   public GridView getMyGridView() { return myGridView; }

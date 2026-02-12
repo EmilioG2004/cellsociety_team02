@@ -19,12 +19,15 @@ public class Simulation {
         CellState[][] nextStates = myRule.getNextStates(currentStates);
         myGrid.setCellsState(nextStates);
         myStateStack.push(currentStates);
-
+    }
+    public int getStateStackSize() {
+        return myStateStack.size();
     }
     public void stepBack() {
 
         if (myStateStack.size() <= 1) {
             throw new IllegalStateException("Cannot step back from initial state");
+
         }
         myStateStack.pop();
         myGrid.setCellsState(myStateStack.peek());
