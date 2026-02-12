@@ -33,10 +33,10 @@ class SpreadingOfFireRuleTest {
   @BeforeEach
   void setUp() {
     rule = new SpreadingOfFireRule();
-    ruleCatchOneNoGrow = new SpreadingOfFireRule(Map.of("probCatch", "1.0", "probTree", "0"));
-    ruleNoCatchGrowAll = new SpreadingOfFireRule(Map.of("probCatch", "0", "probTree", "1.0"));
-    ruleNoCatchNoGrow = new SpreadingOfFireRule(Map.of("probCatch", "0", "probTree", "0"));
-    ruleEmptyParams = new SpreadingOfFireRule(Map.of());
+    ruleCatchOneNoGrow = new SpreadingOfFireRule(Map.of("probCatch", 1.0, "probTree", 0.0));
+    ruleNoCatchGrowAll = new SpreadingOfFireRule(Map.of("probCatch", 0.0, "probTree", 1.0));
+    ruleNoCatchNoGrow = new SpreadingOfFireRule(Map.of("probCatch", 0.0, "probTree", 0.0));
+    ruleEmptyParams = new SpreadingOfFireRule(Map.<String, Double>of());
   }
 
   // ---------- Z (Zero): empty/minimal ----------
@@ -301,25 +301,25 @@ class SpreadingOfFireRuleTest {
   @Test
   void constructor_probCatchAboveOne_throws() {
     assertThrows(IllegalArgumentException.class,
-        () -> new SpreadingOfFireRule(Map.of("probCatch", "1.5")));
+        () -> new SpreadingOfFireRule(Map.of("probCatch", 1.5)));
   }
 
   @Test
   void constructor_probCatchNegative_throws() {
     assertThrows(IllegalArgumentException.class,
-        () -> new SpreadingOfFireRule(Map.of("probCatch", "-0.1")));
+        () -> new SpreadingOfFireRule(Map.of("probCatch", -0.1)));
   }
 
   @Test
   void constructor_probTreeAboveOne_throws() {
     assertThrows(IllegalArgumentException.class,
-        () -> new SpreadingOfFireRule(Map.of("probTree", "2.0")));
+        () -> new SpreadingOfFireRule(Map.of("probTree", 2.0)));
   }
 
   @Test
   void constructor_probTreeNegative_throws() {
     assertThrows(IllegalArgumentException.class,
-        () -> new SpreadingOfFireRule(Map.of("probTree", "-0.1")));
+        () -> new SpreadingOfFireRule(Map.of("probTree", -0.1)));
   }
 
   @Test

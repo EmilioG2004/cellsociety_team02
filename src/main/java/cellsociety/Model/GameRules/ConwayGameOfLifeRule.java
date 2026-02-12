@@ -71,7 +71,7 @@ public class ConwayGameOfLifeRule extends GameRule {
    *
    * @param parameters map of simulation parameters parsed from configuration
    */
-  public ConwayGameOfLifeRule(Map<String, String> parameters) {
+  public ConwayGameOfLifeRule(Map<String, Double> parameters) {
     super(new MooreNeighborStrategy(), parameters);
   }
 

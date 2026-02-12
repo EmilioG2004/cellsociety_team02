@@ -6,6 +6,7 @@ import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.GameRules.SpreadingOfFireRule;
 import cellsociety.config.SimulationConfig;
 import java.util.Map;
+import java.util.HashMap;
 
 public class SimulationFactory {
   public static final Map<String, GameRule> GAME_RULES = Map.of(
