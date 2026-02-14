@@ -1,7 +1,9 @@
 package cellsociety.Model;
+
 import java.util.Stack;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
+
 public class Simulation {
     private Grid myGrid;
     private GameRule myRule;
@@ -30,6 +32,16 @@ public class Simulation {
         }
         myStateStack.pop();
         myGrid.setCellsState(myStateStack.peek());
+    }
+ 
+
+    /**
+     * toggles the cell at (row, col) to the next state in this simulation's
+     */
+    public void toggleCellState(int row, int col) {
+        CellState next = myRule.getNextStateInCycle(myGrid.getCellState(row, col));
+        myGrid.setCellState(row, col, next);
+        myStateStack.peek()[row][col] = next;
     }
     /**
      * Sets the grid to the given state and updates the undo stack so stepBack()

@@ -75,6 +75,18 @@ public class Grid implements ReadOnlyGrid {
   public CellState getCellState(int row, int col) {
     return cells[row][col].getState();
   }
+
+  /**
+   * Sets the state of a single cell. Use for edits (e.g. user toggle); does not touch other cells.
+   */
+  public void setCellState(int row, int col, CellState state) {
+    if (cells[row][col] != null) {
+      cells[row][col].setState(state);
+    } else {
+      cells[row][col] = new Cell(state);
+    }
+  }
+
   public CellState[][] getCellStates() {
     CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
@@ -85,4 +97,7 @@ public class Grid implements ReadOnlyGrid {
     return states;
   }
 
+  public Cell getCell(int row, int col) {
+    return cells[row][col];
+  }
 }
