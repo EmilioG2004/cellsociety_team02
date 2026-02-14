@@ -17,13 +17,17 @@ public class SimulationView {
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
   private final Button myUploadButton = new Button("Upload XML Configuartion");
-  private final Button myStepButton = new Button("Step Simulation");
+  private final Button myForwardButton = new Button("Step Forward");
+  private final Button myBackButton = new Button("Step Backward");
   private final Button myStartButton = new Button("Start Simulation");
   private final Button myPauseButton = new Button("Pause Simulation");
   private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
   private final Button mySlowDownButton = new Button("Slow Down Simulation");
   private final Button mySaveButton = new Button("Save State");
+  private final Button myResetButton = new Button("Reset Grid");
+  private final Button myChangeDirectionButton = new Button("Forward");
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
+  private final Label myStateStackSizeLabel = new Label("State Stack Size: 0");
   private StackPane centerPane;
 
   private final double myCellSize = 20.0;
@@ -57,7 +61,7 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myStepButton, mySpeedLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Label configLabel = new Label("Configuration: ");
@@ -148,12 +152,28 @@ public class SimulationView {
     return mySlowDownButton;
   }
 
-  public Button getMyStepButton(){
-    return myStepButton;
+  public Button getMyForwardButton(){
+    return myForwardButton;
+  }
+
+  public Button getMyBackButton(){
+    return myBackButton;
+  }
+
+  public Button getMyChangeDirectionButton(){
+    return myChangeDirectionButton;
   }
 
   public Button getMySaveButton(){
     return mySaveButton;
+  }
+
+  public Button getMyResetButton(){
+    return myResetButton;
+  }
+
+  public Label getMyStateStackSizeLabel(){
+    return myStateStackSizeLabel;
   }
 
   public GridView getMyGridView() { return myGridView; }

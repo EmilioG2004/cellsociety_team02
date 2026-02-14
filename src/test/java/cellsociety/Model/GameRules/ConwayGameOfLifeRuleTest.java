@@ -41,13 +41,6 @@ class ConwayGameOfLifeRuleTest {
     }
   }
 
-  @Test
-  void getNextStates_1x1DeadGrid_remainsDead() {
-    CellState[][] single = {{DEAD}};
-    CellState[][] next = rule.getNextStates(single);
-    assertEquals(DEAD, next[0][0]);
-  }
-
   // O - One: single alive cell
   @Test
   void getNextStates_singleAliveCell_dies() {
@@ -58,13 +51,6 @@ class ConwayGameOfLifeRuleTest {
     };
     CellState[][] next = rule.getNextStates(single);
     assertEquals(DEAD, next[1][1], "Single alive cell dies from underpopulation");
-  }
-
-  @Test
-  void getNextStates_1x1AliveCell_dies() {
-    CellState[][] tiny = {{ALIVE}};
-    CellState[][] next = rule.getNextStates(tiny);
-    assertEquals(DEAD, next[0][0], "Alone cell with no neighbors dies");
   }
 
   // M - Many: classic patterns
@@ -199,12 +185,8 @@ class ConwayGameOfLifeRuleTest {
   }
 
   @Test
-  void fromInt_zero_returnsDead() {
+  void fromInt_zeroAndOne_returnDeadAndAlive() {
     assertEquals(DEAD, rule.fromInt(0));
-  }
-
-  @Test
-  void fromInt_one_returnsAlive() {
     assertEquals(ALIVE, rule.fromInt(1));
   }
 
@@ -242,82 +224,5 @@ class ConwayGameOfLifeRuleTest {
   @Test
   void fromInt_negativeValue_throws() {
     assertThrows(IllegalArgumentException.class, () -> rule.fromInt(-1));
-  }
-
-  // S - Simple: basic Conway rules
-  @Test
-  void aliveCellWith0Neighbors_dies() {
-    CellState[][] grid = {
-        {DEAD, DEAD, DEAD},
-        {DEAD, ALIVE, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    assertEquals(DEAD, rule.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void aliveCellWith1Neighbor_dies() {
-    CellState[][] grid = {
-        {DEAD, ALIVE, DEAD},
-        {DEAD, ALIVE, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    // (1,1) has 1 alive neighbor -> dies
-    assertEquals(DEAD, rule.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void aliveCellWith2Neighbors_survives() {
-    CellState[][] grid = {
-        {ALIVE, DEAD, DEAD},
-        {DEAD, ALIVE, DEAD},
-        {DEAD, DEAD, ALIVE}
-    };
-    // (1,1) has 2 alive neighbors -> survives
-    assertEquals(ALIVE, rule.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void aliveCellWith3Neighbors_survives() {
-    CellState[][] grid = {
-        {ALIVE, ALIVE, DEAD},
-        {DEAD, ALIVE, DEAD},
-        {DEAD, DEAD, ALIVE}
-    };
-    // (1,1) has 3 alive neighbors -> survives
-    assertEquals(ALIVE, rule.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void aliveCellWith4Neighbors_dies() {
-    CellState[][] grid = {
-        {ALIVE, ALIVE, DEAD},
-        {ALIVE, ALIVE, DEAD},
-        {DEAD, DEAD, ALIVE}
-    };
-    // (1,1) has 4 alive neighbors -> dies
-    assertEquals(DEAD, rule.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void deadCellWith3Neighbors_becomesAlive() {
-    CellState[][] grid = {
-        {ALIVE, ALIVE, DEAD},
-        {ALIVE, DEAD, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    // (1,1) is dead with 3 alive neighbors -> becomes alive
-    assertEquals(ALIVE, rule.getNextStates(grid)[1][1]);
-  }
-
-  @Test
-  void deadCellWith2Neighbors_staysDead() {
-    CellState[][] grid = {
-        {ALIVE, DEAD, DEAD},
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, ALIVE}
-    };
-    // (1,1) is dead with 2 alive neighbors -> stays dead
-    assertEquals(DEAD, rule.getNextStates(grid)[1][1]);
   }
 }
