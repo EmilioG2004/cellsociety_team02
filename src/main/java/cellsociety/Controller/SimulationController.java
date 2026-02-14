@@ -69,12 +69,7 @@ public class SimulationController {
     this.myConfigSaver = new ConfigSaver();
     wireButtons();
 
-    myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
-      Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getReadOnlyGrid(), mySim.getRule().getStateColors());
-      mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
-    })
-    );
+    myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
 
   /**
@@ -92,8 +87,23 @@ public class SimulationController {
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().setOnCellClicked((row, col) -> {
+      Simulation s = myDriver.getSimulation();
+      if (s == null) return;
+      myDriver.toggleCellState(row, col);
+      Platform.runLater(this::refreshViewFromSimulation);
+    });
   }
-
+  /**
+ * Re-renders the grid view and stack size label from the driver's current simulation.
+ * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
+ */
+  private void refreshViewFromSimulation() {
+    Simulation sim = myDriver.getSimulation();
+    if (sim == null) return;
+    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    mySimView.getMyStateStackSizeLabel().setText("" + sim.getStateStackSize());
+  }
   /**
    * Wires all UI buttons in the view to their corresponding controller actions.
    * This method exists to keep constructor logic concise and organized.

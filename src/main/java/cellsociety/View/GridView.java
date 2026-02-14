@@ -60,7 +60,7 @@ public interface GridView {
    * - Implementations define what constitutes a "cleared" state.
    */
   void clear();
-
+  void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler);
   /**
    * Returns the JavaFX node representing this grid view.
    *

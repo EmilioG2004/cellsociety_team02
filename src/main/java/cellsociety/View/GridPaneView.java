@@ -44,6 +44,7 @@ public class GridPaneView implements GridView {
   private final Rectangle[][] myCells;
   private final int myRows;
   private final int myCols;
+  private java.util.function.BiConsumer<Integer, Integer> myOnCellClicked;
 
   /**
    * Constructs a GridPaneView with the specified dimensions and cell size.
@@ -102,6 +103,11 @@ public class GridPaneView implements GridView {
         cell.setStroke(Color.BLACK);
 
         myCells[r][c] = cell;
+        final int row = r;
+        final int col = c;
+        cell.setOnMouseClicked(e -> { if (myOnCellClicked != null) myOnCellClicked.accept(row,col);
+        });
+
         myGrid.add(cell, c, r);
       }
     }
@@ -148,4 +154,10 @@ public class GridPaneView implements GridView {
       }
     }
   }
+  @Override
+  public void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler)
+  {
+    this.myOnCellClicked = handler;
+  }
+
 }
