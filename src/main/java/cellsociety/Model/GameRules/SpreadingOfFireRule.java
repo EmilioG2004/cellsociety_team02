@@ -20,30 +20,16 @@ public class SpreadingOfFireRule extends GameRule {
     super(new CardinalNeighborStrategy());
   }
 
-  public SpreadingOfFireRule(Map<String, String> parameters) {
+  public SpreadingOfFireRule(Map<String, Double> parameters) {
     super(new CardinalNeighborStrategy(), parameters);
-    if (parameters != null) {
-      validateProb(parameters, "probCatch");
-      validateProb(parameters, "probTree");
+    if(parameters.containsKey("probCatch") && (parameters.get("probCatch") < 0 || parameters.get("probCatch") > 1)) {
+      throw new IllegalArgumentException("probCatch must be between 0 and 1");
+    }
+    if(parameters.containsKey("probTree") && (parameters.get("probTree") < 0 || parameters.get("probTree") > 1)) {
+      throw new IllegalArgumentException("probTree must be between 0 and 1");
     }
   }
 
-  private static void validateProb(Map<String, String> parameters, String key) {
-    if (!parameters.containsKey(key)) {
-      return;
-    }
-    String raw = parameters.get(key);
-    if (raw != null && !raw.isEmpty()) {
-      try {
-        double p = Double.parseDouble(raw);
-        if (p < 0 || p > 1) {
-          throw new IllegalArgumentException(key + " must be between 0 and 1");
-        }
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException(key + " must be a number");
-      }
-    }       
-  }
 
   @Override
   public CellState[][] getNextStates(CellState[][] currentStates) {
@@ -51,10 +37,10 @@ public class SpreadingOfFireRule extends GameRule {
     int cols = currentStates[0].length;
     double probCatch = parameters == null || !parameters.containsKey("probCatch")
         ? DEFAULT_PROB_CATCH
-        : Double.parseDouble(parameters.get("probCatch"));
+        : parameters.get("probCatch");
     double probTree = parameters == null || !parameters.containsKey("probTree")
         ? DEFAULT_PROB_TREE
-        : Double.parseDouble(parameters.get("probTree"));
+        : parameters.get("probTree");
     CellState[][] nextStates = new CellState[rows][cols];
 
     for (int r = 0; r < rows; r++) {
