@@ -23,6 +23,7 @@ class ConwayGameOfLifeRuleTest {
   @BeforeEach
   void setUp() {
     rule = new ConwayGameOfLifeRule();
+    
   }
 
   // Z - Zero: all dead grid
@@ -224,5 +225,16 @@ class ConwayGameOfLifeRuleTest {
   @Test
   void fromInt_negativeValue_throws() {
     assertThrows(IllegalArgumentException.class, () -> rule.fromInt(-1));
+  }
+
+  // Toggle / getNextStateInCycle
+  @Test
+  void getNextStateInCycle_dead_returnsAlive() {
+    assertEquals(ALIVE, rule.getNextStateInCycle(DEAD));
+  }
+
+  @Test
+  void getNextStateInCycle_alive_returnsDead() {
+    assertEquals(DEAD, rule.getNextStateInCycle(ALIVE));
   }
 }
