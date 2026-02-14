@@ -1,0 +1,28 @@
+<simulation type="Segregation">
+  <metadata>
+    <title>Segregation High Threshold</title>
+    <author>Ixa Sigler</author>
+    <description>A segregation model with a small grid and high threshold.</description>
+  </metadata>
+
+  <grid rows="12" cols="12">
+    <states>
+      1,2,1,2,1,2,0,1,2,1,2,0
+      2,1,2,1,2,1,2,0,1,2,1,2
+      1,2,1,2,1,2,1,2,0,1,2,1
+      2,1,2,1,2,1,2,1,2,0,1,2
+      1,2,1,2,1,2,1,2,1,2,0,1
+      0,0,0,0,0,0,0,0,0,0,0,0
+      2,1,2,1,2,1,0,2,1,2,1,0
+      1,2,1,2,1,2,1,0,2,1,2,1
+      2,1,2,1,2,1,2,1,0,2,1,2
+      1,2,1,2,1,2,1,2,1,0,2,1
+      2,1,2,1,2,1,2,1,2,1,0,2
+      0,0,0,0,0,0,0,0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+    <param name="satisfactionThreshold" value="0.7"/>
+  </parameters>
+</simulation>
