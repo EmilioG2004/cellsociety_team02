@@ -131,4 +131,8 @@ public class ConwayGameOfLifeRule extends GameRule {
   public CellState fromInt(int value) {
     return GameOfLifeState.fromInt(value);
   }
+  @Override
+  public CellState getNextStateInCycle(CellState current) {
+    return GameOfLifeState.getNextStateInCycle(current);
+  }
 }

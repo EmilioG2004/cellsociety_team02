@@ -10,7 +10,15 @@ public enum SpreadingOfFireState implements CellState {
     SpreadingOfFireState(String color) {
         this.color = color;
     }
-    
+    public static SpreadingOfFireState getNextStateInCycle(CellState current) {
+        return switch (current) {
+            case SpreadingOfFireState.EMPTY -> SpreadingOfFireState.TREE;
+            case SpreadingOfFireState.TREE -> SpreadingOfFireState.BURNING;
+            case SpreadingOfFireState.BURNING -> SpreadingOfFireState.EMPTY;
+            case SpreadingOfFireState.TREE -> SpreadingOfFireState.BURNING;
+            default -> (SpreadingOfFireState) current;
+        };
+    }
     @Override
     public String getColor() {
         return color;
