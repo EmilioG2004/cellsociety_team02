@@ -1,7 +1,7 @@
 package cellsociety.View;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.GridHandler;
+import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
@@ -21,12 +21,12 @@ import javafx.scene.shape.Rectangle;
  *
  * Assumptions:
  * - The number of rows and columns is fixed for the lifetime of this view.
- * - The provided GridHandler has dimensions that match the rows and columns used to
+ * - The provided ReadOnlyGrid has dimensions that match the rows and columns used to
  *   construct this GridPaneView.
  * - The stateColors map contains a color entry for every possible cell state.
  *
  * Dependencies:
- * - GridHandler for accessing simulation state without allowing mutation.
+ * - ReadOnlyGrid for accessing simulation state (rows, cols, getCellState) without mutation.
  * - JavaFX GridPane and Rectangle for rendering.
  * - JavaFX Color and Paint for visual styling.
  *
@@ -44,6 +44,7 @@ public class GridPaneView implements GridView {
   private final Rectangle[][] myCells;
   private final int myRows;
   private final int myCols;
+  private java.util.function.BiConsumer<Integer, Integer> myOnCellClicked;
 
   /**
    * Constructs a GridPaneView with the specified dimensions and cell size.
@@ -102,6 +103,11 @@ public class GridPaneView implements GridView {
         cell.setStroke(Color.BLACK);
 
         myCells[r][c] = cell;
+        final int row = r;
+        final int col = c;
+        cell.setOnMouseClicked(e -> { if (myOnCellClicked != null) myOnCellClicked.accept(row,col);
+        });
+
         myGrid.add(cell, c, r);
       }
     }
@@ -136,16 +142,22 @@ public class GridPaneView implements GridView {
    * - The dimensions of the ReadOnlyGrid match this view’s row and column counts.
    * - stateColors contains a valid color string for every state value returned by the grid.
    *
-   * @param myGridHandler read-only view of the simulation grid state
+   * @param grid read-only view of the simulation grid (rows, cols, getCellState)
    * @param stateColors mapping from cell state values to color strings
    */
   @Override
-  public void render(GridHandler myGridHandler, Map<CellState, String> stateColors) {
-    for (int r = 0; r < myGridHandler.getRows(); r++) {
-      for (int c = 0; c < myGridHandler.getCols(); c++) {
-        CellState cellState = myGridHandler.getCellState(r, c);
+  public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+    for (int r = 0; r < grid.getRows(); r++) {
+      for (int c = 0; c < grid.getCols(); c++) {
+        CellState cellState = grid.getCellState(r, c);
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
       }
     }
   }
+  @Override
+  public void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler)
+  {
+    this.myOnCellClicked = handler;
+  }
+
 }

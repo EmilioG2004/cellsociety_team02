@@ -1,6 +1,7 @@
 package cellsociety.Controller;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
@@ -68,12 +69,7 @@ public class SimulationController {
     this.myConfigSaver = new ConfigSaver();
     wireButtons();
 
-    myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
-      Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
-      mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
-    })
-    );
+    myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
 
   /**
@@ -90,9 +86,24 @@ public class SimulationController {
    */
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getGridHandler(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().setOnCellClicked((row, col) -> {
+      Simulation s = myDriver.getSimulation();
+      if (s == null) return;
+      myDriver.toggleCellState(row, col);
+      Platform.runLater(this::refreshViewFromSimulation);
+    });
   }
-
+  /**
+ * Re-renders the grid view and stack size label from the driver's current simulation.
+ * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
+ */
+  private void refreshViewFromSimulation() {
+    Simulation sim = myDriver.getSimulation();
+    if (sim == null) return;
+    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    mySimView.getMyStateStackSizeLabel().setText("" + sim.getStateStackSize());
+  }
   /**
    * Wires all UI buttons in the view to their corresponding controller actions.
    * This method exists to keep constructor logic concise and organized.
@@ -200,9 +211,10 @@ public class SimulationController {
         myDriver.pause();
       }
 
-      CellState[][] stateSnapshot = myDriver.getSimulation().getGridHandler().getCellStates();
-      int snapshotRows = myDriver.getSimulation().getGridHandler().getRows();
-      int snapshotCols = myDriver.getSimulation().getGridHandler().getCols();
+      ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
+      CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
+      int snapshotRows = grid.getRows();
+      int snapshotCols = grid.getCols();
       String type = initialConfig.getSimulationType();
       String title = initialConfig.getTitle();
       String author = initialConfig.getAuthor();
@@ -249,9 +261,10 @@ public class SimulationController {
                 SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
                 setInitialConfig(myConfig);
                 Simulation mySim = SimulationFactory.createSimulation(myConfig);
+                ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
                 mySimView.setGrid(
-                    mySim.getGridHandler().getRows(),
-                    mySim.getGridHandler().getCols(),
+                    readOnlyGrid.getRows(),
+                    readOnlyGrid.getCols(),
                     cellSize);
                 setSimulation(mySim);
               } catch (ParserConfigurationException | SAXException | IOException ex) {

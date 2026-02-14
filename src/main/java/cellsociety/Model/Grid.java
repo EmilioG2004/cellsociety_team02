@@ -12,7 +12,7 @@ import java.util.Collection;
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
  * Does not store a NeighborStrategy; obtains it from GameRule during updates.
  */
-public class Grid {
+public class Grid implements ReadOnlyGrid {
 
   private final Cell[][] cells;
   private final int rows;
@@ -75,6 +75,18 @@ public class Grid {
   public CellState getCellState(int row, int col) {
     return cells[row][col].getState();
   }
+
+  /**
+   * Sets the state of a single cell. Use for edits (e.g. user toggle); does not touch other cells.
+   */
+  public void setCellState(int row, int col, CellState state) {
+    if (cells[row][col] != null) {
+      cells[row][col].setState(state);
+    } else {
+      cells[row][col] = new Cell(state);
+    }
+  }
+
   public CellState[][] getCellStates() {
     CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
@@ -85,4 +97,7 @@ public class Grid {
     return states;
   }
 
+  public Cell getCell(int row, int col) {
+    return cells[row][col];
+  }
 }

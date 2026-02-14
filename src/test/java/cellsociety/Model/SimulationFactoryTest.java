@@ -4,6 +4,7 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.config.SimulationConfig;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
@@ -24,8 +25,8 @@ public class SimulationFactoryTest {
         "GameOfLife", "Test", "Author", "Desc", 0, 0, new int[][]{}, new HashMap<>());
     Simulation sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
-    assertEquals(0, sim.getGridHandler().getRows());
-    assertEquals(0, sim.getGridHandler().getCols());
+    assertEquals(0, sim.getReadOnlyGrid().getRows());
+    assertEquals(0, sim.getReadOnlyGrid().getCols());
   }
 
   @Test
@@ -35,10 +36,10 @@ public class SimulationFactoryTest {
         new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, new HashMap<>());
     Simulation sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
-    GridHandler handler = sim.getGridHandler();
+    ReadOnlyGrid grid = sim.getReadOnlyGrid();
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
-        assertEquals(DEAD, handler.getCellState(r, c));
+        assertEquals(DEAD, grid.getCellState(r, c));
       }
     }
   }
@@ -51,9 +52,9 @@ public class SimulationFactoryTest {
         new int[][]{{1}}, new HashMap<>());
     Simulation sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
-    assertEquals(1, sim.getGridHandler().getRows());
-    assertEquals(1, sim.getGridHandler().getCols());
-    assertEquals(ALIVE, sim.getGridHandler().getCellState(0, 0));
+    assertEquals(1, sim.getReadOnlyGrid().getRows());
+    assertEquals(1, sim.getReadOnlyGrid().getCols());
+    assertEquals(ALIVE, sim.getReadOnlyGrid().getCellState(0, 0));
   }
 
   // M - Many: multiple elements
@@ -64,18 +65,18 @@ public class SimulationFactoryTest {
         new int[][]{{0, 1, 0}, {0, 1, 0}, {0, 1, 0}}, new HashMap<>());
     Simulation sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
-    GridHandler handler = sim.getGridHandler();
-    assertEquals(3, handler.getRows());
-    assertEquals(3, handler.getCols());
-    assertEquals(DEAD, handler.getCellState(0, 0));
-    assertEquals(ALIVE, handler.getCellState(0, 1));
-    assertEquals(DEAD, handler.getCellState(0, 2));
-    assertEquals(DEAD, handler.getCellState(1, 0));
-    assertEquals(ALIVE, handler.getCellState(1, 1));
-    assertEquals(DEAD, handler.getCellState(1, 2));
-    assertEquals(DEAD, handler.getCellState(2, 0));
-    assertEquals(ALIVE, handler.getCellState(2, 1));
-    assertEquals(DEAD, handler.getCellState(2, 2));
+    ReadOnlyGrid grid = sim.getReadOnlyGrid();
+    assertEquals(3, grid.getRows());
+    assertEquals(3, grid.getCols());
+    assertEquals(DEAD, grid.getCellState(0, 0));
+    assertEquals(ALIVE, grid.getCellState(0, 1));
+    assertEquals(DEAD, grid.getCellState(0, 2));
+    assertEquals(DEAD, grid.getCellState(1, 0));
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+    assertEquals(DEAD, grid.getCellState(1, 2));
+    assertEquals(DEAD, grid.getCellState(2, 0));
+    assertEquals(ALIVE, grid.getCellState(2, 1));
+    assertEquals(DEAD, grid.getCellState(2, 2));
   }
 
   @Test
@@ -84,10 +85,10 @@ public class SimulationFactoryTest {
         "GameOfLife", "Test", "Author", "Desc", 2, 2,
         new int[][]{{1, 1}, {1, 1}}, new HashMap<>());
     Simulation sim = SimulationFactory.createSimulation(config);
-    GridHandler handler = sim.getGridHandler();
+    ReadOnlyGrid grid = sim.getReadOnlyGrid();
     for (int r = 0; r < 2; r++) {
       for (int c = 0; c < 2; c++) {
-        assertEquals(ALIVE, handler.getCellState(r, c));
+        assertEquals(ALIVE, grid.getCellState(r, c));
       }
     }
   }
@@ -111,16 +112,16 @@ public class SimulationFactoryTest {
 
   // I - Interface: returns correct types
   @Test
-  void createSimulation_returnsSimulationWithGridHandlerAndRule() {
+  void createSimulation_returnsSimulationWithReadOnlyGridAndRule() {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, new HashMap<>());
     Simulation sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
-    assertNotNull(sim.getGridHandler());
+    assertNotNull(sim.getReadOnlyGrid());
     assertNotNull(sim.getRule());
-    assertEquals(3, sim.getGridHandler().getRows());
-    assertEquals(3, sim.getGridHandler().getCols());
+    assertEquals(3, sim.getReadOnlyGrid().getRows());
+    assertEquals(3, sim.getReadOnlyGrid().getCols());
   }
 
   @Test

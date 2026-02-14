@@ -226,6 +226,37 @@ class SimulationDriverTest {
     assertNull(driver.getSimulation());
   }
 
+  @Test
+  void toggleCellState_withNoSimulation_doesNotThrow() {
+    driver.toggleCellState(0, 0); // no-op when simulation is null
+    assertNull(driver.getSimulation());
+  }
+
+  @Test
+  void toggleCellState_withSimulation_updatesCell() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    driver.setSimulation(simulation);
+    driver.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+  }
+
+  @Test
+  void toggleCellState_withSimulation_twice_returnsToOriginal() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    driver.setSimulation(simulation);
+    driver.toggleCellState(1, 1);
+    driver.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+  }
+
   // I - Interface: integration with Simulation
   @Test
   void periodicStepping_invokesCallbackMultipleTimes() throws InterruptedException {
