@@ -15,6 +15,8 @@ public class SimulationFactory {
   public static final String SIMULATION_TYPE_SPREADING_OF_FIRE = "SpreadingOfFire";
   private static final int MIN_PARAMS_TO_APPLY = 1;
   private static final String ERROR_MESSAGE_INVALID_CONFIG = "Invalid simulation configuration: ";
+  private static final String ERROR_UNKNOWN_TYPE = "Unknown simulation type: '%s'. Supported: "
+      + SIMULATION_TYPE_GAME_OF_LIFE + ", " + SIMULATION_TYPE_SPREADING_OF_FIRE;
 
   public static final Map<String, GameRule> GAME_RULES = Map.of(
       SIMULATION_TYPE_GAME_OF_LIFE, new ConwayGameOfLifeRule(),
@@ -24,6 +26,9 @@ public class SimulationFactory {
     try {
       String simulationType = config.getSimulationType();
       GameRule rule = GAME_RULES.get(simulationType);
+      if (rule == null) {
+        throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_TYPE, simulationType));
+      }
       if (config.getParameters().size() >= MIN_PARAMS_TO_APPLY) {
         rule.setParameters(config.getParameters());
       }

@@ -189,7 +189,7 @@ class GridTest {
     assertEquals(3, result[0].length);
   }
 
-  // E - Exceptional: empty grid
+  // E - Exceptional: empty grid, uninitialized access
   @Test
   void zeroSizeGrid_hasZeroDimensionsAndEmptyGetCellStates() {
     Grid emptyGrid = new Grid(0, 0);
@@ -198,5 +198,26 @@ class GridTest {
     emptyGrid.setCellsState(new CellState[0][0]);
     CellState[][] result = emptyGrid.getCellStates();
     assertEquals(0, result.length);
+  }
+
+  @Test
+  void getCellState_beforeSetCellsState_throws() {
+    Grid uninit = new Grid(2, 2);
+    assertThrows(IllegalStateException.class, () -> uninit.getCellState(0, 0));
+  }
+
+  @Test
+  void getCellStates_beforeSetCellsState_throws() {
+    Grid uninit = new Grid(2, 2);
+    assertThrows(IllegalStateException.class, () -> uninit.getCellStates());
+  }
+
+  @Test
+  void getCellState_outOfBounds_throws() {
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(-1, 0));
+    assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(0, -1));
+    assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(3, 0));
+    assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(0, 3));
   }
 }

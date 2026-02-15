@@ -26,6 +26,7 @@ public class SimulationDriver {
   private static final String THREAD_NAME = "SimulationDriver";
   private static final double SPEED_FLOOR = 0.0;
   private static final double NANOS_PER_SECOND = 1_000_000_000.0;
+  private static final String ERROR_NO_SIMULATION = "No simulation set";
 
   public SimulationDriver() {
     this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -62,10 +63,19 @@ public class SimulationDriver {
     }
   }
 
+  /** Returns true if a simulation has been set. */
+  public boolean hasSimulation() {
+    return simulation != null;
+  }
+
   /**
-   * Returns the current simulation, or null if none set.
+   * Returns the current simulation.
+   * @throws IllegalStateException if no simulation has been set
    */
   public Simulation getSimulation() {
+    if (simulation == null) {
+      throw new IllegalStateException(ERROR_NO_SIMULATION);
+    }
     return simulation;
   }
 

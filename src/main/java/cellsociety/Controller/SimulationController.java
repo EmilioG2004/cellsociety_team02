@@ -88,8 +88,7 @@ public class SimulationController {
     myDriver.setSimulation(sim);
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     mySimView.getMyGridView().setOnCellClicked((row, col) -> {
-      Simulation s = myDriver.getSimulation();
-      if (s == null) return;
+      if (!myDriver.hasSimulation()) return;
       myDriver.toggleCellState(row, col);
       Platform.runLater(this::refreshViewFromSimulation);
     });
@@ -99,8 +98,8 @@ public class SimulationController {
  * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
  */
   private void refreshViewFromSimulation() {
+    if (!myDriver.hasSimulation()) return;
     Simulation sim = myDriver.getSimulation();
-    if (sim == null) return;
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     mySimView.getMyStateStackSizeLabel().setText("" + sim.getStateStackSize());
   }
@@ -128,7 +127,7 @@ public class SimulationController {
       }
       myDriver.setDirection(forward);
       myDriver.step();
-      if (myDriver.getSimulation() != null) {
+      if (myDriver.hasSimulation()) {
         mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
       }
     });
@@ -141,7 +140,7 @@ public class SimulationController {
       }
       myDriver.setDirection(backward);
       myDriver.stepBack();
-      if (myDriver.getSimulation() != null) {
+      if (myDriver.hasSimulation()) {
         mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
       }
     });
@@ -206,7 +205,9 @@ public class SimulationController {
       if (initialConfig == null) {
         return;
       }
-
+      if (!myDriver.hasSimulation()) {
+        return;
+      }
       if (myDriver.isRunning()){
         myDriver.pause();
       }

@@ -12,6 +12,7 @@ import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import org.junit.jupiter.api.Test;
@@ -135,10 +136,13 @@ public class SimulationFactoryTest {
 
   // E - Exceptional: invalid simulation type
   @Test
-  void createSimulation_invalidSimulationType_throws() {
+  void createSimulation_unknownSimulationType_throwsWithClearMessage() {
     SimulationConfig config = new SimulationConfig(
         "InvalidType", "Test", "Author", "Desc", 1, 1,
         new int[][]{{0}}, new HashMap<>());
-    assertThrows(IllegalArgumentException.class, () -> SimulationFactory.createSimulation(config));
+    IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+        () -> SimulationFactory.createSimulation(config));
+    assertTrue(thrown.getMessage().contains("Unknown simulation type"));
+    assertTrue(thrown.getMessage().contains("InvalidType"));
   }
 }
