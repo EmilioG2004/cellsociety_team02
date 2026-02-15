@@ -33,6 +33,7 @@ public class SimulationView {
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
   private final Button myAboutButton = new Button("About This Configuration");
+  private final Button myToggleOutlineButton = new Button("Toggle Outlines");
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog(Main.APP_WIDTH, Main.APP_HEIGHT);
 
@@ -41,10 +42,8 @@ public class SimulationView {
 
   private GridView myGridView;
 
-
   public SimulationView(){
     buildTop();
-
     myRoot.setPadding(new Insets(12));
     myRoot.setStyle("-fx-background-color: #f6f7fb;");
   }
@@ -66,7 +65,7 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, mySpeedLabel, myStateStackSizeLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, myToggleOutlineButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Region spacer = new Region();
@@ -193,6 +192,8 @@ public class SimulationView {
   public Button getMyAboutButton(){
     return myAboutButton;
   }
+
+  public Button getMyToggleOutlineButton() { return myToggleOutlineButton; }
 
   public Label getMyStateStackSizeLabel(){
     return myStateStackSizeLabel;

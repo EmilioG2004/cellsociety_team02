@@ -39,12 +39,13 @@ import javafx.scene.shape.Rectangle;
  */
 public class GridPaneView implements GridView {
 
-  private final GridPane myGrid = new GridPane();
+  private final GridPane myGridPane = new GridPane();
   private final double myCellSize;
   private final Rectangle[][] myCells;
   private final int myRows;
   private final int myCols;
   private java.util.function.BiConsumer<Integer, Integer> myOnCellClicked;
+  private boolean isOutlined;
 
   /**
    * Constructs a GridPaneView with the specified dimensions and cell size.
@@ -65,6 +66,7 @@ public class GridPaneView implements GridView {
     this.myCols = cols;
     this.myRows = rows;
     this.myCells = new Rectangle[rows][cols];
+    this.isOutlined = true;
 
     buildGrid();
   }
@@ -80,7 +82,7 @@ public class GridPaneView implements GridView {
    */
   @Override
   public Node getNode() {
-    return myGrid;
+    return myGridPane;
   }
 
   /**
@@ -94,7 +96,7 @@ public class GridPaneView implements GridView {
    * - Grid dimensions are fixed and do not change after construction.
    */
   private void buildGrid() {
-    myGrid.setGridLinesVisible(true);
+    myGridPane.setGridLinesVisible(false);
 
     for (int r = 0; r < myRows; r++) {
       for (int c = 0; c < myCols; c++) {
@@ -108,7 +110,7 @@ public class GridPaneView implements GridView {
         cell.setOnMouseClicked(e -> { if (myOnCellClicked != null) myOnCellClicked.accept(row,col);
         });
 
-        myGrid.add(cell, c, r);
+        myGridPane.add(cell, c, r);
       }
     }
   }
@@ -151,6 +153,12 @@ public class GridPaneView implements GridView {
       for (int c = 0; c < grid.getCols(); c++) {
         CellState cellState = grid.getCellState(r, c);
         myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
+
+        if (isOutlined){
+          myCells[r][c].setStroke(Color.BLACK);
+        } else {
+          myCells[r][c].setStroke(Color.TRANSPARENT);
+        }
       }
     }
   }
@@ -158,6 +166,21 @@ public class GridPaneView implements GridView {
   public void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler)
   {
     this.myOnCellClicked = handler;
+  }
+
+  @Override
+  public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors){
+    isOutlined = !isOutlined;
+    for (int r = 0; r < grid.getRows(); r++) {
+      for (int c = 0; c < grid.getCols(); c++) {
+        if (isOutlined){
+          myCells[r][c].setStroke(Color.BLACK);
+        } else {
+          myCells[r][c].setStroke(Color.TRANSPARENT);
+        }
+      }
+    }
+
   }
 
 }

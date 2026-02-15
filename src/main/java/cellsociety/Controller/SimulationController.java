@@ -122,6 +122,7 @@ public class SimulationController {
     wireSlowDown();
     wireReset();
     wireAbout();
+    wireToggleOutline();
   }
 
   private void wireForward() {
@@ -306,7 +307,7 @@ public class SimulationController {
    * Assumptions:
    * - The initial config is not null and has a value
    */
-  public void wireReset(){
+  private void wireReset(){
     mySimView.getMyResetButton()
         .setOnAction(e -> {
           if (this.initialConfig == null) { return; }
@@ -316,7 +317,7 @@ public class SimulationController {
         });
   }
 
-  public void wireAbout(){
+  private void wireAbout(){
     mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
         mySimView.getMyAboutDialog().closeInfo()
     );
@@ -328,5 +329,12 @@ public class SimulationController {
         mySimView.showAboutSplash(initialConfig);
     }
     );
+  }
+
+  private void wireToggleOutline(){
+    mySimView.getMyToggleOutlineButton().setOnAction(e -> {
+      Simulation sim = myDriver.getSimulation();
+      mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    });
   }
 }
