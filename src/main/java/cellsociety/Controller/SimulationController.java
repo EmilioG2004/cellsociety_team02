@@ -321,8 +321,12 @@ public class SimulationController {
         mySimView.getMyAboutDialog().closeInfo()
     );
 
-    mySimView.getMyAboutButton().setOnAction(e ->
-        mySimView.showAboutSplash(initialConfig)
+    mySimView.getMyAboutButton().setOnAction(e -> {
+          if (initialConfig == null) {
+            throw new IllegalStateException("No configuration loaded");
+          }
+        mySimView.showAboutSplash(initialConfig);
+    }
     );
   }
 }
