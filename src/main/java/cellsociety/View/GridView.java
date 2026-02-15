@@ -1,7 +1,7 @@
 package cellsociety.View;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.GridHandler;
+import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
 
@@ -20,7 +20,7 @@ import javafx.scene.Node;
  *   and should not be modified by implementations.
  *
  * Dependencies:
- * - GridHandler for accessing grid state in a read-only manner.
+ * - ReadOnlyGrid for accessing grid state (rows, cols, cell state per index).
  * - JavaFX Node so implementations can be embedded in the UI layout.
  *
  * Example usage:
@@ -37,17 +37,17 @@ public interface GridView {
    *
    * Purpose:
    * Updates the visual representation of each cell based on the data provided
-   * by the GridHandler and the associated state-to-color mapping.
+   * by the ReadOnlyGrid and the associated state-to-color mapping.
    *
    * Assumptions:
    * - The dimensions of the ReadOnlyGrid are compatible with the implementation’s
    *   internal grid representation.
    * - The stateColors map contains entries for all possible cell states.
    *
-   * @param myGridHandler read-only view of the simulation grid state
+   * @param grid read-only view of the simulation grid (rows, cols, getCellState)
    * @param stateColors mapping from cell state values to color strings
    */
-  void render(GridHandler myGridHandler, Map<CellState, String> stateColors);
+  void render(ReadOnlyGrid grid, Map<CellState, String> stateColors);
 
   /**
    * Clears the visual grid.
@@ -60,7 +60,7 @@ public interface GridView {
    * - Implementations define what constitutes a "cleared" state.
    */
   void clear();
-
+  void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler);
   /**
    * Returns the JavaFX node representing this grid view.
    *

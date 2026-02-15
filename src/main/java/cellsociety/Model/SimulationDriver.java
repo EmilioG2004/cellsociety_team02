@@ -51,6 +51,15 @@ public class SimulationDriver {
   }
 
   /**
+   * Toggles the cell at (row, col) to the next state in this simulation's cycle.
+   */
+  public void toggleCellState(int row, int col) {
+    if (simulation != null) {
+      simulation.toggleCellState(row, col);
+    }
+  }
+
+  /**
    * Returns the current simulation, or null if none set.
    */
   public Simulation getSimulation() {

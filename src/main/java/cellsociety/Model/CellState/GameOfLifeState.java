@@ -22,4 +22,11 @@ public enum GameOfLifeState implements CellState {
       default -> throw new IllegalArgumentException("Invalid GameOfLife state: " + value);
     };
   }
+  public static GameOfLifeState getNextStateInCycle(CellState current) {
+    return switch (current) {
+      case GameOfLifeState.DEAD -> GameOfLifeState.ALIVE;
+      case GameOfLifeState.ALIVE -> GameOfLifeState.DEAD;
+      default -> (GameOfLifeState) current;
+    };
+  }
 }

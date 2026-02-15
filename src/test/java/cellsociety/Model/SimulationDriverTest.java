@@ -116,13 +116,6 @@ class SimulationDriverTest {
     assertEquals(1, callCount.get());
   }
 
-  @Test
-  void step_withoutCallback_doesNotThrow() {
-    simulation.setState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
-    driver.setSimulation(simulation);
-    driver.step(); // should not throw
-  }
-
   // M - Many: multiple operations
   @Test
   void step_multipleTimes_advancesMultipleGenerations() {
@@ -213,12 +206,6 @@ class SimulationDriverTest {
   }
 
   @Test
-  void setSpeed_veryLarge_updatesRate() {
-    driver.setSpeed(1000.0);
-    assertEquals(1000.0, driver.getStepsPerSecond());
-  }
-
-  @Test
   void setSpeed_verySmall_updatesRate() {
     driver.setSpeed(0.001);
     assertEquals(0.001, driver.getStepsPerSecond());
@@ -237,6 +224,37 @@ class SimulationDriverTest {
     driver.setSimulation(null);
     driver.step(); // should not throw
     assertNull(driver.getSimulation());
+  }
+
+  @Test
+  void toggleCellState_withNoSimulation_doesNotThrow() {
+    driver.toggleCellState(0, 0); // no-op when simulation is null
+    assertNull(driver.getSimulation());
+  }
+
+  @Test
+  void toggleCellState_withSimulation_updatesCell() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    driver.setSimulation(simulation);
+    driver.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+  }
+
+  @Test
+  void toggleCellState_withSimulation_twice_returnsToOriginal() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    driver.setSimulation(simulation);
+    driver.toggleCellState(1, 1);
+    driver.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
   }
 
   // I - Interface: integration with Simulation

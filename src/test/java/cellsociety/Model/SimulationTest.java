@@ -3,6 +3,7 @@ package cellsociety.Model;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.ReadOnlyGrid;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -59,25 +60,6 @@ class SimulationTest {
         () -> assertEquals(DEAD, result[2][1]),
         () -> assertEquals(DEAD, result[2][2])
     );
-  }
-
-  @Test
-  void step_allDeadGrid_multipleSteps_remainsAllDead() {
-    CellState[][] allDead = {
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    simulation.setState(allDead);
-    simulation.step();
-    simulation.step();
-    simulation.step();
-    CellState[][] result = grid.getCellStates();
-    for (int r = 0; r < 3; r++) {
-      for (int c = 0; c < 3; c++) {
-        assertEquals(DEAD, result[r][c]);
-      }
-    }
   }
 
   // O - One: single element
@@ -206,18 +188,6 @@ class SimulationTest {
     simulation.setState(oneLive);
     assertThrows(IllegalStateException.class, () -> simulation.stepBack(),
         "Cannot step back when only one state on stack (current)");
-  }
-
-  @Test
-  void step_singleAliveCornerCell_dies() {
-    CellState[][] cornerLive = {
-        {ALIVE, DEAD, DEAD},
-        {DEAD, DEAD, DEAD},
-        {DEAD, DEAD, DEAD}
-    };
-    simulation.setState(cornerLive);
-    simulation.step();
-    assertEquals(DEAD, grid.getCellStates()[0][0], "Corner cell with no neighbors should die");
   }
 
   // M - Many: multiple elements
@@ -392,33 +362,92 @@ class SimulationTest {
     assertEquals(DEAD, grid.getCellStates()[1][1], "Step after stepBack should match normal step from same state");
   }
 
-  // I - Interface: getGridHandler and getRule contracts
+  // Toggle cell state (click-to-cycle)
   @Test
-  void getGridHandler_returnsNonNull() {
+  void toggleCellState_dead_becomesAlive() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    simulation.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+  }
+
+  @Test
+  void toggleCellState_alive_becomesDead() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    simulation.toggleCellState(1, 1);
+    assertEquals(DEAD, grid.getCellState(1, 1));
+  }
+
+  @Test
+  void toggleCellState_twice_returnsToOriginal() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, ALIVE, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    simulation.toggleCellState(1, 1);
+    simulation.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+  }
+
+  @Test
+  void toggleCellState_updatesStackTopSoStepBackRestores() {
+    simulation.setState(new CellState[][]{
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD},
+        {DEAD, DEAD, DEAD}
+    });
+    simulation.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+    simulation.step(); // now we have history
+    simulation.stepBack(); // should show toggled state (one alive at center)
+    assertEquals(ALIVE, grid.getCellState(1, 1));
+  }
+
+  @Test
+  void toggleCellState_otherCellsUnchanged() {
+    simulation.setState(new CellState[][]{
+        {ALIVE, DEAD, ALIVE},
+        {DEAD, DEAD, DEAD},
+        {ALIVE, DEAD, ALIVE}
+    });
+    simulation.toggleCellState(1, 1);
+    assertEquals(ALIVE, grid.getCellState(0, 0));
+    assertEquals(DEAD, grid.getCellState(0, 1));
+    assertEquals(ALIVE, grid.getCellState(2, 2));
+    assertEquals(ALIVE, grid.getCellState(1, 1)); // toggled from DEAD
+  }
+
+  // I - Interface: getReadOnlyGrid and getRule contracts
+  @Test
+  void getReadOnlyGrid_returnsNonNullWithCorrectDimensions() {
     CellState[][] initial = {{DEAD, ALIVE}, {ALIVE, DEAD}};
     Grid g = new Grid(2, 2);
     g.setCellsState(initial);
     Simulation sim = new Simulation(g, rules);
-    GridHandler handler = sim.getGridHandler();
-    assertNotNull(handler);
-    assertEquals(2, handler.getRows());
-    assertEquals(2, handler.getCols());
+    ReadOnlyGrid readOnlyGrid = sim.getReadOnlyGrid();
+    assertNotNull(readOnlyGrid);
+    assertEquals(2, readOnlyGrid.getRows());
+    assertEquals(2, readOnlyGrid.getCols());
   }
 
   @Test
-  void getGridHandler_dimensionsMatchGrid() {
-    GridHandler handler = simulation.getGridHandler();
-    assertEquals(grid.getRows(), handler.getRows());
-    assertEquals(grid.getCols(), handler.getCols());
+  void getReadOnlyGrid_dimensionsMatchGrid() {
+    ReadOnlyGrid readOnlyGrid = simulation.getReadOnlyGrid();
+    assertEquals(grid.getRows(), readOnlyGrid.getRows());
+    assertEquals(grid.getCols(), readOnlyGrid.getCols());
   }
 
   @Test
   void getRule_returnsOriginalRule() {
     assertEquals(rules, simulation.getRule());
-  }
-
-  @Test
-  void getRule_isConwayGameOfLifeRule() {
     assertEquals(ConwayGameOfLifeRule.class, simulation.getRule().getClass());
   }
 

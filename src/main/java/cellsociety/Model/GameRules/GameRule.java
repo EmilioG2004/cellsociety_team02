@@ -110,4 +110,5 @@ public abstract class GameRule {
     }
     return count;
   }
+  public abstract CellState getNextStateInCycle(CellState current);
 }
