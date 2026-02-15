@@ -123,10 +123,7 @@ public class SegregationRule extends GameRule {
 
   @Override
   public Map<CellState, String> getStateColors() {
-    return Map.of(
-        SegregationState.EMPTY, SegregationState.EMPTY.getColor(),
-        SegregationState.GROUP_A, SegregationState.GROUP_A.getColor(),
-        SegregationState.GROUP_B, SegregationState.GROUP_B.getColor());
+    return stateColorsFor(SegregationState.EMPTY, SegregationState.GROUP_A, SegregationState.GROUP_B);
   }
 
   @Override

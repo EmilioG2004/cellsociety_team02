@@ -73,10 +73,10 @@ public class SpreadingOfFireRule extends GameRule {
 
   @Override
   public Map<CellState, String> getStateColors() {
-    return Map.of(
-        SpreadingOfFireState.EMPTY, SpreadingOfFireState.EMPTY.getColor(),
-        SpreadingOfFireState.TREE, SpreadingOfFireState.TREE.getColor(),
-        SpreadingOfFireState.BURNING, SpreadingOfFireState.BURNING.getColor());
+    return stateColorsFor(
+        SpreadingOfFireState.EMPTY,
+        SpreadingOfFireState.TREE,
+        SpreadingOfFireState.BURNING);
   }
 
   @Override

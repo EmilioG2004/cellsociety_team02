@@ -2,10 +2,10 @@ package cellsociety.Model.GameRules;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Utils.NeighborStrategy;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * Abstract base class for cellular automaton transition rules. Each simulation type (e.g.,
@@ -78,6 +78,18 @@ public abstract class GameRule {
    * @return map of state to color string
    */
   public abstract Map<CellState, String> getStateColors();
+
+  /**
+   * Builds a state-to-color map from the given states (each state maps to its own getColor()).
+   * Use in subclasses to avoid duplicating the Map.of(state, state.getColor(), ...) pattern.
+   */
+  protected static Map<CellState, String> stateColorsFor(CellState... states) {
+    Map<CellState, String> m = new HashMap<>();
+    for (CellState s : states) {
+      m.put(s, s.getColor());
+    }
+    return Map.copyOf(m);
+  }
 
   /**
    * Converts an integer value (from XML config) to the appropriate CellState enum.

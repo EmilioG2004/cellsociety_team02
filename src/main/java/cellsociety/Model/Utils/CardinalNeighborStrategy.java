@@ -2,10 +2,6 @@ package cellsociety.Model.Utils;
 import java.util.List;
 public class CardinalNeighborStrategy implements NeighborStrategy {
 
-    private static final int OFFSET_PREV_ROW_OR_COL = -1;
-    private static final int OFFSET_SAME_ROW_OR_COL = 0;
-    private static final int OFFSET_NEXT_ROW_OR_COL = 1;
-
     private static final List<int[]> CARDINAL_OFFSETS = List.of(
         new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }, // N
         new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // W

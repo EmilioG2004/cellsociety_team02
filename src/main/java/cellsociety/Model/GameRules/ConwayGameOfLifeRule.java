@@ -118,8 +118,9 @@ public class ConwayGameOfLifeRule extends GameRule {
     return nextStates;
   }
 
+  @Override
   public Map<CellState, String> getStateColors() {
-    return Map.of(GameOfLifeState.DEAD, GameOfLifeState.DEAD.getColor(), GameOfLifeState.ALIVE, GameOfLifeState.ALIVE.getColor());
+    return stateColorsFor(GameOfLifeState.DEAD, GameOfLifeState.ALIVE);
   }
 
   /**

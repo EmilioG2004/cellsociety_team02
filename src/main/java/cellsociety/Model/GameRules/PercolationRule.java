@@ -57,7 +57,7 @@ public class PercolationRule extends GameRule {
     }
     @Override
     public Map<CellState, String> getStateColors() {
-        return Map.of(PercolotionState.CLOSED, PercolotionState.CLOSED.getColor(), PercolotionState.OPEN, PercolotionState.OPEN.getColor(), PercolotionState.FULL, PercolotionState.FULL.getColor());
+        return stateColorsFor(PercolotionState.CLOSED, PercolotionState.OPEN, PercolotionState.FULL);
     }
     @Override
     public CellState fromInt(int value) {

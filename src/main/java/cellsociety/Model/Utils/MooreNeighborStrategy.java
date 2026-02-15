@@ -4,10 +4,6 @@ import java.util.List;
 
 public class MooreNeighborStrategy implements NeighborStrategy {
 
-    private static final int OFFSET_PREV_ROW_OR_COL = -1;
-    private static final int OFFSET_SAME_ROW_OR_COL = 0;
-    private static final int OFFSET_NEXT_ROW_OR_COL = 1;
-
     private static final List<int[]> MOORE_OFFSETS = List.of(
             new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // NW
             new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }, // N
