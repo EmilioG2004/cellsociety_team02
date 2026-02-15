@@ -133,4 +133,9 @@ public class SegregationRule extends GameRule {
   public CellState fromInt(int value) {
     return SegregationState.fromInt(value);
   }
+
+  @Override
+  public CellState getNextStateInCycle(CellState current) {
+    return SegregationState.getNextStateInCycle(current);
+  }
 }
