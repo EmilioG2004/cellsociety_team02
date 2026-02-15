@@ -1,5 +1,6 @@
 package cellsociety.Model.CellState;
 
+/** Spreading of Fire cell states: EMPTY, TREE, BURNING. */
 public enum SpreadingOfFireState implements CellState {
     EMPTY("WHITE"),
     TREE("GREEN"),

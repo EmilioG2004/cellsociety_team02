@@ -24,42 +24,16 @@ public abstract class GameRule {
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
   protected Map<String, Double> parameters;
 
-  /**
-   * Constructs a GameRule with the given neighbor strategy and no parameters.
-   *
-   * @param neighborStrategy strategy defining which cells are neighbors
-   */
   public GameRule(NeighborStrategy neighborStrategy) {
     this(neighborStrategy, Map.of());
   }
 
-  /**
-   * Constructs a GameRule with the given neighbor strategy and parameters.
-   *
-   * @param neighborStrategy strategy defining which cells are neighbors
-   * @param parameters simulation-specific parameters (e.g., probCatch, threshold)
-   */
   public GameRule(NeighborStrategy neighborStrategy, Map<String, Double> parameters) {
     this.neighborStrategy = neighborStrategy;
     this.parameters = parameters;
   }
 
-  /**
-   * Computes the next state for a cell given its current state and neighbor cells.
-   *
-   * @param currentState the cell's current state
-   * @param neighbors list of neighboring cells (read-only)
-   * @return the state the cell should transition to in the next generation
-   */
-
-  // public abstract CellState getNextState(CellState currentState, List<ReadOnlyCell> neighbors);
   public abstract CellState[][] getNextStates(CellState[][] currentStates);
-  /**
-   * Returns the neighbor strategy used by this rule. The grid calls this when building
-   * the neighbor list for each cell during {@code updateAllCells}.
-   *
-   * @return the NeighborStrategy for this simulation type
-   */
   public NeighborStrategy getNeighborStrategy() {
     return neighborStrategy;
   }
@@ -72,17 +46,8 @@ public abstract class GameRule {
   public Map<String, Double> getParameters() {
     return parameters;
   }
-  /**
-   * Returns a map from state display keys to CSS/hex colors for rendering the grid.
-   *
-   * @return map of state to color string
-   */
   public abstract Map<CellState, String> getStateColors();
 
-  /**
-   * Builds a state-to-color map from the given states (each state maps to its own getColor()).
-   * Use in subclasses to avoid duplicating the Map.of(state, state.getColor(), ...) pattern.
-   */
   protected static Map<CellState, String> stateColorsFor(CellState... states) {
     Map<CellState, String> m = new HashMap<>();
     for (CellState s : states) {
@@ -91,22 +56,9 @@ public abstract class GameRule {
     return Map.copyOf(m);
   }
 
-  /**
-   * Converts an integer value (from XML config) to the appropriate CellState enum.
-   *
-   * @param value the integer state value from the config
-   * @return the corresponding CellState
-   */
   public abstract CellState fromInt(int value);
 
-  /**
-   * Counts how many neighbors have the specified state. Useful for rules like Game of Life
-   * that depend on the number of live neighbors.
-   *
-   * @param neighbors list of neighboring cells
-   * @param targetState the state to count
-   * @return number of neighbors in the target state
-   */
+  /** Returns in-bounds neighbor states at (row, col) using this rule's neighbor strategy. */
   protected List<CellState> getNeighbors(CellState[][] currentStates, int row, int col) {
     List<CellState> neighbors = new ArrayList<CellState>();
     for (int[] offset : neighborStrategy.getNeighborOffsets()) {
@@ -118,6 +70,8 @@ public abstract class GameRule {
     }
     return neighbors;
   }
+
+  /** Counts neighbors that equal targetState. */
   protected static int countNeighborsWithState(List<CellState> neighbors, CellState targetState) {
     int count = 0;
     for (CellState cell : neighbors) {

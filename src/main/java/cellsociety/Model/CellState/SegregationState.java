@@ -1,5 +1,6 @@
 package cellsociety.Model.CellState;
 
+/** Segregation cell states: EMPTY, GROUP_A, GROUP_B. */
 public enum SegregationState implements CellState {
     EMPTY("WHITE"),
     GROUP_A("BLUE"),

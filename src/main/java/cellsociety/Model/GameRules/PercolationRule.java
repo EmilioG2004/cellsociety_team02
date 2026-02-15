@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.List;
 import cellsociety.Model.CellState.PercolotionState;
 
+/** Percolation: OPEN cells become FULL when they have enough FULL neighbors (Moore). Optional param: threshold (default 1). */
 public class PercolationRule extends GameRule {
 
     private static final int DEFAULT_THRESHOLD = 1;
@@ -18,12 +19,6 @@ public class PercolationRule extends GameRule {
     public PercolationRule(Map<String, Double> parameters) {
         super(new MooreNeighborStrategy(), parameters);
     }
-    /**
-     * Computes the next state for a cell given its current state and neighbor cells.
-     * reads threshold to use for percolation from parameters, if not present, defaults to 1. Threshold is number of full neighbors required for percolation.
-     * @param currentStates the current state of the grid
-     * @return the next state of the grid
-     */
     @Override
     public CellState[][] getNextStates(CellState[][] currentStates) {
         int rows = currentStates.length;

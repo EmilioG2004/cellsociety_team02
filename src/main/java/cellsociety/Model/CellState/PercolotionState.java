@@ -1,5 +1,6 @@
 package cellsociety.Model.CellState;
 
+/** Percolation cell states: CLOSED, OPEN, FULL. */
 public enum PercolotionState implements CellState {
     CLOSED("BLACK"),
     OPEN("WHITE"),

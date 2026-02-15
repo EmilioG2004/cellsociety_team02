@@ -1,5 +1,6 @@
 package cellsociety.Model.CellState;
 
+/** Game of Life cell states: DEAD, ALIVE. */
 public enum GameOfLifeState implements CellState {
   DEAD("WHITE"),
   ALIVE("GREEN");

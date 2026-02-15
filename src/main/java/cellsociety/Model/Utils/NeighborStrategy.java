@@ -2,6 +2,7 @@ package cellsociety.Model.Utils;
 
 import java.util.List;
 
+/** Defines which grid offsets count as neighbors (e.g. Moore 8, Cardinal 4). */
 public interface NeighborStrategy {
 
   /** Offset for previous row or column (e.g. north, west). */

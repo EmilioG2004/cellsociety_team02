@@ -2,6 +2,7 @@ package cellsociety.Model.Utils;
 
 import java.util.List;
 
+/** Eight neighbors: N, S, E, W, NE, NW, SE, SW. */
 public class MooreNeighborStrategy implements NeighborStrategy {
 
     private static final List<int[]> MOORE_OFFSETS = List.of(

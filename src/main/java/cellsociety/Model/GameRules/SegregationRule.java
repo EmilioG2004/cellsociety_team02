@@ -6,15 +6,7 @@ import cellsociety.Model.Utils.MooreNeighborStrategy;
 import java.util.List;
 import java.util.*;
 
-/**
- * Schelling Segregation model:
- * Agents (GROUP_A / GROUP_B) are "happy" if
- * (same-type occupied neighbors)/(occupied neighbors) >= satisfactionThreshold.
- * Unhappy agents move to random EMPTY cells.
- *
- * Params:
- * - satisfactionThreshold (default 0.5) in [0, 1]
- */
+/** Schelling Segregation: unhappy agents (same-type ratio below threshold) move to random EMPTY cells. Param: satisfactionThreshold in [0,1], default 0.3. */
 public class SegregationRule extends GameRule {
 
   private static final double DEFAULT_THRESHOLD = 0.3;

@@ -6,11 +6,7 @@ import cellsociety.Model.Utils.CardinalNeighborStrategy;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Spreading of Fire cellular automaton: TREE cells catch fire from BURNING neighbors
- * with probability probCatch; BURNING becomes EMPTY; EMPTY becomes TREE with probability probTree.
- * Uses cardinal (4) neighbors. Parameters: probCatch (default 0.15), probTree (default 0.05).
- */
+/** Spreading of Fire: TREE catches from BURNING (probCatch), BURNING→EMPTY, EMPTY→TREE (probTree). Cardinal neighbors. Params: probCatch (0.15), probTree (0.05). */
 public class SpreadingOfFireRule extends GameRule {
 
   private static final double DEFAULT_PROB_CATCH = 0.15;

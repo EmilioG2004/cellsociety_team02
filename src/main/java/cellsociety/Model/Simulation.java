@@ -4,6 +4,7 @@ import java.util.Stack;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 
+/** Runs a single simulation: applies a GameRule to a Grid and maintains step-back history. */
 public class Simulation {
 
     /** Minimum number of states on the stack (current only) before stepBack is allowed. */

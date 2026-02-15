@@ -1,5 +1,8 @@
 package cellsociety.Model.Utils;
+
 import java.util.List;
+
+/** Four neighbors: N, S, E, W only. */
 public class CardinalNeighborStrategy implements NeighborStrategy {
 
     private static final List<int[]> CARDINAL_OFFSETS = List.of(

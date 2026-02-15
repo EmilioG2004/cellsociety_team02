@@ -8,6 +8,7 @@ import cellsociety.config.SimulationConfig;
 import java.util.Map;
 import java.util.HashMap;
 
+/** Builds a Simulation from a SimulationConfig (type, dimensions, initial states, parameters). */
 public class SimulationFactory {
 
   public static final String SIMULATION_TYPE_GAME_OF_LIFE = "GameOfLife";
