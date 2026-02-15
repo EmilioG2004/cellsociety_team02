@@ -32,6 +32,9 @@ public class Main extends Application {
     // internal configuration file
     public static final String INTERNAL_CONFIGURATION = "cellsociety.Version";
 
+    public static final int APP_WIDTH = 1200;
+    public static final int APP_HEIGHT = 750;
+
     /**
      * @see Application#start(Stage)
      */
@@ -39,7 +42,7 @@ public class Main extends Application {
     public void start (Stage primaryStage) {
         SimulationView view = new SimulationView();
         SimulationController controller = new SimulationController(view);
-        Scene scene = new Scene(view.getRoot(), 1200, 750);
+        Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

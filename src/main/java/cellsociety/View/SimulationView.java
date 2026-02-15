@@ -1,5 +1,7 @@
 package cellsociety.View;
 
+import cellsociety.Main;
+import cellsociety.config.SimulationConfig;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -32,16 +34,16 @@ public class SimulationView {
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
   private final Button myAboutButton = new Button("About This Configuration");
   private StackPane centerPane;
+  private final AboutDialog myAboutDialog = new AboutDialog(Main.APP_WIDTH, Main.APP_HEIGHT);
+
 
   private final double myCellSize = 20.0;
 
   private GridView myGridView;
 
-  private boolean isRunning;
 
   public SimulationView(){
     buildTop();
-    isRunning = false;
 
     myRoot.setPadding(new Insets(12));
     myRoot.setStyle("-fx-background-color: #f6f7fb;");
@@ -135,12 +137,21 @@ public class SimulationView {
     return chooser.showSaveDialog(w);
   }
 
-  public Parent getRoot(){
-    return myRoot;
+  public void showAboutSplash(SimulationConfig config){
+    if (centerPane == null){
+      centerPane = new StackPane();
+      centerPane.setPadding(new Insets(18,0,18,0));
+      myRoot.setCenter(centerPane);
+    }
+    myAboutDialog.generateInfo(config);
+
+    centerPane.getChildren().add(myAboutDialog);
+
+    StackPane.setAlignment(myAboutDialog, Pos.CENTER);
   }
 
-  public boolean isRunning() {
-    return isRunning;
+  public Parent getRoot(){
+    return myRoot;
   }
 
   public Button getMyUploadButton(){
@@ -186,6 +197,8 @@ public class SimulationView {
   public Label getMyStateStackSizeLabel(){
     return myStateStackSizeLabel;
   }
+
+  public AboutDialog getMyAboutDialog() { return myAboutDialog; }
 
   public GridView getMyGridView() { return myGridView; }
 

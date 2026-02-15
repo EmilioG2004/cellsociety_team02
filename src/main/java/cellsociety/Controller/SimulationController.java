@@ -1,10 +1,12 @@
 package cellsociety.Controller;
 
+import cellsociety.Main;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
+import cellsociety.View.AboutDialog;
 import cellsociety.View.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
@@ -119,6 +121,7 @@ public class SimulationController {
     wireSpeedUp();
     wireSlowDown();
     wireReset();
+    wireAbout();
   }
 
   private void wireForward() {
@@ -236,14 +239,17 @@ public class SimulationController {
       String description = initialConfig.getDescription();
       Map<String, Double> parameters = new HashMap<> (initialConfig.getParameters());
 
-      /*
 
-      SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols, stateSnapshot, parameters);
+
+      /*
+      SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols,
+          (int[][]) Arrays.stream(stateSnapshot).toArray(), parameters);
 
       File saveDestination = mySimView.showSaveConfigDialog();
       if (saveDestination != null){
         myConfigSaver.saveConfig(configSnapshot, saveDestination);
       }
+
        */
 
     });
@@ -311,9 +317,12 @@ public class SimulationController {
   }
 
   public void wireAbout(){
-    mySimView.getMyAboutButton()
-        .setOnAction(e -> {
+    mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
+        mySimView.getMyAboutDialog().closeInfo()
+    );
 
-        });
+    mySimView.getMyAboutButton().setOnAction(e ->
+        mySimView.showAboutSplash(initialConfig)
+    );
   }
 }

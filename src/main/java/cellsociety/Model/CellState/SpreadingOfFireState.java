@@ -15,8 +15,7 @@ public enum SpreadingOfFireState implements CellState {
             case SpreadingOfFireState.EMPTY -> SpreadingOfFireState.TREE;
             case SpreadingOfFireState.TREE -> SpreadingOfFireState.BURNING;
             case SpreadingOfFireState.BURNING -> SpreadingOfFireState.EMPTY;
-            case SpreadingOfFireState.TREE -> SpreadingOfFireState.BURNING;
-            default -> (SpreadingOfFireState) current;
+          default -> (SpreadingOfFireState) current;
         };
     }
     @Override
