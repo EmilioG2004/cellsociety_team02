@@ -1,9 +1,17 @@
 package cellsociety.View;
 
 import cellsociety.Controller.SimulationController;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import util.DukeApplicationTest;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.testfx.api.FxToolkit;
+import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.util.WaitForAsyncUtils;
+
 public class ViewTest extends DukeApplicationTest {
   @Override
   public void start(Stage stage) {
