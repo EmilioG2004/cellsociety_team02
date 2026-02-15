@@ -18,6 +18,10 @@ import java.util.*;
 public class SegregationRule extends GameRule {
 
   private static final double DEFAULT_THRESHOLD = 0.3;
+  private static final String PARAM_SATISFACTION_THRESHOLD = "satisfactionThreshold";
+  private static final double THRESHOLD_MIN = 0.0;
+  private static final double THRESHOLD_MAX = 1.0;
+  private static final int NO_OCCUPIED_NEIGHBORS = 0;
 
   public SegregationRule() {
     super(new MooreNeighborStrategy());
@@ -25,7 +29,7 @@ public class SegregationRule extends GameRule {
 
   public SegregationRule(Map<String, Double> parameters) {
     super(new MooreNeighborStrategy(), parameters);
-    if(parameters.containsKey("satisfactionThreshold") && (parameters.get("satisfactionThreshold") < 0 || parameters.get("satisfactionThreshold") > 1)) {
+    if (parameters.containsKey(PARAM_SATISFACTION_THRESHOLD) && (parameters.get(PARAM_SATISFACTION_THRESHOLD) < THRESHOLD_MIN || parameters.get(PARAM_SATISFACTION_THRESHOLD) > THRESHOLD_MAX)) {
       throw new IllegalArgumentException("satisfactionThreshold must be between 0 and 1");
     }
   }
@@ -36,9 +40,9 @@ public class SegregationRule extends GameRule {
     int rows = currentStates.length;
     int cols = currentStates[0].length;
 
-    double threshold = parameters == null || !parameters.containsKey("satisfactionThreshold")
+    double threshold = parameters == null || !parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
         ? DEFAULT_THRESHOLD
-        : parameters.get("satisfactionThreshold");
+        : parameters.get(PARAM_SATISFACTION_THRESHOLD);
 
     List<int[]> emptyCells = new ArrayList<>();
     List<Mover> movers = new ArrayList<>();
@@ -99,7 +103,7 @@ public class SegregationRule extends GameRule {
       if (n == self) same++;
     }
 
-    if (occupied == 0) return true;
+    if (occupied == NO_OCCUPIED_NEIGHBORS) return true;
 
     double fracSame = (double) same / occupied;
     return fracSame >= threshold;

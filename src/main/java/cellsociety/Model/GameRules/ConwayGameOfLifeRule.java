@@ -43,6 +43,13 @@ public class ConwayGameOfLifeRule extends GameRule {
   /** Integer value representing a living cell. */
   public static final int ALIVE = 1;
 
+  /** Number of alive neighbors for which a live cell survives (lower bound in classic rule). */
+  private static final int SURVIVE_NEIGHBOR_COUNT_LOW = 2;
+  /** Number of alive neighbors for which a live cell survives (upper bound in classic rule). */
+  private static final int SURVIVE_NEIGHBOR_COUNT_HIGH = 3;
+  /** Number of alive neighbors for which a dead cell is born. */
+  private static final int BIRTH_NEIGHBOR_COUNT = 3;
+
   /**
    * Constructs a ConwayGameOfLifeRule with no additional parameters.
    *
@@ -99,17 +106,17 @@ public class ConwayGameOfLifeRule extends GameRule {
         CellState currentState = currentStates[r][c];
         List<CellState> neighbors = getNeighbors(currentStates, r, c);
         int aliveNeighbors = countNeighborsWithState(neighbors, GameOfLifeState.ALIVE);
-        if (currentState == GameOfLifeState.ALIVE && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
+        if (currentState == GameOfLifeState.ALIVE && (aliveNeighbors == SURVIVE_NEIGHBOR_COUNT_LOW || aliveNeighbors == SURVIVE_NEIGHBOR_COUNT_HIGH)) {
           nextStates[r][c] = GameOfLifeState.ALIVE;
-        } else if (currentState == GameOfLifeState.DEAD && aliveNeighbors == 3) {
+        } else if (currentState == GameOfLifeState.DEAD && aliveNeighbors == BIRTH_NEIGHBOR_COUNT) {
           nextStates[r][c] = GameOfLifeState.ALIVE;
         } else {
           nextStates[r][c] = GameOfLifeState.DEAD;
-          }
-          }
+        }
       }
-    return nextStates;
     }
+    return nextStates;
+  }
 
   public Map<CellState, String> getStateColors() {
     return Map.of(GameOfLifeState.DEAD, GameOfLifeState.DEAD.getColor(), GameOfLifeState.ALIVE, GameOfLifeState.ALIVE.getColor());

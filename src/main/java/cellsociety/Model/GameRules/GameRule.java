@@ -14,6 +14,11 @@ import java.util.ArrayList;
  */
 public abstract class GameRule {
 
+  /** Index of row component in neighbor offset arrays. */
+  protected static final int OFFSET_ROW_INDEX = 0;
+  /** Index of column component in neighbor offset arrays. */
+  protected static final int OFFSET_COL_INDEX = 1;
+
   /** Defines which offsets from a cell's position count as neighbors (e.g., Moore, Von Neumann). */
   protected final NeighborStrategy neighborStrategy;
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
@@ -93,8 +98,8 @@ public abstract class GameRule {
   protected List<CellState> getNeighbors(CellState[][] currentStates, int row, int col) {
     List<CellState> neighbors = new ArrayList<CellState>();
     for (int[] offset : neighborStrategy.getNeighborOffsets()) {
-      int nr = row + offset[0];
-      int nc = col + offset[1];
+      int nr = row + offset[OFFSET_ROW_INDEX];
+      int nc = col + offset[OFFSET_COL_INDEX];
       if (nr >= 0 && nr < currentStates.length && nc >= 0 && nc < currentStates[0].length) {
         neighbors.add(currentStates[nr][nc]);
       }

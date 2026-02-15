@@ -5,6 +5,10 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 
 public class Simulation {
+
+    /** Minimum number of states on the stack (current only) before stepBack is allowed. */
+    private static final int MIN_STACK_SIZE_FOR_STEP_BACK = 1;
+
     private Grid myGrid;
     private GameRule myRule;
     private Stack<CellState[][]> myStateStack;
@@ -26,7 +30,7 @@ public class Simulation {
     }
     public void stepBack() {
 
-        if (myStateStack.size() <= 1) {
+        if (myStateStack.size() <= MIN_STACK_SIZE_FOR_STEP_BACK) {
             throw new IllegalStateException("Cannot step back from initial state");
 
         }

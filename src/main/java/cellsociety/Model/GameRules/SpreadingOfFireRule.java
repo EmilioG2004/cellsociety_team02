@@ -15,6 +15,11 @@ public class SpreadingOfFireRule extends GameRule {
 
   private static final double DEFAULT_PROB_CATCH = 0.15;
   private static final double DEFAULT_PROB_TREE = 0.05;
+  private static final String PARAM_PROB_CATCH = "probCatch";
+  private static final String PARAM_PROB_TREE = "probTree";
+  private static final double PROBABILITY_MIN = 0.0;
+  private static final double PROBABILITY_MAX = 1.0;
+  private static final int MIN_BURNING_NEIGHBORS_TO_CATCH = 1;
 
   public SpreadingOfFireRule() {
     super(new CardinalNeighborStrategy());
@@ -22,10 +27,10 @@ public class SpreadingOfFireRule extends GameRule {
 
   public SpreadingOfFireRule(Map<String, Double> parameters) {
     super(new CardinalNeighborStrategy(), parameters);
-    if(parameters.containsKey("probCatch") && (parameters.get("probCatch") < 0 || parameters.get("probCatch") > 1)) {
+    if (parameters.containsKey(PARAM_PROB_CATCH) && (parameters.get(PARAM_PROB_CATCH) < PROBABILITY_MIN || parameters.get(PARAM_PROB_CATCH) > PROBABILITY_MAX)) {
       throw new IllegalArgumentException("probCatch must be between 0 and 1");
     }
-    if(parameters.containsKey("probTree") && (parameters.get("probTree") < 0 || parameters.get("probTree") > 1)) {
+    if (parameters.containsKey(PARAM_PROB_TREE) && (parameters.get(PARAM_PROB_TREE) < PROBABILITY_MIN || parameters.get(PARAM_PROB_TREE) > PROBABILITY_MAX)) {
       throw new IllegalArgumentException("probTree must be between 0 and 1");
     }
   }
@@ -35,12 +40,12 @@ public class SpreadingOfFireRule extends GameRule {
   public CellState[][] getNextStates(CellState[][] currentStates) {
     int rows = currentStates.length;
     int cols = currentStates[0].length;
-    double probCatch = parameters == null || !parameters.containsKey("probCatch")
+    double probCatch = parameters == null || !parameters.containsKey(PARAM_PROB_CATCH)
         ? DEFAULT_PROB_CATCH
-        : parameters.get("probCatch");
-    double probTree = parameters == null || !parameters.containsKey("probTree")
+        : parameters.get(PARAM_PROB_CATCH);
+    double probTree = parameters == null || !parameters.containsKey(PARAM_PROB_TREE)
         ? DEFAULT_PROB_TREE
-        : parameters.get("probTree");
+        : parameters.get(PARAM_PROB_TREE);
     CellState[][] nextStates = new CellState[rows][cols];
 
     for (int r = 0; r < rows; r++) {
@@ -51,7 +56,7 @@ public class SpreadingOfFireRule extends GameRule {
         } else if (currentState == SpreadingOfFireState.TREE) {
           List<CellState> neighbors = getNeighbors(currentStates, r, c);
           int burningNeighbors = countNeighborsWithState(neighbors, SpreadingOfFireState.BURNING);
-          if (burningNeighbors > 0 && Math.random() < probCatch) {
+          if (burningNeighbors >= MIN_BURNING_NEIGHBORS_TO_CATCH && Math.random() < probCatch) {
             nextStates[r][c] = SpreadingOfFireState.BURNING;
           } else {
             nextStates[r][c] = SpreadingOfFireState.TREE;

@@ -5,6 +5,11 @@ public enum SpreadingOfFireState implements CellState {
     TREE("GREEN"),
     BURNING("RED");
 
+    private static final int STATE_VALUE_EMPTY = 0;
+    private static final int STATE_VALUE_TREE = 1;
+    private static final int STATE_VALUE_BURNING = 2;
+    private static final String ERROR_MESSAGE_INVALID_STATE = "Invalid SpreadingOfFire state: ";
+
     private final String color;
 
     SpreadingOfFireState(String color) {
@@ -15,7 +20,6 @@ public enum SpreadingOfFireState implements CellState {
             case SpreadingOfFireState.EMPTY -> SpreadingOfFireState.TREE;
             case SpreadingOfFireState.TREE -> SpreadingOfFireState.BURNING;
             case SpreadingOfFireState.BURNING -> SpreadingOfFireState.EMPTY;
-            case SpreadingOfFireState.TREE -> SpreadingOfFireState.BURNING;
             default -> (SpreadingOfFireState) current;
         };
     }
@@ -26,10 +30,10 @@ public enum SpreadingOfFireState implements CellState {
 
     public static SpreadingOfFireState fromInt(int value) {
         return switch (value) {
-            case 0 -> EMPTY;
-            case 1 -> TREE;
-            case 2 -> BURNING;
-            default -> throw new IllegalArgumentException("Invalid SpreadingOfFire state: " + value);
+            case STATE_VALUE_EMPTY -> EMPTY;
+            case STATE_VALUE_TREE -> TREE;
+            case STATE_VALUE_BURNING -> BURNING;
+            default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + value);
         };
     }
 }

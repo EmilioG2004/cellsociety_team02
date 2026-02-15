@@ -14,6 +14,9 @@ import java.util.Collection;
  */
 public class Grid implements ReadOnlyGrid {
 
+  private static final int FIRST_ROW_INDEX = 0;
+  private static final int FIRST_COL_INDEX = 0;
+
   private final Cell[][] cells;
   private final int rows;
   private final int cols;
@@ -34,10 +37,10 @@ public class Grid implements ReadOnlyGrid {
    * @throws IllegalArgumentException if dimensions don't match
    */
   public void setCellsState(CellState[][] state) {
-    if (state.length != rows || (rows > 0 && state[0].length != cols)) {
+    if (state.length != rows || (rows > FIRST_ROW_INDEX && state[FIRST_ROW_INDEX].length != cols)) {
       throw new IllegalArgumentException(
           "Initial state dimensions " + state.length + "x"
-              + (state.length > 0 ? state[0].length : 0)
+              + (state.length > FIRST_ROW_INDEX ? state[FIRST_ROW_INDEX].length : FIRST_COL_INDEX)
               + " do not match grid " + rows + "x" + cols);
     }
     for (int r = 0; r < rows; r++) {

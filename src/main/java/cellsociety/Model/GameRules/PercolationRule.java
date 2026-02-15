@@ -7,7 +7,10 @@ import java.util.List;
 import cellsociety.Model.CellState.PercolotionState;
 
 public class PercolationRule extends GameRule {
+
     private static final int DEFAULT_THRESHOLD = 1;
+    private static final String PARAM_THRESHOLD = "threshold";
+
     public PercolationRule() {
         super(new MooreNeighborStrategy());
     }
@@ -26,8 +29,8 @@ public class PercolationRule extends GameRule {
         int rows = currentStates.length;
         int cols = currentStates[0].length;
         int threshold;
-        if (parameters != null && parameters.containsKey("threshold")) {
-            threshold = parameters.get("threshold").intValue();
+        if (parameters != null && parameters.containsKey(PARAM_THRESHOLD)) {
+            threshold = parameters.get(PARAM_THRESHOLD).intValue();
         } else {
             threshold = DEFAULT_THRESHOLD;
         }
