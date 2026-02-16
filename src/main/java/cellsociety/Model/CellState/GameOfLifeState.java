@@ -1,8 +1,13 @@
 package cellsociety.Model.CellState;
 
+/** Game of Life cell states: DEAD, ALIVE. */
 public enum GameOfLifeState implements CellState {
   DEAD("WHITE"),
   ALIVE("GREEN");
+
+  private static final int STATE_VALUE_DEAD = 0;
+  private static final int STATE_VALUE_ALIVE = 1;
+  private static final String ERROR_MESSAGE_INVALID_STATE = "Invalid GameOfLife state: ";
 
   private final String color;
 
@@ -17,9 +22,9 @@ public enum GameOfLifeState implements CellState {
 
   public static GameOfLifeState fromInt(int value) {
     return switch (value) {
-      case 0 -> DEAD;
-      case 1 -> ALIVE;
-      default -> throw new IllegalArgumentException("Invalid GameOfLife state: " + value);
+      case STATE_VALUE_DEAD -> DEAD;
+      case STATE_VALUE_ALIVE -> ALIVE;
+      default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + value);
     };
   }
   public static GameOfLifeState getNextStateInCycle(CellState current) {

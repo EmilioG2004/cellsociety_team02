@@ -9,21 +9,35 @@ import cellsociety.config.SimulationConfig;
 import java.util.Map;
 import java.util.HashMap;
 
+/** Builds a Simulation from a SimulationConfig (type, dimensions, initial states, parameters). */
 public class SimulationFactory {
+
+  public static final String SIMULATION_TYPE_GAME_OF_LIFE = "GameOfLife";
+  public static final String SIMULATION_TYPE_SPREADING_OF_FIRE = "SpreadingOfFire";
+  private static final int MIN_PARAMS_TO_APPLY = 1;
+  private static final String ERROR_MESSAGE_INVALID_CONFIG = "Invalid simulation configuration: ";
+  public static final String SIMULATION_TYPE_SEGREGATION = "Segregation";
+  private static final String ERROR_UNKNOWN_TYPE = "Unknown simulation type: '%s'. Supported: "
+      + SIMULATION_TYPE_GAME_OF_LIFE + ", " + SIMULATION_TYPE_SPREADING_OF_FIRE + ", " + SIMULATION_TYPE_SEGREGATION;
+
   public static final Map<String, GameRule> GAME_RULES = Map.of(
-      "GameOfLife", new ConwayGameOfLifeRule(),
-      "SpreadingOfFire", new SpreadingOfFireRule(),
-      "Segregation", new SegregationRule());
+      SIMULATION_TYPE_GAME_OF_LIFE, new ConwayGameOfLifeRule(),
+      SIMULATION_TYPE_SPREADING_OF_FIRE, new SpreadingOfFireRule(),
+      SIMULATION_TYPE_SEGREGATION, new SegregationRule());
+
   public static Simulation createSimulation(SimulationConfig config) throws IllegalArgumentException {
     try {
       String simulationType = config.getSimulationType();
       GameRule rule = GAME_RULES.get(simulationType);
-      if (config.getParameters().size() > 0) {
+      if (rule == null) {
+        throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_TYPE, simulationType));
+      }
+      if (config.getParameters().size() >= MIN_PARAMS_TO_APPLY) {
         rule.setParameters(config.getParameters());
       }
       int rows = config.getRows();
       int cols = config.getCols();
-      Grid grid = new Grid(rows, cols);
+      MutableGrid grid = new Grid(rows, cols);
       int[][] intStates = config.getInitialStates();
       CellState[][] cellStates = new CellState[rows][cols];
       for (int r = 0; r < rows; r++) {
@@ -34,7 +48,7 @@ public class SimulationFactory {
       grid.setCellsState(cellStates);
       return new Simulation(grid, rule);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid simulation configuration: " + e.getMessage());
+      throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_CONFIG + e.getMessage());
     }
   }
 }

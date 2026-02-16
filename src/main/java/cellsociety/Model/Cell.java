@@ -2,6 +2,7 @@ package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
 
+/** A single cell that holds a simulation state. */
 public class Cell {
 
   private CellState currentState;

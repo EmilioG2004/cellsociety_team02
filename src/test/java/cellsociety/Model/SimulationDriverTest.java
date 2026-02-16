@@ -8,8 +8,7 @@ import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,7 +52,7 @@ class SimulationDriverTest {
   void step_withNoSimulation_doesNothing() {
     driver.step();
     assertFalse(driver.isRunning());
-    assertNull(driver.getSimulation());
+    assertFalse(driver.hasSimulation());
   }
 
   @Test
@@ -63,8 +62,9 @@ class SimulationDriverTest {
   }
 
   @Test
-  void getSimulation_initiallyNull() {
-    assertNull(driver.getSimulation());
+  void getSimulation_withNoSimulationSet_throws() {
+    assertFalse(driver.hasSimulation());
+    assertThrows(IllegalStateException.class, () -> driver.getSimulation());
   }
 
   @Test
@@ -81,7 +81,7 @@ class SimulationDriverTest {
   @Test
   void setSimulation_thenGetSimulation_returnsSame() {
     driver.setSimulation(simulation);
-    assertNotNull(driver.getSimulation());
+    assertTrue(driver.hasSimulation());
     assertEquals(simulation, driver.getSimulation());
   }
 
@@ -215,7 +215,8 @@ class SimulationDriverTest {
   void setSimulation_toNull_clearsSimulation() {
     driver.setSimulation(simulation);
     driver.setSimulation(null);
-    assertNull(driver.getSimulation());
+    assertFalse(driver.hasSimulation());
+    assertThrows(IllegalStateException.class, () -> driver.getSimulation());
   }
 
   @Test
@@ -223,13 +224,13 @@ class SimulationDriverTest {
     driver.setSimulation(simulation);
     driver.setSimulation(null);
     driver.step(); // should not throw
-    assertNull(driver.getSimulation());
+    assertFalse(driver.hasSimulation());
   }
 
   @Test
   void toggleCellState_withNoSimulation_doesNotThrow() {
     driver.toggleCellState(0, 0); // no-op when simulation is null
-    assertNull(driver.getSimulation());
+    assertFalse(driver.hasSimulation());
   }
 
   @Test
