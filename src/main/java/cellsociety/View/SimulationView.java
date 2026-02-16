@@ -16,6 +16,8 @@ import javafx.stage.Window;
 import java.io.File;
 
 public class SimulationView {
+  public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
+
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
@@ -123,6 +125,7 @@ public class SimulationView {
   public File showOpenConfigDialog() {
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Open Simulation Configuration");
+    chooser.setInitialDirectory(new File(DATA_FILE_FOLDER));
     chooser.getExtensionFilters().add(
         new FileChooser.ExtensionFilter("XML Files", "*.xml")
     );
