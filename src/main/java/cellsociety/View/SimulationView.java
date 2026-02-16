@@ -304,5 +304,6 @@ public class SimulationView {
     mySettingsButton.setText(myBundle.getString("button.settings"));
 
     mySettings.applyLanguage(bundle);
+    myAboutDialog.applyLanguage(bundle);
   }
 }
