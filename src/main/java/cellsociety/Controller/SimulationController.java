@@ -102,7 +102,7 @@ public class SimulationController {
     Simulation sim = myDriver.getSimulation();
     if (sim == null) return;
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
-    mySimView.getMyStateStackSizeLabel().setText("" + sim.getStateStackSize());
+    updateGenerationLabel();
   }
   /**
    * Wires all UI buttons in the view to their corresponding controller actions.
@@ -132,7 +132,7 @@ public class SimulationController {
       }
       myDriver.step();
       if (myDriver.getSimulation() != null) {
-        mySimView.getMyStateStackSizeLabel().setText("Generation: " + myDriver.getSimulation().getGeneration());
+        updateGenerationLabel();
       }
     });
   }
@@ -145,7 +145,7 @@ public class SimulationController {
 
       myDriver.stepBack();
       if (myDriver.getSimulation() != null) {
-        mySimView.getMyStateStackSizeLabel().setText("Generation: " + myDriver.getSimulation().getGeneration());
+        updateGenerationLabel();
       }
     });
   }
@@ -321,7 +321,7 @@ public class SimulationController {
           if (this.initialConfig == null) { return; }
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
           setSimulation(mySim);
-          mySimView.getMyStateStackSizeLabel().setText("Generation: 0");
+          updateGenerationLabel();
         });
   }
 
@@ -353,4 +353,15 @@ public class SimulationController {
   private void wireSettings(){
     mySimView.getMySettingsButton().setOnAction(e -> mySimView.openSettings());
   }
+
+  private void updateGenerationLabel() {
+    Simulation sim = myDriver.getSimulation();
+    if (sim == null) return;
+
+    int generation = sim.getGeneration();
+
+    mySimView.getMyStateStackSizeLabel()
+        .setText("Generation: " + generation);
+  }
+
 }
