@@ -12,6 +12,7 @@ import javafx.scene.text.Text;
 
 public class AboutDialog extends StackPane{
   private final Button myCloseButton = new Button("Close Panel");
+
   public AboutDialog(double width, double height){
     setPrefSize(width, height);
     setStyle("""

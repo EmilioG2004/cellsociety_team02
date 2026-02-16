@@ -1,12 +1,10 @@
 package cellsociety.Controller;
 
-import cellsociety.Main;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
-import cellsociety.View.AboutDialog;
 import cellsociety.View.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
@@ -111,6 +109,8 @@ public class SimulationController {
    * This method exists to keep constructor logic concise and organized.
    */
   private void wireButtons(){
+    wireApplyChanges();
+    wireSettings();
     wireForward();
     wireBackward();
     wireChangeDirection();
@@ -277,21 +277,29 @@ public class SimulationController {
         .getMyUploadButton()
         .setOnAction(
             e -> {
-              File myFile = mySimView.showOpenConfigDialog();
-              try {
-                SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
-                setInitialConfig(myConfig);
-                Simulation mySim = SimulationFactory.createSimulation(myConfig);
-                ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
-                mySimView.setGrid(
-                    readOnlyGrid.getRows(),
-                    readOnlyGrid.getCols(),
-                    cellSize);
-                setSimulation(mySim);
-              } catch (ParserConfigurationException | SAXException | IOException ex) {
-                throw new RuntimeException(ex);
-              }
+              handleUpload();
             });
+
+    mySimView.getMySettings().getMyUploadButton().setOnAction(e -> {
+      handleUpload();
+    });
+  }
+
+  private void handleUpload() {
+    File myFile = mySimView.showOpenConfigDialog();
+    try {
+      SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
+      setInitialConfig(myConfig);
+      Simulation mySim = SimulationFactory.createSimulation(myConfig);
+      ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
+      mySimView.setGrid(
+          readOnlyGrid.getRows(),
+          readOnlyGrid.getCols(),
+          cellSize);
+      setSimulation(mySim);
+    } catch (ParserConfigurationException | SAXException | IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
@@ -336,5 +344,13 @@ public class SimulationController {
       Simulation sim = myDriver.getSimulation();
       mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     });
+  }
+
+  private void wireApplyChanges(){
+    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> mySimView.closeSettings());
+  }
+
+  private void wireSettings(){
+    mySimView.getMySettingsButton().setOnAction(e -> mySimView.openSettings());
   }
 }

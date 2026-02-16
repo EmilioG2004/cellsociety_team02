@@ -157,7 +157,7 @@ public class GridPaneView implements GridView {
         if (isOutlined){
           myCells[r][c].setStroke(Color.BLACK);
         } else {
-          myCells[r][c].setStroke(Color.TRANSPARENT);
+          myCells[r][c].setStroke(Paint.valueOf(stateColors.get(cellState)));
         }
       }
     }
@@ -173,14 +173,14 @@ public class GridPaneView implements GridView {
     isOutlined = !isOutlined;
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {
+        CellState cellState = grid.getCellState(r, c);
         if (isOutlined){
           myCells[r][c].setStroke(Color.BLACK);
         } else {
-          myCells[r][c].setStroke(Color.TRANSPARENT);
+          myCells[r][c].setStroke(Paint.valueOf(stateColors.get(cellState)));
         }
       }
     }
-
   }
 
 }

@@ -2,6 +2,7 @@ package cellsociety.View;
 
 import cellsociety.Main;
 import cellsociety.config.SimulationConfig;
+import java.util.Stack;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,7 +17,8 @@ import java.io.File;
 
 public class SimulationView {
 
-  private final BorderPane myRoot = new BorderPane();
+  private final StackPane myRoot = new StackPane();
+  private final BorderPane myMain = new BorderPane();
   private double mySpeedMultiplier = 1;
 
   private final Label myTitle = new Label("Cellular Automata Simulator");
@@ -34,8 +36,10 @@ public class SimulationView {
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
   private final Button myAboutButton = new Button("About This Configuration");
   private final Button myToggleOutlineButton = new Button("Toggle Outlines");
+  private final Button mySettingsButton = new Button("Settings");
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog(Main.APP_WIDTH, Main.APP_HEIGHT);
+  private final SettingsSplash mySettings = new SettingsSplash(Main.APP_WIDTH, Main.APP_HEIGHT);
 
 
   private final double myCellSize = 20.0;
@@ -44,8 +48,10 @@ public class SimulationView {
 
   public SimulationView(){
     buildTop();
-    myRoot.setPadding(new Insets(12));
-    myRoot.setStyle("-fx-background-color: #f6f7fb;");
+    myMain.setPadding(new Insets(12));
+    myMain.setStyle("-fx-background-color: #f6f7fb;");
+
+    myRoot.getChildren().addAll(myMain, mySettings);
   }
 
   private void buildTop(){
@@ -54,14 +60,14 @@ public class SimulationView {
     myTitle.setMaxWidth(Double.MAX_VALUE);
     myTitle.setAlignment(Pos.CENTER);
 
-    HBox myUploadRow = new HBox(myUploadButton, myAboutButton);
+    HBox myUploadRow = new HBox(myUploadButton, myAboutButton, mySettingsButton);
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
-    myUploadRow.setPadding(new Insets(6,0,10,0));
+    myUploadRow.setPadding(new Insets(6,10,10,10));
 
     HBox myControlBar = buildControlBar();
     VBox myTopBox = new VBox(myTitle, myUploadRow, myControlBar);
     myTopBox.setSpacing(8);
-    myRoot.setTop(myTopBox);
+    myMain.setTop(myTopBox);
   }
 
   private HBox buildControlBar(){
@@ -96,7 +102,7 @@ public class SimulationView {
     if (centerPane == null) {
       centerPane = new StackPane();
       centerPane.setPadding(new Insets(18,0,18,0));
-      myRoot.setCenter(centerPane);
+      myMain.setCenter(centerPane);
     }
 
     StackPane card = new StackPane();
@@ -121,7 +127,7 @@ public class SimulationView {
         new FileChooser.ExtensionFilter("XML Files", "*.xml")
     );
 
-    Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
+    Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
     return chooser.showOpenDialog(w);
   }
 
@@ -132,7 +138,7 @@ public class SimulationView {
         new ExtensionFilter("XML Files", "*.xml")
     );
 
-    Window w = myRoot.getScene() == null ? null : myRoot.getScene().getWindow();
+    Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
     return chooser.showSaveDialog(w);
   }
 
@@ -140,13 +146,23 @@ public class SimulationView {
     if (centerPane == null){
       centerPane = new StackPane();
       centerPane.setPadding(new Insets(18,0,18,0));
-      myRoot.setCenter(centerPane);
+      myMain.setCenter(centerPane);
     }
     myAboutDialog.generateInfo(config);
 
     centerPane.getChildren().add(myAboutDialog);
 
     StackPane.setAlignment(myAboutDialog, Pos.CENTER);
+  }
+
+  public void closeSettings(){
+    mySettings.setVisible(false);
+    mySettings.setManaged(false);
+  }
+
+  public void openSettings(){
+    mySettings.setVisible(true);
+    mySettings.setVisible(true);
   }
 
   public Parent getRoot(){
@@ -195,9 +211,13 @@ public class SimulationView {
 
   public Button getMyToggleOutlineButton() { return myToggleOutlineButton; }
 
+  public Button getMySettingsButton() { return mySettingsButton; }
+
   public Label getMyStateStackSizeLabel(){
     return myStateStackSizeLabel;
   }
+
+  public SettingsSplash getMySettings() { return mySettings; }
 
   public AboutDialog getMyAboutDialog() { return myAboutDialog; }
 
