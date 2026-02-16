@@ -60,4 +60,7 @@ public class ConwayGameOfLifeRule extends GameRule {
   public CellState getNextStateInCycle(CellState current) {
     return GameOfLifeState.getNextStateInCycle(current);
   }
+
+  @Override
+  public int fromState(CellState state) { return GameOfLifeState.fromState(state); }
 }

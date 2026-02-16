@@ -37,4 +37,13 @@ public enum SpreadingOfFireState implements CellState {
             default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + value);
         };
     }
+
+    public static int fromState(CellState state){
+        return switch (state){
+            case EMPTY -> STATE_VALUE_EMPTY;
+            case TREE -> STATE_VALUE_TREE;
+            case BURNING -> STATE_VALUE_BURNING;
+            default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
+        };
+    }
 }

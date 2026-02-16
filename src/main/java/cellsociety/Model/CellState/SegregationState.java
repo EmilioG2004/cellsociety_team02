@@ -31,6 +31,15 @@ public enum SegregationState implements CellState {
         };
     }
 
+    public static int fromState(CellState state){
+        return switch(state){
+            case EMPTY -> STATE_VALUE_EMPTY;
+            case GROUP_A -> STATE_VALUE_GROUP_A;
+            case GROUP_B -> STATE_VALUE_GROUP_B;
+            default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
+        };
+    }
+
     /** Returns the next state in the click-to-toggle cycle: EMPTY -> GROUP_A -> GROUP_B -> EMPTY. */
     public static SegregationState getNextStateInCycle(CellState current) {
         return switch (current) {

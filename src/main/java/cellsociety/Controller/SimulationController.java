@@ -233,6 +233,8 @@ public class SimulationController {
 
       ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
       CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
+      int[][] intSnapshot = ReadOnlyGrid.produceIntArray(stateSnapshot, myDriver.getSimulation()
+          .getRule());
       int snapshotRows = grid.getRows();
       int snapshotCols = grid.getCols();
       String type = initialConfig.getSimulationType();
@@ -243,16 +245,16 @@ public class SimulationController {
 
 
 
-      /*
+
       SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols,
-          (int[][]) Arrays.stream(stateSnapshot).toArray(), parameters);
+          intSnapshot, parameters);
 
       File saveDestination = mySimView.showSaveConfigDialog();
       if (saveDestination != null){
         myConfigSaver.saveConfig(configSnapshot, saveDestination);
       }
 
-       */
+
 
     });
   }

@@ -127,4 +127,6 @@ public class SegregationRule extends GameRule {
   public CellState getNextStateInCycle(CellState current) {
     return SegregationState.getNextStateInCycle(current);
   }
+
+  @Override public int fromState(CellState state) { return SegregationState.fromState(state); }
 }

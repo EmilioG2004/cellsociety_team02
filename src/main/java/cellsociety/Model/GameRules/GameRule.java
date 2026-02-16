@@ -58,6 +58,8 @@ public abstract class GameRule {
 
   public abstract CellState fromInt(int value);
 
+  public abstract int fromState(CellState state);
+
   /** Returns in-bounds neighbor states at (row, col) using this rule's neighbor strategy. */
   protected List<CellState> getNeighbors(CellState[][] currentStates, int row, int col) {
     List<CellState> neighbors = new ArrayList<CellState>();
