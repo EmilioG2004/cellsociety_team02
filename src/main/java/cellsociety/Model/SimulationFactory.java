@@ -34,7 +34,7 @@ public class SimulationFactory {
       }
       int rows = config.getRows();
       int cols = config.getCols();
-      Grid grid = new Grid(rows, cols);
+      MutableGrid grid = new Grid(rows, cols);
       int[][] intStates = config.getInitialStates();
       CellState[][] cellStates = new CellState[rows][cols];
       for (int r = 0; r < rows; r++) {

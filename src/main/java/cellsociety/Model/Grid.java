@@ -12,7 +12,7 @@ import java.util.Collection;
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
  * Does not store a NeighborStrategy; obtains it from GameRule during updates.
  */
-public class Grid implements ReadOnlyGrid {
+public class Grid implements MutableGrid {
 
   private static final int FIRST_ROW_INDEX = 0;
   private static final int FIRST_COL_INDEX = 0;
@@ -34,12 +34,7 @@ public class Grid implements ReadOnlyGrid {
     this.cells = new Cell[rows][cols];
   }
 
-  /**
-   * Initializes the grid with cells from the given state array. Dimensions must match rows and cols.
-   *
-   * @param state 2D array of CellState values, row-major order
-   * @throws IllegalArgumentException if dimensions don't match
-   */
+  @Override
   public void setCellsState(CellState[][] state) {
     if (state.length != rows || (rows > FIRST_ROW_INDEX && state[FIRST_ROW_INDEX].length != cols)) {
       throw new IllegalArgumentException(
@@ -99,10 +94,7 @@ public class Grid implements ReadOnlyGrid {
     }
   }
 
-  /**
-   * Sets the state of a single cell. Use for edits (e.g. user toggle); does not touch other cells.
-   * @throws IndexOutOfBoundsException if row or col is out of bounds
-   */
+  @Override
   public void setCellState(int row, int col, CellState state) {
     checkBounds(row, col);
     if (cells[row][col] != null) {
@@ -112,6 +104,7 @@ public class Grid implements ReadOnlyGrid {
     }
   }
 
+  @Override
   public CellState[][] getCellStates() {
     CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
@@ -123,19 +116,5 @@ public class Grid implements ReadOnlyGrid {
       }
     }
     return states;
-  }
-
-  /**
-   * Returns the cell at (row, col).
-   * @throws IndexOutOfBoundsException if row or col is out of bounds
-   * @throws IllegalStateException if the grid has not been initialized at (row, col)
-   */
-  public Cell getCell(int row, int col) {
-    checkBounds(row, col);
-    Cell cell = cells[row][col];
-    if (cell == null) {
-      throw new IllegalStateException(String.format(ERROR_CELL_NOT_INITIALIZED, row, col));
-    }
-    return cell;
   }
 }

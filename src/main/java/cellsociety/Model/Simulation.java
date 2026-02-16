@@ -4,17 +4,17 @@ import java.util.Stack;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 
-/** Runs a single simulation: applies a GameRule to a Grid and maintains step-back history. */
+/** Runs a single simulation: applies a GameRule to a grid and maintains step-back history. */
 public class Simulation {
 
     /** Minimum number of states on the stack (current only) before stepBack is allowed. */
     private static final int MIN_STACK_SIZE_FOR_STEP_BACK = 1;
 
-    private Grid myGrid;
-    private GameRule myRule;
-    private Stack<CellState[][]> myStateStack;
+    private final MutableGrid myGrid;
+    private final GameRule myRule;
+    private final Stack<CellState[][]> myStateStack;
 
-    public Simulation(Grid grid, GameRule rule) {
+    public Simulation(MutableGrid grid, GameRule rule) {
         this.myGrid = grid;
         this.myRule = rule;
         this.myStateStack = new Stack<>();
