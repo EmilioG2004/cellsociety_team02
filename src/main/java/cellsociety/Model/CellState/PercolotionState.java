@@ -31,6 +31,15 @@ public enum PercolotionState implements CellState {
         };
     }
 
+    public static int fromState(CellState state){
+        return switch (state){
+            case CLOSED -> STATE_VALUE_CLOSED;
+            case OPEN -> STATE_VALUE_OPEN;
+            case FULL -> STATE_VALUE_FULL;
+            default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
+        };
+    }
+
     public static PercolotionState getNextStateInCycle(CellState current) {
         return switch (current) {
             case PercolotionState.CLOSED -> PercolotionState.OPEN;

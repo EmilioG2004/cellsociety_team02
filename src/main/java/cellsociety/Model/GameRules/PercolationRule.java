@@ -62,4 +62,7 @@ public class PercolationRule extends GameRule {
     public CellState getNextStateInCycle(CellState current) {
         return PercolotionState.getNextStateInCycle(current);
     }
+
+    @Override
+    public int fromState(CellState state){ return PercolotionState.fromState(state); }
 }

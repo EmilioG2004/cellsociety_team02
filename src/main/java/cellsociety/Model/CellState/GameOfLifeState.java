@@ -27,6 +27,15 @@ public enum GameOfLifeState implements CellState {
       default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + value);
     };
   }
+
+  public static int fromState(CellState state){
+    return switch (state){
+      case DEAD -> STATE_VALUE_DEAD;
+      case ALIVE -> STATE_VALUE_ALIVE;
+      default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
+    };
+  }
+
   public static GameOfLifeState getNextStateInCycle(CellState current) {
     return switch (current) {
       case GameOfLifeState.DEAD -> GameOfLifeState.ALIVE;
