@@ -16,7 +16,7 @@ public class SettingsSplash extends StackPane {
   private final Button myUploadButton = new Button("Upload Configuration");
   private final Button myLoadButton = new Button("Load Simulation");
   public SettingsSplash(double width, double height){
-    setPrefSize(width, height);
+    setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     setStyle("""
             -fx-background-color: white;
             -fx-text-fill: black;

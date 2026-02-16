@@ -54,6 +54,11 @@ public class SimulationView {
     myMain.setStyle("-fx-background-color: #f6f7fb;");
 
     myRoot.getChildren().addAll(myMain, mySettings);
+
+    mySettings.prefWidthProperty().bind(myRoot.widthProperty());
+    mySettings.prefHeightProperty().bind(myRoot.heightProperty());
+    mySettings.maxWidthProperty().bind(myRoot.widthProperty());
+    mySettings.maxHeightProperty().bind(myRoot.heightProperty());
   }
 
   private void buildTop(){
@@ -165,7 +170,7 @@ public class SimulationView {
 
   public void openSettings(){
     mySettings.setVisible(true);
-    mySettings.setVisible(true);
+    mySettings.setManaged(true);
   }
 
   public Parent getRoot(){
