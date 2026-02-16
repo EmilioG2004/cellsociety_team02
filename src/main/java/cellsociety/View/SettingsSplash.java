@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -28,7 +29,9 @@ public class SettingsSplash extends StackPane {
     getChildren().clear();
     Text title = new Text("Cellular Automata");
     Text subtitle = new Text("Settings");
-    VBox myPane = new VBox(12, title, subtitle, myLanguages, myThemes, myUploadButton, myLoadButton, myApplyChanges);
+    Label languageLabel = new Label("Select Language:");
+    Label themeLabel = new Label("Select Theme:");
+    VBox myPane = new VBox(12, title, subtitle, languageLabel, myLanguages, themeLabel, myThemes, myUploadButton, myLoadButton, myApplyChanges);
     myPane.setPadding(new Insets(20,20,20,20));
     myPane.setAlignment(Pos.CENTER);
 
