@@ -3,6 +3,8 @@ package cellsociety.View;
 import cellsociety.Main;
 import cellsociety.config.SimulationConfig;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
@@ -11,10 +13,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class AboutDialog extends StackPane{
-  private final Button myCloseButton = new Button("Close Panel");
+  private SimulationConfig myConfig;
+  private ResourceBundle myBundle;
+  private final Button myCloseButton;
+  private final Text myTitle;
+  private final Text myType;
+  private final Text myAuthor;
+  private final Text myDescription;
+  private final Text myParameters;
 
   public AboutDialog(double width, double height){
     setPrefSize(width, height);
+    myCloseButton = new Button();
+    myTitle = new Text();
+    myType = new Text();
+    myAuthor = new Text();
+    myDescription = new Text();
+    myParameters = new Text();
     setStyle("""
             -fx-background-color: white;
             -fx-text-fill: black;
@@ -23,17 +38,17 @@ public class AboutDialog extends StackPane{
   }
 
   public void generateInfo(SimulationConfig config){
+    myConfig = config;
+
     getChildren().clear();
-    Text title = new Text("About This Configuration");
-    Text info = new Text("Simulation Type: " + config.getSimulationType() +"\n\n"
-    + config.getTitle() + "\n\n"
-    + "Author: " + config.getAuthor() + "\n\n"
-    + config.getDescription() + "\n\n"
-    + "Parameters: " + config.getParameters());
-    VBox infoPanel = new VBox(10, title, info, myCloseButton);
+    VBox infoPanel = new VBox(10, myTitle, myType, myAuthor, myDescription, myParameters, myCloseButton);
     infoPanel.setAlignment(Pos.TOP_CENTER);
 
     getChildren().add(infoPanel);
+
+    if (myBundle != null) {
+      applyLanguage(myBundle);
+    }
   }
 
   public void closeInfo() {
@@ -43,5 +58,18 @@ public class AboutDialog extends StackPane{
   }
 
   public Button getMyCloseButton() { return myCloseButton; }
+
+  public void applyLanguage(ResourceBundle bundle){
+    myBundle = bundle;
+    myTitle.setText(bundle.getString("about.title"));
+    myCloseButton.setText(bundle.getString("button.closePanel"));
+
+    if (myConfig == null) return;
+
+    myType.setText(MessageFormat.format(bundle.getString("about.simulationType"), myConfig.getSimulationType()));
+    myDescription.setText(MessageFormat.format(bundle.getString("about.description"), myConfig.getDescription()));
+    myAuthor.setText(MessageFormat.format(bundle.getString("about.author"), myConfig.getAuthor()));
+    myParameters.setText(MessageFormat.format(bundle.getString("about.parameters"), myConfig.getParameters()));
+  }
 
 }
