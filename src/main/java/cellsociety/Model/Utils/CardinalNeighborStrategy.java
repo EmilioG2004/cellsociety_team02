@@ -1,11 +1,15 @@
 package cellsociety.Model.Utils;
+
 import java.util.List;
+
+/** Four neighbors: N, S, E, W only. */
 public class CardinalNeighborStrategy implements NeighborStrategy {
+
     private static final List<int[]> CARDINAL_OFFSETS = List.of(
-        new int[] { -1, 0 }, // N
-        new int[] { 0, -1 }, // W
-        new int[] { 0, 1 }, // E
-        new int[] { 1, 0 } // S
+        new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }, // N
+        new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // W
+        new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL }, // E
+        new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }  // S
     );
 
     public List<int[]> getNeighborOffsets() {

@@ -6,8 +6,12 @@ import java.util.Map;
 import java.util.List;
 import cellsociety.Model.CellState.PercolotionState;
 
+/** Percolation: OPEN cells become FULL when they have enough FULL neighbors (Moore). Optional param: threshold (default 1). */
 public class PercolationRule extends GameRule {
+
     private static final int DEFAULT_THRESHOLD = 1;
+    private static final String PARAM_THRESHOLD = "threshold";
+
     public PercolationRule() {
         super(new MooreNeighborStrategy());
     }
@@ -15,19 +19,13 @@ public class PercolationRule extends GameRule {
     public PercolationRule(Map<String, Double> parameters) {
         super(new MooreNeighborStrategy(), parameters);
     }
-    /**
-     * Computes the next state for a cell given its current state and neighbor cells.
-     * reads threshold to use for percolation from parameters, if not present, defaults to 1. Threshold is number of full neighbors required for percolation.
-     * @param currentStates the current state of the grid
-     * @return the next state of the grid
-     */
     @Override
     public CellState[][] getNextStates(CellState[][] currentStates) {
         int rows = currentStates.length;
         int cols = currentStates[0].length;
         int threshold;
-        if (parameters != null && parameters.containsKey("threshold")) {
-            threshold = parameters.get("threshold").intValue();
+        if (parameters != null && parameters.containsKey(PARAM_THRESHOLD)) {
+            threshold = parameters.get(PARAM_THRESHOLD).intValue();
         } else {
             threshold = DEFAULT_THRESHOLD;
         }
@@ -54,7 +52,7 @@ public class PercolationRule extends GameRule {
     }
     @Override
     public Map<CellState, String> getStateColors() {
-        return Map.of(PercolotionState.CLOSED, PercolotionState.CLOSED.getColor(), PercolotionState.OPEN, PercolotionState.OPEN.getColor(), PercolotionState.FULL, PercolotionState.FULL.getColor());
+        return stateColorsFor(PercolotionState.CLOSED, PercolotionState.OPEN, PercolotionState.FULL);
     }
     @Override
     public CellState fromInt(int value) {
