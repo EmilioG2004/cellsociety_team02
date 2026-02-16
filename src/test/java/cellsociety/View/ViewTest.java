@@ -4,8 +4,8 @@ import cellsociety.Controller.SimulationController;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.Test;
 import util.DukeApplicationTest;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

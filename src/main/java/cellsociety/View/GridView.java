@@ -71,4 +71,6 @@ public interface GridView {
    * @return Node used to display the grid
    */
   Node getNode();
+
+  void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors);
 }

@@ -68,4 +68,9 @@ public class Simulation {
     public ReadOnlyGrid getReadOnlyGrid() {
         return myGrid;
     }
+
+    public int getGeneration() {
+        return myStateStack.size() - 1;
+    }
+
 }
