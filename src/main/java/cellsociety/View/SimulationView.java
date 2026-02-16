@@ -2,7 +2,7 @@ package cellsociety.View;
 
 import cellsociety.Main;
 import cellsociety.config.SimulationConfig;
-import java.util.Stack;
+import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -17,38 +17,61 @@ import java.io.File;
 
 public class SimulationView {
   public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
+  private ResourceBundle myBundle;
 
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
   private double mySpeedMultiplier = 1;
 
-  private final Label myTitle = new Label("Cellular Automata Simulator");
-  private final Button myUploadButton = new Button("Upload XML Configuration");
-  private final Button myForwardButton = new Button("Step Forward");
-  private final Button myBackButton = new Button("Step Backward");
-  private final Button myStartButton = new Button("Start Simulation");
-  private final Button myPauseButton = new Button("Pause Simulation");
-  private final Button mySpeedUpButton = new Button ("Speed Up Simulation");
-  private final Button mySlowDownButton = new Button("Slow Down Simulation");
-  private final Button mySaveButton = new Button("Save State");
-  private final Button myResetButton = new Button("Reset Grid");
-  private final Button myChangeDirectionButton = new Button("Forward");
+  private final Label myTitle;
+  private final Button myUploadButton;
+  private final Button myForwardButton;
+  private final Button myBackButton;
+  private final Button myStartButton;
+  private final Button myPauseButton;
+  private final Button mySpeedUpButton;
+  private final Button mySlowDownButton;
+  private final Button mySaveButton;
+  private final Button myResetButton;
+  private final Button myChangeDirectionButton;
   private final Label mySpeedLabel = new Label("Current Speed: 1x");
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
-  private final Button myAboutButton = new Button("About This Configuration");
-  private final Button myToggleOutlineButton = new Button("Toggle Outlines");
-  private final Button mySettingsButton = new Button("Settings");
+  private final Button myAboutButton;
+  private final Button myToggleOutlineButton;
+  private final Button mySettingsButton;
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog(Main.APP_WIDTH, Main.APP_HEIGHT);
-  private final SettingsSplash mySettings = new SettingsSplash(Main.APP_WIDTH, Main.APP_HEIGHT);
+  private final SettingsSplash mySettings = new SettingsSplash();
 
 
   private final double myCellSize = 20.0;
 
   private GridView myGridView;
 
-  public SimulationView(){
+  public SimulationView(ResourceBundle bundle){
+    this(bundle, false);
+  }
+
+  public SimulationView(ResourceBundle bundle, boolean showSplash){
+    myBundle = bundle;
+    myTitle = new Label();
+    myUploadButton = new Button();
+    myForwardButton = new Button();
+    myBackButton = new Button();
+    myStartButton = new Button();
+    myPauseButton = new Button();
+    mySpeedUpButton = new Button();
+    mySlowDownButton = new Button();
+    mySaveButton = new Button();
+    myResetButton = new Button();
+    myChangeDirectionButton = new Button();
+    myAboutButton = new Button();
+    myToggleOutlineButton = new Button();
+    mySettingsButton = new Button();
+
+    applyLanguage(myBundle);
+
     buildTop();
     myMain.setPadding(new Insets(12));
     myMain.setStyle("-fx-background-color: #f6f7fb;");
@@ -59,6 +82,11 @@ public class SimulationView {
     mySettings.prefHeightProperty().bind(myRoot.heightProperty());
     mySettings.maxWidthProperty().bind(myRoot.widthProperty());
     mySettings.maxHeightProperty().bind(myRoot.heightProperty());
+    if (showSplash){
+      openSettings();
+    } else {
+      closeSettings();
+    }
   }
 
   private void buildTop(){
@@ -256,5 +284,25 @@ public class SimulationView {
 
   public void updateSpeedLabel(){
     mySpeedLabel.setText("Current Speed: " + mySpeedMultiplier + "x");
+  }
+
+  public void applyLanguage(ResourceBundle bundle) {
+    myBundle = bundle;
+
+    myTitle.setText(myBundle.getString("app.title"));
+    myUploadButton.setText(myBundle.getString("button.uploadConfig"));
+    myForwardButton.setText(myBundle.getString("button.stepForward"));
+    myBackButton.setText(myBundle.getString("button.stepBackward"));
+    myStartButton.setText(myBundle.getString("button.start"));
+    myPauseButton.setText(myBundle.getString("button.pause"));
+    mySpeedUpButton.setText(myBundle.getString("button.speedUp"));
+    mySlowDownButton.setText(myBundle.getString("button.slowDown"));
+    mySaveButton.setText(myBundle.getString("button.saveState"));
+    myResetButton.setText(myBundle.getString("button.resetGrid"));
+    myAboutButton.setText(myBundle.getString("button.aboutConfig"));
+    myToggleOutlineButton.setText(myBundle.getString("button.toggleOutlines"));
+    mySettingsButton.setText(myBundle.getString("button.settings"));
+
+    mySettings.applyLanguage(bundle);
   }
 }

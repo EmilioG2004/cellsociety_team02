@@ -1,5 +1,6 @@
 package cellsociety.View;
 
+import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -8,38 +9,42 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.StringConverter;
 
 public class SettingsSplash extends StackPane {
+  private final Text myTitle;
+  private final Text mySubtitle;
+  private final Label myLanguage;
+  private final Label myTheme;
   private final ChoiceBox<String> myLanguages = new ChoiceBox<>();
   private final ChoiceBox<String> myThemes = new ChoiceBox<>();
-  private final Button myApplyChanges = new Button("Apply Changes");
-  private final Button myUploadButton = new Button("Upload Configuration");
-  private final Button myLoadButton = new Button("Load Simulation");
-  public SettingsSplash(double width, double height){
+  private final Button myApplyChanges;
+  private final Button myUploadButton;
+  private final Button myLoadButton;
+  public SettingsSplash(){
     setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     setStyle("""
             -fx-background-color: white;
             -fx-text-fill: black;
         """);
+    myTitle = new Text();
+    mySubtitle = new Text();
+    myLanguage = new Label();
+    myTheme = new Label();
+    myApplyChanges = new Button();
+    myUploadButton = new Button();
+    myLoadButton = new Button();
     buildDropdowns();
     buildDialog();
   }
 
   private void buildDialog(){
     getChildren().clear();
-    Text title = new Text("Cellular Automata");
-    Text subtitle = new Text("Settings");
-    Label languageLabel = new Label("Select Language:");
-    Label themeLabel = new Label("Select Theme:");
-    VBox myPane = new VBox(12, title, subtitle, languageLabel, myLanguages, themeLabel, myThemes, myUploadButton, myLoadButton, myApplyChanges);
+    VBox myPane = new VBox(12, myTitle, mySubtitle, myLanguage, myLanguages, myTheme, myThemes, myUploadButton, myLoadButton, myApplyChanges);
     myPane.setPadding(new Insets(20,20,20,20));
     myPane.setAlignment(Pos.CENTER);
 
     getChildren().add(myPane);
-  }
-
-  public String getChoice(ChoiceBox<String> choiceBox){
-    return choiceBox.getValue();
   }
 
   public void buildDropdowns(){
@@ -47,8 +52,56 @@ public class SettingsSplash extends StackPane {
     myThemes.getItems().addAll("Light", "Dark", "Duke");
   }
 
+  public void applyLanguage(ResourceBundle bundle){
+    myTitle.setText(bundle.getString("settings.dialog.title"));
+    mySubtitle.setText(bundle.getString("settings.title"));
+    myLanguage.setText(bundle.getString("settings.language"));
+    myTheme.setText(bundle.getString("settings.theme"));
+    myApplyChanges.setText(bundle.getString("button.applyChanges"));
+    myUploadButton.setText(bundle.getString("button.uploadConfiguration"));
+    myLoadButton.setText(bundle.getString("button.loadSimulation"));
+
+    myLanguages.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String value) {
+        if (value == null) return "";
+        return switch (value) {
+          case "English" -> bundle.getString("language.english");
+          case "Spanish" -> bundle.getString("language.spanish");
+          case "Portuguese" -> bundle.getString("language.portuguese");
+          default -> value;
+        };
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string; // not used
+      }
+    });
+
+    myThemes.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String value) {
+        if (value == null) return "";
+        return switch (value) {
+          case "Light" -> bundle.getString("theme.light");
+          case "Dark" -> bundle.getString("theme.dark");
+          case "Duke" -> bundle.getString("theme.duke");
+          default -> value;
+        };
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    });
+  }
+
   public Button getMyApplyChanges(){ return myApplyChanges; }
 
   public Button getMyUploadButton() { return myUploadButton; }
+
+  public ChoiceBox<String> getMyLanguages() { return myLanguages; }
 
 }

@@ -347,7 +347,10 @@ public class SimulationController {
   }
 
   private void wireApplyChanges(){
-    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> mySimView.closeSettings());
+    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
+      mySimView.closeSettings();
+
+    });
   }
 
   private void wireSettings(){
