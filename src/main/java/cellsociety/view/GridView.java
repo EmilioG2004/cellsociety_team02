@@ -73,4 +73,8 @@ public interface GridView {
   Node getNode();
 
   void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors);
+
+  void rotateLeft();
+
+  void rotateRight();
 }

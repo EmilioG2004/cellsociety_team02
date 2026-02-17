@@ -126,6 +126,7 @@ public class SimulationController {
     wireReset();
     wireAbout();
     wireToggleOutline();
+    wireRotate();
   }
 
   private void wireForward() {
@@ -370,6 +371,16 @@ public class SimulationController {
 
   private void wireSettings(){
     mySimView.getMySettingsButton().setOnAction(e -> mySimView.openSettings());
+  }
+
+  private void wireRotate(){
+    mySimView.getMyRotateLeftButton().setOnAction(e -> {
+      mySimView.getMyGridView().rotateLeft();
+    });
+
+    mySimView.getMyRotateRightButton().setOnAction(e -> {
+      mySimView.getMyGridView().rotateRight();
+    });
   }
 
   private void updateGenerationLabel() {
