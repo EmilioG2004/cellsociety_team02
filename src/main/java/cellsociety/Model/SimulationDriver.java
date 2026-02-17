@@ -23,10 +23,14 @@ public class SimulationDriver {
   private ScheduledFuture<?> stepTask;
 
   private static final double DEFAULT_SPEED = 1.0;
+  private static final String THREAD_NAME = "SimulationDriver";
+  private static final double SPEED_FLOOR = 0.0;
+  private static final double NANOS_PER_SECOND = 1_000_000_000.0;
+  private static final String ERROR_NO_SIMULATION = "No simulation set";
 
   public SimulationDriver() {
     this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-      Thread t = new Thread(r, "SimulationDriver");
+      Thread t = new Thread(r, THREAD_NAME);
       t.setDaemon(true);
       return t;
     });
@@ -51,9 +55,27 @@ public class SimulationDriver {
   }
 
   /**
-   * Returns the current simulation, or null if none set.
+   * Toggles the cell at (row, col) to the next state in this simulation's cycle.
+   */
+  public void toggleCellState(int row, int col) {
+    if (simulation != null) {
+      simulation.toggleCellState(row, col);
+    }
+  }
+
+  /** Returns true if a simulation has been set. */
+  public boolean hasSimulation() {
+    return simulation != null;
+  }
+
+  /**
+   * Returns the current simulation.
+   * @throws IllegalStateException if no simulation has been set
    */
   public Simulation getSimulation() {
+    if (simulation == null) {
+      throw new IllegalStateException(ERROR_NO_SIMULATION);
+    }
     return simulation;
   }
 
@@ -108,7 +130,7 @@ public class SimulationDriver {
    * Sets the stepping rate in steps per second. If running, reschedules at the new rate immediately.
    */
   public void setSpeed(double stepsPerSecond) {
-    if (stepsPerSecond <= 0) {
+    if (stepsPerSecond <= SPEED_FLOOR) {
       stepsPerSecond = DEFAULT_SPEED;
     }
     this.stepsPerSecond = stepsPerSecond;
@@ -168,7 +190,7 @@ public class SimulationDriver {
     if (!isRunning || simulation == null) {
       return;
     }
-    long periodNanos = (long) (1_000_000_000.0 / stepsPerSecond);
+    long periodNanos = (long) (NANOS_PER_SECOND / stepsPerSecond);
     stepTask = scheduler.scheduleAtFixedRate(
         this::tick,
         periodNanos,

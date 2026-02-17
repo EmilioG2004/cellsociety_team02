@@ -1,18 +1,20 @@
 package cellsociety.View;
 
 import cellsociety.Controller.SimulationController;
+import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.Test;
 import util.DukeApplicationTest;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ViewTest extends DukeApplicationTest {
   @Override
   public void start(Stage stage) {
-    SimulationView view = new SimulationView();
+    ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.Languages.English");
+    SimulationView view = new SimulationView(bundle);
     @SuppressWarnings("unused") // controller wires view buttons; needed for test setup
     SimulationController controller = new SimulationController(view);
     Scene scene = new Scene(view.getRoot(), 1200, 750);

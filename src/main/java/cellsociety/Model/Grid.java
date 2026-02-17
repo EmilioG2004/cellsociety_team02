@@ -12,7 +12,14 @@ import java.util.Collection;
  * GameRule, and drives the two-pass update (compute next state for all, then commit).
  * Does not store a NeighborStrategy; obtains it from GameRule during updates.
  */
-public class Grid {
+public class Grid implements MutableGrid {
+
+  private static final int FIRST_ROW_INDEX = 0;
+  private static final int FIRST_COL_INDEX = 0;
+  private static final String ERROR_GRID_NOT_INITIALIZED = "Grid not initialized; call setCellsState first";
+  private static final String ERROR_CELL_NOT_INITIALIZED = "Cell at (%d, %d) not initialized";
+  private static final String ERROR_ROW_OUT_OF_BOUNDS = "Row %d out of bounds [0, %d)";
+  private static final String ERROR_COL_OUT_OF_BOUNDS = "Column %d out of bounds [0, %d)";
 
   private final Cell[][] cells;
   private final int rows;
@@ -27,17 +34,12 @@ public class Grid {
     this.cells = new Cell[rows][cols];
   }
 
-  /**
-   * Initializes the grid with cells from the given state array. Dimensions must match rows and cols.
-   *
-   * @param state 2D array of CellState values, row-major order
-   * @throws IllegalArgumentException if dimensions don't match
-   */
+  @Override
   public void setCellsState(CellState[][] state) {
-    if (state.length != rows || (rows > 0 && state[0].length != cols)) {
+    if (state.length != rows || (rows > FIRST_ROW_INDEX && state[FIRST_ROW_INDEX].length != cols)) {
       throw new IllegalArgumentException(
           "Initial state dimensions " + state.length + "x"
-              + (state.length > 0 ? state[0].length : 0)
+              + (state.length > FIRST_ROW_INDEX ? state[FIRST_ROW_INDEX].length : FIRST_COL_INDEX)
               + " do not match grid " + rows + "x" + cols);
     }
     for (int r = 0; r < rows; r++) {
@@ -71,18 +73,48 @@ public class Grid {
    * @param row the row of the cell
    * @param col the column of the cell
    * @return the state of the cell
+   * @throws IndexOutOfBoundsException if row or col is out of bounds
+   * @throws IllegalStateException if the grid has not been initialized at (row, col)
    */
   public CellState getCellState(int row, int col) {
-    return cells[row][col].getState();
+    checkBounds(row, col);
+    Cell cell = cells[row][col];
+    if (cell == null) {
+      throw new IllegalStateException(String.format(ERROR_CELL_NOT_INITIALIZED, row, col));
+    }
+    return cell.getState();
   }
+
+  private void checkBounds(int row, int col) {
+    if (row < 0 || row >= rows) {
+      throw new IndexOutOfBoundsException(String.format(ERROR_ROW_OUT_OF_BOUNDS, row, rows));
+    }
+    if (col < 0 || col >= cols) {
+      throw new IndexOutOfBoundsException(String.format(ERROR_COL_OUT_OF_BOUNDS, col, cols));
+    }
+  }
+
+  @Override
+  public void setCellState(int row, int col, CellState state) {
+    checkBounds(row, col);
+    if (cells[row][col] != null) {
+      cells[row][col].setState(state);
+    } else {
+      cells[row][col] = new Cell(state);
+    }
+  }
+
+  @Override
   public CellState[][] getCellStates() {
     CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
+        if (cells[r][c] == null) {
+          throw new IllegalStateException(ERROR_GRID_NOT_INITIALIZED);
+        }
         states[r][c] = cells[r][c].getState();
       }
     }
     return states;
   }
-
 }

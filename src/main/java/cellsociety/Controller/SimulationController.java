@@ -1,6 +1,7 @@
 package cellsociety.Controller;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
@@ -68,12 +69,7 @@ public class SimulationController {
     this.myConfigSaver = new ConfigSaver();
     wireButtons();
 
-    myDriver.setOnStepCallback(() -> Platform.runLater(() -> {
-      Simulation mySim = myDriver.getSimulation();
-      mySimView.getMyGridView().render(mySim.getGridHandler(), mySim.getRule().getStateColors());
-      mySimView.getMyStateStackSizeLabel().setText(""+mySim.getStateStackSize());
-    })
-    );
+    myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
 
   /**
@@ -90,14 +86,30 @@ public class SimulationController {
    */
   public void setSimulation(Simulation sim) {
     myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getGridHandler(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    mySimView.getMyGridView().setOnCellClicked((row, col) -> {
+      if (!myDriver.hasSimulation()) return;
+      myDriver.toggleCellState(row, col);
+      Platform.runLater(this::refreshViewFromSimulation);
+    });
   }
-
+  /**
+ * Re-renders the grid view and stack size label from the driver's current simulation.
+ * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
+ */
+  private void refreshViewFromSimulation() {
+    if (!myDriver.hasSimulation()) return;
+    Simulation sim = myDriver.getSimulation();
+    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    updateGenerationLabel();
+  }
   /**
    * Wires all UI buttons in the view to their corresponding controller actions.
    * This method exists to keep constructor logic concise and organized.
    */
   private void wireButtons(){
+    wireApplyChanges();
+    wireSettings();
     wireForward();
     wireBackward();
     wireChangeDirection();
@@ -108,6 +120,8 @@ public class SimulationController {
     wireSpeedUp();
     wireSlowDown();
     wireReset();
+    wireAbout();
+    wireToggleOutline();
   }
 
   private void wireForward() {
@@ -115,10 +129,9 @@ public class SimulationController {
       if (myDriver.isRunning()) {
         myDriver.pause();
       }
-      myDriver.setDirection(forward);
       myDriver.step();
-      if (myDriver.getSimulation() != null) {
-        mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
+      if (myDriver.hasSimulation()) {
+        updateGenerationLabel();
       }
     });
   }
@@ -128,10 +141,10 @@ public class SimulationController {
       if (myDriver.isRunning()) {
         myDriver.pause();
       }
-      myDriver.setDirection(backward);
+
       myDriver.stepBack();
-      if (myDriver.getSimulation() != null) {
-        mySimView.getMyStateStackSizeLabel().setText("" + myDriver.getSimulation().getStateStackSize());
+      if (myDriver.hasSimulation()) {
+        updateGenerationLabel();
       }
     });
   }
@@ -171,7 +184,15 @@ public class SimulationController {
   private void wireSpeedUp() {
     mySimView
         .getMySpeedUpButton()
-        .setOnAction(e -> myDriver.setSpeed(myDriver.getStepsPerSecond() * 2));
+        .setOnAction(e -> {
+          if (mySimView.getMySpeedMultiplier() >= 4){
+            return;
+          }
+          myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
+          mySimView.doubleMySpeed();
+          mySimView.updateSpeedLabel();
+
+        });
   }
 
   /**
@@ -183,7 +204,15 @@ public class SimulationController {
   private void wireSlowDown() {
     mySimView
         .getMySlowDownButton()
-        .setOnAction(e -> myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0));
+        .setOnAction(e -> {
+          if (mySimView.getMySpeedMultiplier() <= 0.25){
+            return;
+          }
+          myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
+          mySimView.halveMySpeed();
+          mySimView.updateSpeedLabel();
+
+        });
   }
 
   /**
@@ -195,30 +224,37 @@ public class SimulationController {
       if (initialConfig == null) {
         return;
       }
-
+      if (!myDriver.hasSimulation()) {
+        return;
+      }
       if (myDriver.isRunning()){
         myDriver.pause();
       }
 
-      CellState[][] stateSnapshot = myDriver.getSimulation().getGridHandler().getCellStates();
-      int snapshotRows = myDriver.getSimulation().getGridHandler().getRows();
-      int snapshotCols = myDriver.getSimulation().getGridHandler().getCols();
+      ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
+      CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
+      int[][] intSnapshot = ReadOnlyGrid.produceIntArray(stateSnapshot, myDriver.getSimulation()
+          .getRule());
+      int snapshotRows = grid.getRows();
+      int snapshotCols = grid.getCols();
       String type = initialConfig.getSimulationType();
       String title = initialConfig.getTitle();
       String author = initialConfig.getAuthor();
       String description = initialConfig.getDescription();
       Map<String, Double> parameters = new HashMap<> (initialConfig.getParameters());
 
-      //SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols, stateSnapshot, parameters);
 
-      //File saveDestination = mySimView.showSaveConfigDialog();
-      //if (saveDestination != null){
-        //try {
-          //myConfigSaver.saveConfig(configSnapshot, saveDestination);
-        //} catch (ParserConfigurationException | IOException ex) {
-          //throw new RuntimeException(ex);
-        //}
-      //}
+
+
+      SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols,
+          intSnapshot, parameters);
+
+      File saveDestination = mySimView.showSaveConfigDialog();
+      if (saveDestination != null){
+        myConfigSaver.saveConfig(configSnapshot, saveDestination);
+      }
+
+
 
     });
   }
@@ -244,20 +280,29 @@ public class SimulationController {
         .getMyUploadButton()
         .setOnAction(
             e -> {
-              File myFile = mySimView.showOpenConfigDialog();
-              try {
-                SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
-                setInitialConfig(myConfig);
-                Simulation mySim = SimulationFactory.createSimulation(myConfig);
-                mySimView.setGrid(
-                    mySim.getGridHandler().getRows(),
-                    mySim.getGridHandler().getCols(),
-                    cellSize);
-                setSimulation(mySim);
-              } catch (ParserConfigurationException | SAXException | IOException ex) {
-                throw new RuntimeException(ex);
-              }
+              handleUpload();
             });
+
+    mySimView.getMySettings().getMyUploadButton().setOnAction(e -> {
+      handleUpload();
+    });
+  }
+
+  private void handleUpload() {
+    File myFile = mySimView.showOpenConfigDialog();
+    try {
+      SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
+      setInitialConfig(myConfig);
+      Simulation mySim = SimulationFactory.createSimulation(myConfig);
+      ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
+      mySimView.setGrid(
+          readOnlyGrid.getRows(),
+          readOnlyGrid.getCols(),
+          cellSize);
+      setSimulation(mySim);
+    } catch (ParserConfigurationException | SAXException | IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
@@ -273,12 +318,56 @@ public class SimulationController {
    * Assumptions:
    * - The initial config is not null and has a value
    */
-  public void wireReset(){
+  private void wireReset(){
     mySimView.getMyResetButton()
         .setOnAction(e -> {
           if (this.initialConfig == null) { return; }
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
           setSimulation(mySim);
+          updateGenerationLabel();
         });
   }
+
+  private void wireAbout(){
+    mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
+        mySimView.getMyAboutDialog().closeInfo()
+    );
+
+    mySimView.getMyAboutButton().setOnAction(e -> {
+          if (initialConfig == null) {
+            throw new IllegalStateException("No configuration loaded");
+          }
+        mySimView.showAboutSplash(initialConfig);
+    }
+    );
+  }
+
+  private void wireToggleOutline(){
+    mySimView.getMyToggleOutlineButton().setOnAction(e -> {
+      Simulation sim = myDriver.getSimulation();
+      mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    });
+  }
+
+  private void wireApplyChanges(){
+    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
+      mySimView.closeSettings();
+
+    });
+  }
+
+  private void wireSettings(){
+    mySimView.getMySettingsButton().setOnAction(e -> mySimView.openSettings());
+  }
+
+  private void updateGenerationLabel() {
+    Simulation sim = myDriver.getSimulation();
+    if (sim == null) return;
+
+    int generation = sim.getGeneration();
+
+    mySimView.getMyStateStackSizeLabel()
+        .setText("Generation: " + generation);
+  }
+
 }

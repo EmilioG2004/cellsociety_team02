@@ -32,16 +32,41 @@ public class Main extends Application {
     // internal configuration file
     public static final String INTERNAL_CONFIGURATION = "cellsociety.Version";
 
+    public static final int APP_WIDTH = 1200;
+    public static final int APP_HEIGHT = 750;
+
     /**
      * @see Application#start(Stage)
      */
     @Override
     public void start (Stage primaryStage) {
-        SimulationView view = new SimulationView();
+        ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.Languages.English");
+        buildGUI(primaryStage, bundle, true);
+    }
+
+    private ResourceBundle loadLanguageBundle(String choice) {
+        return switch (choice) {
+            case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
+            case "Portuguese" -> ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
+          default -> ResourceBundle.getBundle("cellsociety.Languages.English");
+        };
+    }
+
+    private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
+        SimulationView view = new SimulationView(bundle, showSplash);
         SimulationController controller = new SimulationController(view);
-        Scene scene = new Scene(view.getRoot(), 1200, 750);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+
+        Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
+        stage.setScene(scene);
+
+        view.getMySettings().getMyApplyChanges().setOnAction(e -> {
+            String choice = view.getMySettings().getMyLanguages().getValue();
+            ResourceBundle chosenBundle = loadLanguageBundle(choice);
+
+            view.applyLanguage(chosenBundle);
+            view.closeSettings();
+        });
+        stage.show();
     }
 
     /**
