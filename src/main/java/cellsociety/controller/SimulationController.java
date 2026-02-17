@@ -52,8 +52,6 @@ public class SimulationController {
   private SimulationConfig initialConfig;
   private ConfigSaver myConfigSaver;
   private static final double cellSize = 20.0;
-  private static final boolean forward = true;
-  private static final boolean backward = false;
 
   /**
    * Constructs a SimulationController for the given view.
@@ -97,6 +95,7 @@ public class SimulationController {
       Platform.runLater(this::refreshViewFromSimulation);
     });
   }
+
   /**
  * Re-renders the grid view and stack size label from the driver's current simulation.
  * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
@@ -159,9 +158,10 @@ public class SimulationController {
       System.out.println("Changing Direction to " + (myDriver.isForwardDirection() ? "Backward" : "Forward"));
       myDriver.setDirection(!myDriver.isForwardDirection());
       if (myDriver.isForwardDirection()) {
-        mySimView.getMyChangeDirectionButton().setText("Forward");
+        mySimView.getMyChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.forward"));
       } else {
-        mySimView.getMyChangeDirectionButton().setText("Backward");
+        mySimView.getMyChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.backward"));
+
       }
     });
   }

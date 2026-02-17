@@ -1,7 +1,8 @@
 package cellsociety.view;
 
-import cellsociety.Main;
+
 import cellsociety.config.SimulationConfig;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 import java.io.File;
+
 
 public class SimulationView {
   public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
@@ -50,7 +52,7 @@ public class SimulationView {
   private final Button mySaveButton;
   private final Button myResetButton;
   private final Button myChangeDirectionButton;
-  private final Label mySpeedLabel = new Label("Current Speed: 1x");
+  private final Label mySpeedLabel;
   private final Label myStateStackSizeLabel = new Label("Generation: 0");
   private final Button myAboutButton;
   private final Button myToggleOutlineButton;
@@ -85,10 +87,13 @@ public class SimulationView {
     myAboutButton = new Button();
     myToggleOutlineButton = new Button();
     mySettingsButton = new Button();
+    mySpeedLabel = new Label();
     myRoot.getStyleClass().add("app-root");
     myMain.getStyleClass().add("main-pane");
     myRotateLeftButton = new Button();
     myRotateRightButton = new Button();
+    myForwardButton.setText(myBundle.getString("button.stepForward"));
+    mySpeedMultiplier = 1.0;
 
     applyLanguage(myBundle);
 
@@ -126,7 +131,7 @@ public class SimulationView {
     myTitle.setMaxWidth(Double.MAX_VALUE);
     myTitle.setAlignment(Pos.CENTER);
 
-    HBox myUploadRow = new HBox(myUploadButton, myAboutButton, mySettingsButton);
+    HBox myUploadRow = new HBox(myUploadButton, mySaveButton, myAboutButton, mySettingsButton);
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
     myUploadRow.setPadding(new Insets(6,10,10,10));
     myUploadRow.getStyleClass().add("upload-row");
@@ -138,7 +143,7 @@ public class SimulationView {
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, mySaveButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, myToggleOutlineButton, mySpeedLabel, myStateStackSizeLabel);
+    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, myToggleOutlineButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Region spacer = new Region();
@@ -309,7 +314,8 @@ public class SimulationView {
   public void halveMySpeed() { this.mySpeedMultiplier /= 2; }
 
   public void updateSpeedLabel(){
-    mySpeedLabel.setText("Current Speed: " + mySpeedMultiplier + "x");
+    String pattern = myBundle.getString("label.currentSpeed");
+    mySpeedLabel.setText(MessageFormat.format(pattern, mySpeedMultiplier));
   }
 
   public void applyLanguage(ResourceBundle bundle) {
@@ -330,7 +336,8 @@ public class SimulationView {
     mySettingsButton.setText(myBundle.getString("button.settings"));
     myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
     myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
-
+    myChangeDirectionButton.setText(myBundle.getString("button.changeDirection"));
+    updateSpeedLabel();
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
   }
@@ -347,4 +354,6 @@ public class SimulationView {
   public Button getMyRotateLeftButton(){ return myRotateLeftButton; }
 
   public Button getMyRotateRightButton(){ return myRotateRightButton; }
+
+  public ResourceBundle getMyBundle() { return myBundle; }
 }
