@@ -3,8 +3,10 @@ package cellsociety.config;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -12,14 +14,15 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import static cellsociety.config.ConfigXmlConstants.*;
 
-
 public class ConfigLoader {
 
-  public SimulationConfig loadConfig(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
+  public SimulationConfig loadConfig(File xmlFile)
+      throws ParserConfigurationException, IOException, SAXException {
+
     Document xmlDocument = DocumentBuilderFactory
-      .newInstance()
-      .newDocumentBuilder()
-      .parse(xmlFile);
+        .newInstance()
+        .newDocumentBuilder()
+        .parse(xmlFile);
 
     String simulationType = getSimulationType(xmlDocument);
 
@@ -32,25 +35,25 @@ public class ConfigLoader {
     int rows = gridSize[0];
     int cols = gridSize[1];
 
-    int[][] states = getStates(xmlDocument, rows, cols);
+    int[][] states = getInitialStates(xmlDocument, rows, cols);
 
     HashMap<String, Double> parameters = getParameters(xmlDocument);
 
     return new SimulationConfig(
-      simulationType,
-      title,
-      author,
-      description,
-      rows,
-      cols,
-      states,
-      parameters
+        simulationType,
+        title,
+        author,
+        description,
+        rows,
+        cols,
+        states,
+        parameters
     );
   }
 
   private Element getFirstElementByTag(Document xmlDocument, String tag) {
     Element root = xmlDocument.getDocumentElement();
-    Element element = (Element)root.getElementsByTagName(tag).item(0);
+    Element element = (Element) root.getElementsByTagName(tag).item(0);
     if (element == null) {
       throw new IllegalArgumentException("Missing <" + tag + "> element");
     }
@@ -106,20 +109,135 @@ public class ConfigLoader {
       throw new IllegalArgumentException("Grid rows/cols must be positive");
     }
 
-    return new int[]{rows, cols};
+    return new int[] { rows, cols };
   }
 
-  private int[][] getStates(Document xmlDocument, int rows, int cols) {
+  // check for explicit states; if not provided, then check if counts for random grid are given
+  private int[][] getInitialStates(Document xmlDocument, int rows, int cols) {
     Element grid = getFirstElementByTag(xmlDocument, CONFIG_GRID);
 
     Element statesElement = (Element) grid.getElementsByTagName(CONFIG_STATES).item(0);
-    if (statesElement == null) {
-      throw new IllegalArgumentException("Missing <" + CONFIG_STATES + "> element");
+    if (statesElement != null) {
+      return getStates(statesElement, rows, cols);
     }
 
+    return getRandomStatesByCount(xmlDocument, rows, cols);
+  }
+
+  private int[][] getStates(Element statesElement, int rows, int cols) {
     String rawText = statesElement.getTextContent();
     List<String> lines = nonEmptyLines(rawText);
     return iterateThroughRows(lines, rows, cols);
+  }
+
+  private int[][] getRandomStatesByCount(Document xmlDocument, int rows, int cols) {
+    Element grid = getFirstElementByTag(xmlDocument, CONFIG_GRID);
+    Element randomElement = (Element) grid.getElementsByTagName(CONFIG_RANDOM_BY_COUNT).item(0);
+
+    if (randomElement == null) {
+      throw new IllegalArgumentException(
+          "Missing <" + CONFIG_STATES + "> and no <" + CONFIG_RANDOM_BY_COUNT + "> provided."
+      );
+    }
+
+    Map<Integer, Integer> counts = parseStateCounts(randomElement);
+
+    int totalCells = rows * cols;
+    fillRandomStateMapRemainder(counts, totalCells);
+
+    return buildGridFromStateCounts(counts, rows, cols);
+  }
+
+  private Map<Integer, Integer> parseStateCounts(Element randomElement) {
+    Map<Integer, Integer> counts = new HashMap<>();
+    var stateNodes = randomElement.getElementsByTagName(CONFIG_RANDOM_STATE);
+
+    for (int i = 0; i < stateNodes.getLength(); i++) {
+      Element stateEl = (Element) stateNodes.item(i);
+
+      int id = parseNonNegativeInt(stateEl, CONFIG_ID_ATTR);
+      int count = parseNonNegativeInt(stateEl, CONFIG_COUNT_ATTR);
+
+      if (counts.containsKey(id)) {
+        throw new IllegalArgumentException("Duplicate state id: " + id);
+      }
+
+      counts.put(id, count);
+    }
+
+    return counts;
+  }
+
+  private int parseNonNegativeInt(Element el, String attr) {
+    String raw = el.getAttribute(attr).trim();
+    if (raw.isEmpty()) {
+      throw new IllegalArgumentException(
+          "<state> missing '" + attr + "' attribute"
+      );
+    }
+
+    try {
+      int value = Integer.parseInt(raw);
+      if (value < 0) throw new IllegalArgumentException();
+      return value;
+    } catch (Exception e) {
+      throw new IllegalArgumentException(
+          "Invalid non-negative integer for '" + attr + "': " + raw
+      );
+    }
+  }
+
+  private void fillRandomStateMapRemainder(Map<Integer, Integer> counts, int totalCells) {
+    int sum = 0;
+    for (int c : counts.values()) sum += c;
+
+    if (sum > totalCells) {
+      throw new IllegalArgumentException(
+          "Specified state counts (" + sum +
+              ") exceed total grid cells (" + totalCells + ")"
+      );
+    }
+
+    if (sum < totalCells) {
+      counts.put(0,
+          counts.getOrDefault(0, 0) + (totalCells - sum));
+    }
+  }
+
+  private int[][] buildGridFromStateCounts(Map<Integer, Integer> counts, int rows, int cols) {
+    int totalCells = rows * cols;
+
+    List<Integer> values = new ArrayList<>(totalCells);
+
+    // add all the intended cells to values list
+    for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+      int stateId = entry.getKey();
+      int count = entry.getValue();
+
+      for (int i = 0; i < count; i++) {
+        values.add(stateId);
+      }
+    }
+
+    if (values.size() != totalCells) {
+      throw new IllegalArgumentException(
+          "State counts do not match grid size. Expected " +
+              totalCells + " but got " + values.size()
+      );
+    }
+
+    Collections.shuffle(values);
+
+    int[][] grid = new int[rows][cols];
+    int index = 0;
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        grid[r][c] = values.get(index++);
+      }
+    }
+
+    return grid;
   }
 
   private List<String> nonEmptyLines(String rawText) {
@@ -208,5 +326,4 @@ public class ConfigLoader {
       );
     }
   }
-
 }
