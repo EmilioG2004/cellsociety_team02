@@ -1,0 +1,16 @@
+<simulation type="GameOfLife">
+  <metadata>
+    <title>Random 40 Alive</title>
+    <author>Ixa Sigler</author>
+    <description>20x20 grid with exactly 40 randomly placed alive cells. Uses new CELL-32A random config feature.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" count="40"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
