@@ -56,7 +56,7 @@ public class FallingSandRule extends GameRule {
     }
 
     // place water
-    for (int r = rows - 1; r >= 0; r--) {
+    for (int r = 0; r <= rows - 1; r++) {
       for (int c = 0; c < cols; c++) {
         if (cast(currentStates[r][c]) == FallingSandState.WATER) {
           placeWater(currentStates, nextStates, r, c);
