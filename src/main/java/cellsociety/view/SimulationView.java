@@ -1,4 +1,4 @@
-package cellsociety.View;
+package cellsociety.view;
 
 import cellsociety.Main;
 import cellsociety.config.SimulationConfig;
@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -17,6 +18,20 @@ import java.io.File;
 
 public class SimulationView {
   public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
+  private static final String BASE_CSS =
+      SimulationView.class.getResource("/cellsociety/stylesheets/base.css").toExternalForm();
+
+  private static final String LIGHT_CSS =
+      SimulationView.class.getResource("/cellsociety/stylesheets/light.css").toExternalForm();
+
+  private static final String DARK_CSS =
+      SimulationView.class.getResource("/cellsociety/stylesheets/dark.css").toExternalForm();
+
+  private static final String DUKE_CSS =
+      SimulationView.class.getResource("/cellsociety/stylesheets/duke.css").toExternalForm();
+
+
+
   private ResourceBundle myBundle;
 
 
@@ -67,13 +82,14 @@ public class SimulationView {
     myAboutButton = new Button();
     myToggleOutlineButton = new Button();
     mySettingsButton = new Button();
+    myRoot.getStyleClass().add("app-root");
+    myMain.getStyleClass().add("main-pane");
 
     applyLanguage(myBundle);
 
     buildTop();
 
     myMain.setPadding(new Insets(12));
-    myMain.setStyle("-fx-background-color: #f6f7fb;");
 
     myRoot.getChildren().addAll(myMain, mySettings);
 
@@ -107,6 +123,7 @@ public class SimulationView {
     HBox myUploadRow = new HBox(myUploadButton, myAboutButton, mySettingsButton);
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
     myUploadRow.setPadding(new Insets(6,10,10,10));
+    myUploadRow.getStyleClass().add("upload-row");
 
     HBox myControlBar = buildControlBar();
     VBox myTopBox = new VBox(myTitle, myUploadRow, myControlBar);
@@ -125,17 +142,7 @@ public class SimulationView {
     bar.setAlignment(Pos.CENTER_LEFT);
     bar.setPadding(new Insets(14));
     bar.setMinHeight(64);
-
-    bar.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: black;
-        """);
-
-    myStartButton.setStyle("""
-            -fx-background-color: black;
-            -fx-text-fill: white;
-        """);
-
+    bar.getStyleClass().add("control-bar");
 
 
     return bar;
@@ -153,11 +160,7 @@ public class SimulationView {
     card.setPadding(new Insets(18));
     card.setPrefSize(760,520);
     card.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-
-    card.setStyle("""
-      -fx-background-color: white;
-      -fx-border-color: black;
-  """);
+    card.getStyleClass().add("card");
 
     Node gridNode = myGridView.getNode();
     card.getChildren().setAll(gridNode);
@@ -314,5 +317,14 @@ public class SimulationView {
 
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
+  }
+
+  public void applyTheme(Scene scene, String themeChoice) {
+    String themeCss = switch (themeChoice) {
+      case "Dark" -> DARK_CSS;
+      case "Duke" -> DUKE_CSS;
+      default -> LIGHT_CSS;
+    };
+    scene.getStylesheets().setAll(BASE_CSS, themeCss);
   }
 }

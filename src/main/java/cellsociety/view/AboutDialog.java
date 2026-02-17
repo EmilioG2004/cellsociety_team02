@@ -1,6 +1,5 @@
-package cellsociety.View;
+package cellsociety.view;
 
-import cellsociety.Main;
 import cellsociety.config.SimulationConfig;
 
 import java.text.MessageFormat;
@@ -30,11 +29,17 @@ public class AboutDialog extends StackPane{
     myAuthor = new Text();
     myDescription = new Text();
     myParameters = new Text();
-    setStyle("""
-            -fx-background-color: white;
-            -fx-text-fill: black;
-        """);
+    setStyleClasses();
 
+  }
+
+  private void setStyleClasses() {
+    myTitle.getStyleClass().add("text");
+    myType.getStyleClass().add("text");
+    myAuthor.getStyleClass().add("text");
+    myDescription.getStyleClass().add("text");
+    myParameters.getStyleClass().add("text");
+    getStyleClass().add("about");
   }
 
   public void generateInfo(SimulationConfig config){

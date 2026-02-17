@@ -1,6 +1,6 @@
-package cellsociety.View;
+package cellsociety.view;
 
-import cellsociety.Controller.SimulationController;
+import cellsociety.controller.SimulationController;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,8 +16,9 @@ public class ViewTest extends DukeApplicationTest {
     ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.Languages.English");
     SimulationView view = new SimulationView(bundle);
     @SuppressWarnings("unused") // controller wires view buttons; needed for test setup
-    SimulationController controller = new SimulationController(view);
     Scene scene = new Scene(view.getRoot(), 1200, 750);
+    SimulationController controller = new SimulationController(view, scene);
+
     stage.setScene(scene);
     stage.show();
   }

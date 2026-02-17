@@ -1,11 +1,11 @@
-package cellsociety.Controller;
+package cellsociety.controller;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
-import cellsociety.View.SimulationView;
+import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.scene.Scene;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
@@ -46,6 +48,7 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final SimulationDriver myDriver;
   private final ConfigLoader myConfigLoader;
+  private final Scene myScene;
   private SimulationConfig initialConfig;
   private ConfigSaver myConfigSaver;
   private static final double cellSize = 20.0;
@@ -62,12 +65,13 @@ public class SimulationController {
    *
    * @param simView the view whose controls are connected to simulation behavior
    */
-  public SimulationController(SimulationView simView) {
+  public SimulationController(SimulationView simView, Scene scene) {
     this.mySimView = simView;
     this.myDriver = new SimulationDriver();
     this.myConfigLoader = new ConfigLoader();
     this.myConfigSaver = new ConfigSaver();
-    wireButtons();
+    this.myScene = scene;
+    wireButtons(simView);
 
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
@@ -107,8 +111,8 @@ public class SimulationController {
    * Wires all UI buttons in the view to their corresponding controller actions.
    * This method exists to keep constructor logic concise and organized.
    */
-  private void wireButtons(){
-    wireApplyChanges();
+  private void wireButtons(SimulationView view){
+    wireApplyChanges(view);
     wireSettings();
     wireForward();
     wireBackward();
@@ -349,8 +353,16 @@ public class SimulationController {
     });
   }
 
-  private void wireApplyChanges(){
+  private void wireApplyChanges(SimulationView view){
     mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
+      String choice = view.getMySettings().getMyLanguages().getValue();
+      ResourceBundle chosenBundle = loadLanguageBundle(choice);
+      view.applyLanguage(chosenBundle);
+
+      String themeChoice = view.getMySettings().getMyThemes().getValue();
+      view.applyTheme(myScene, themeChoice);
+
+      view.closeSettings();
       mySimView.closeSettings();
 
     });
@@ -368,6 +380,14 @@ public class SimulationController {
 
     mySimView.getMyStateStackSizeLabel()
         .setText("Generation: " + generation);
+  }
+
+  private ResourceBundle loadLanguageBundle(String choice) {
+    return switch (choice) {
+      case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
+      case "Portuguese" -> ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
+      default -> ResourceBundle.getBundle("cellsociety.Languages.English");
+    };
   }
 
 }
