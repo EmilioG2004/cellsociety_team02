@@ -11,6 +11,7 @@ import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -71,6 +72,7 @@ public class SimulationController {
     this.myScene = scene;
     wireButtons(simView);
 
+
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
 
@@ -94,6 +96,8 @@ public class SimulationController {
       myDriver.toggleCellState(row, col);
       Platform.runLater(this::refreshViewFromSimulation);
     });
+
+    updateGenerationLabel();
   }
 
   /**
@@ -390,7 +394,7 @@ public class SimulationController {
     int generation = sim.getGeneration();
 
     mySimView.getMyStateStackSizeLabel()
-        .setText("Generation: " + generation);
+        .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
   }
 
   private ResourceBundle loadLanguageBundle(String choice) {

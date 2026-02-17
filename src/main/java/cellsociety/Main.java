@@ -51,6 +51,7 @@ public class Main extends Application {
 
         stage.setScene(scene);
         view.applyTheme(scene, "Light");
+        stage.setMaximized(true);
 
         stage.show();
     }

@@ -53,7 +53,7 @@ public class SimulationView {
   private final Button myResetButton;
   private final Button myChangeDirectionButton;
   private final Label mySpeedLabel;
-  private final Label myStateStackSizeLabel = new Label("Generation: 0");
+  private final Label myStateStackSizeLabel;
   private final Button myAboutButton;
   private final Button myToggleOutlineButton;
   private final Button mySettingsButton;
@@ -92,6 +92,7 @@ public class SimulationView {
     myMain.getStyleClass().add("main-pane");
     myRotateLeftButton = new Button();
     myRotateRightButton = new Button();
+    myStateStackSizeLabel = new Label();
     myForwardButton.setText(myBundle.getString("button.stepForward"));
     mySpeedMultiplier = 1.0;
 
@@ -337,6 +338,7 @@ public class SimulationView {
     myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
     myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
     myChangeDirectionButton.setText(myBundle.getString("button.changeDirection"));
+    myStateStackSizeLabel.setText(myBundle.getString("label.generation.unset"));
     updateSpeedLabel();
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
