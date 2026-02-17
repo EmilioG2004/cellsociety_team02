@@ -37,5 +37,14 @@ public enum WaTorState implements CellState {
             default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + value);
         };
     }
+
+    public static int fromState(CellState state) {
+        return switch (state) {
+            case WATER -> STATE_VALUE_WATER;
+            case FISH -> STATE_VALUE_FISH;
+            case SHARK -> STATE_VALUE_SHARK;
+            default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
+        };
+    }
 } 
     

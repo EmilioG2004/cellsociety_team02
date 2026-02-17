@@ -205,4 +205,9 @@ public class WaTorRule extends GameRule {
   public CellState getNextStateInCycle(CellState current) {
     return WaTorState.getNextStateInCycle(current);
   }
+
+  @Override
+  public int fromState(CellState state) {
+    return WaTorState.fromState(state);
+  }
 }
