@@ -1,0 +1,167 @@
+/* =========================================================
+   base.css  (load this BEFORE theme-specific css files)
+   Theme files should ONLY override the -app-* variables
+   ========================================================= */
+
+
+/* =========================================================
+   GLOBAL THEME VARIABLES (overridden by light/dark/duke)
+   ========================================================= */
+.root {
+  -app-bg: white;
+  -app-panel: #f6f6f6;
+  -app-border: #d0d0d0;
+  -app-accent: #2D68C4;
+  -app-font-size: 14px;
+  -app-text-color: black;
+
+  /* Paint full scene background */
+  -fx-background-color: -app-bg;
+}
+
+/* Font sizing */
+.root, .label, .button, .text {
+  -fx-font-size: -app-font-size;
+}
+
+/* =========================================================
+   BACKGROUNDS
+   ========================================================= */
+.app-root { -fx-background-color: -app-bg; }
+.main-pane { -fx-background-color: -app-bg; }
+
+.splash { -fx-background-color: -app-bg; }
+.about  { -fx-background-color: -app-bg; }
+
+.control-bar,
+.upload-row,
+.panel {
+  -fx-background-color: -app-panel;
+  -fx-border-color: -app-border;
+  -fx-border-width: 0 0 1 0;
+}
+
+.card {
+  -fx-background-color: -app-panel;
+  -fx-border-color: -app-border;
+  -fx-border-width: 1;
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+}
+
+/* =========================================================
+   THEME TEXT (Labels + Text nodes)
+   ========================================================= */
+
+/* Labels follow theme */
+.label {
+  -fx-text-fill: -app-text-color;
+}
+
+/* Text nodes follow theme */
+.text {
+  -fx-fill: -app-text-color;
+}
+
+/* Splash titles/subtitles are Text nodes */
+.splash .text {
+  -fx-fill: -app-text-color;
+}
+
+/* =========================================================
+   BUTTONS (Always light with black text)
+   ========================================================= */
+.button {
+  -fx-background-color: white;
+  -fx-border-color: #cfcfcf;
+  -fx-border-radius: 6;
+  -fx-background-radius: 6;
+}
+
+.button .text {
+  -fx-fill: black;
+}
+
+/* =========================================================
+   CHOICEBOX (Closed control always light)
+   ========================================================= */
+.choice-box {
+  -fx-background-color: white;
+  -fx-border-color: #cfcfcf;
+  -fx-border-radius: 6;
+  -fx-background-radius: 6;
+  -fx-mark-color: black;
+}
+
+/* Selected value text (closed display) */
+.choice-box > .label {
+  -fx-text-fill: black !important;
+}
+
+/* Fallback if a skin uses a Text node (rare) */
+.choice-box > .label .text,
+.choice-box .text {
+  -fx-fill: black !important;
+}
+
+/* =========================================================
+   CHOICEBOX POPUP (dropdown list)
+   JavaFX ChoiceBox popup is a ContextMenu with MenuItems.
+   ========================================================= */
+
+/* Popup container */
+.choice-box-popup,
+.choice-box .context-menu,
+.context-menu {
+  -fx-background-color: white;
+}
+
+/* Menu items */
+.choice-box-popup .menu-item,
+.choice-box .context-menu .menu-item,
+.context-menu .menu-item {
+  -fx-background-color: white;
+}
+
+/* Menu item text (Label inside MenuItem) */
+.choice-box-popup .menu-item .label,
+.choice-box .context-menu .menu-item .label,
+.context-menu .menu-item .label {
+  -fx-text-fill: black;
+}
+
+/* Cover Text nodes too */
+.choice-box-popup .menu-item .text,
+.choice-box .context-menu .menu-item .text,
+.context-menu .menu-item .text {
+  -fx-fill: black;
+}
+
+/* Hover highlight */
+.choice-box-popup .menu-item:hover,
+.choice-box .context-menu .menu-item:hover,
+.context-menu .menu-item:hover {
+  -fx-background-color: #eaeaea;
+}
+
+/* Keep hovered text black */
+.choice-box-popup .menu-item:hover .label,
+.choice-box .context-menu .menu-item:hover .label,
+.context-menu .menu-item:hover .label {
+  -fx-text-fill: black;
+}
+
+.choice-box-popup .menu-item:hover .text,
+.choice-box .context-menu .menu-item:hover .text,
+.context-menu .menu-item:hover .text {
+  -fx-fill: black;
+}
+
+/* =========================================================
+   FOCUS RING
+   ========================================================= */
+.choice-box:focused,
+.button:focused {
+  -fx-faint-focus-color: transparent;
+  -fx-focus-color: -app-accent;
+}

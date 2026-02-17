@@ -1,4 +1,4 @@
-package cellsociety.View;
+package cellsociety.view;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;

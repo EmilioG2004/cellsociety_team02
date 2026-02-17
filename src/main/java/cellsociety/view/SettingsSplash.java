@@ -1,4 +1,4 @@
-package cellsociety.View;
+package cellsociety.view;
 
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
@@ -23,12 +23,10 @@ public class SettingsSplash extends StackPane {
   private final Button myLoadButton;
   public SettingsSplash(){
     setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-    setStyle("""
-            -fx-background-color: white;
-            -fx-text-fill: black;
-        """);
+    getStyleClass().add("splash");
     myTitle = new Text();
     mySubtitle = new Text();
+    setStyleClasses();
     myLanguage = new Label();
     myTheme = new Label();
     myApplyChanges = new Button();
@@ -36,6 +34,11 @@ public class SettingsSplash extends StackPane {
     myLoadButton = new Button();
     buildDropdowns();
     buildDialog();
+  }
+
+  private void setStyleClasses() {
+    myTitle.getStyleClass().add("text");
+    mySubtitle.getStyleClass().add("text");
   }
 
   private void buildDialog(){
@@ -103,5 +106,7 @@ public class SettingsSplash extends StackPane {
   public Button getMyUploadButton() { return myUploadButton; }
 
   public ChoiceBox<String> getMyLanguages() { return myLanguages; }
+
+  public ChoiceBox<String> getMyThemes() { return myThemes; }
 
 }

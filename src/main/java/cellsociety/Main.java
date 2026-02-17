@@ -1,7 +1,7 @@
 package cellsociety;
 
-import cellsociety.Controller.SimulationController;
-import cellsociety.View.SimulationView;
+import cellsociety.controller.SimulationController;
+import cellsociety.view.SimulationView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -44,28 +44,14 @@ public class Main extends Application {
         buildGUI(primaryStage, bundle, true);
     }
 
-    private ResourceBundle loadLanguageBundle(String choice) {
-        return switch (choice) {
-            case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
-            case "Portuguese" -> ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
-          default -> ResourceBundle.getBundle("cellsociety.Languages.English");
-        };
-    }
-
     private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
         SimulationView view = new SimulationView(bundle, showSplash);
-        SimulationController controller = new SimulationController(view);
-
         Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
+        SimulationController controller = new SimulationController(view, scene);
+
         stage.setScene(scene);
+        view.applyTheme(scene, "Light");
 
-        view.getMySettings().getMyApplyChanges().setOnAction(e -> {
-            String choice = view.getMySettings().getMyLanguages().getValue();
-            ResourceBundle chosenBundle = loadLanguageBundle(choice);
-
-            view.applyLanguage(chosenBundle);
-            view.closeSettings();
-        });
         stage.show();
     }
 
