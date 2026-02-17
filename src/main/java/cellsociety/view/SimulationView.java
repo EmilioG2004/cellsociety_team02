@@ -36,10 +36,14 @@ public class SimulationView {
 
   private ResourceBundle myBundle;
 
+  //button manager class
+
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
-  private double mySpeedMultiplier = 1;
+
+  //pull from backend
+  private double mySpeedMultiplier;
 
   private final Label myTitle;
   private final Button myUploadButton;
@@ -143,6 +147,7 @@ public class SimulationView {
     myMain.setTop(myTopBox);
   }
 
+  //get control bar button in button manager, ask chat gpt to auto parse lists
   private HBox buildControlBar(){
     HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, myToggleOutlineButton, mySpeedLabel, myStateStackSizeLabel);
     leftBox.setAlignment(Pos.CENTER_LEFT);
@@ -170,14 +175,18 @@ public class SimulationView {
 
     StackPane card = new StackPane();
     card.setPadding(new Insets(18));
-    card.setPrefSize(760,520);
-    card.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+    card.prefWidthProperty().bind(centerPane.widthProperty());
+    card.prefHeightProperty().bind(centerPane.heightProperty());
+
+    card.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     card.getStyleClass().add("card");
     card.setAlignment(Pos.CENTER);
 
     Node gridNode = myGridView.getNode();
     card.getChildren().setAll(gridNode);
     centerPane.getChildren().setAll(card);
+    myGridView.bindToContainer(card);
+
   }
 
   private void buildBottom(){
@@ -290,8 +299,8 @@ public class SimulationView {
 
   public GridView getMyGridView() { return myGridView; }
 
-  public void setGrid(int rows, int cols, double cellSize){
-    this.myGridView = new GridPaneView(rows, cols, cellSize);
+  public void setGrid(int rows, int cols){
+    this.myGridView = new GridPaneView(rows, cols);
     buildCenter();
     buildBottom();
   }

@@ -51,7 +51,7 @@ public class SimulationController {
   private final ConfigLoader myConfigLoader;
   private final Scene myScene;
   private SimulationConfig initialConfig;
-  private ConfigSaver myConfigSaver;
+  private final ConfigSaver myConfigSaver;
   private static final double cellSize = 20.0;
 
   /**
@@ -115,6 +115,8 @@ public class SimulationController {
    * This method exists to keep constructor logic concise and organized.
    */
   private void wireButtons(SimulationView view){
+
+    // create buttonWirer to move all this out of this file
     wireApplyChanges(view);
     wireSettings();
     wireForward();
@@ -131,6 +133,8 @@ public class SimulationController {
     wireToggleOutline();
     wireRotate();
   }
+
+  // fix these by making the lambda method a function pass in bc same code
 
   private void wireForward() {
     mySimView.getMyForwardButton().setOnAction(e -> {
@@ -306,8 +310,7 @@ public class SimulationController {
       ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
       mySimView.setGrid(
           readOnlyGrid.getRows(),
-          readOnlyGrid.getCols(),
-          cellSize);
+          readOnlyGrid.getCols());
       setSimulation(mySim);
     } catch (ParserConfigurationException | SAXException | IOException ex) {
       throw new RuntimeException(ex);

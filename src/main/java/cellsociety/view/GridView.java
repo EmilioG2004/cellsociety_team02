@@ -4,6 +4,7 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 
 /**
  * Defines a common interface for visual components that render a simulation grid.
@@ -77,4 +78,6 @@ public interface GridView {
   void rotateLeft();
 
   void rotateRight();
+
+  void bindToContainer(Region container);
 }
