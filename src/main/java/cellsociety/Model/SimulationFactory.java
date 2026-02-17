@@ -2,6 +2,7 @@ package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.GameRules.FallingSandRule;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.GameRules.SegregationRule;
 import cellsociety.Model.GameRules.SpreadingOfFireRule;
@@ -14,16 +15,18 @@ public class SimulationFactory {
 
   public static final String SIMULATION_TYPE_GAME_OF_LIFE = "GameOfLife";
   public static final String SIMULATION_TYPE_SPREADING_OF_FIRE = "SpreadingOfFire";
+  public static final String SIMULATION_TYPE_SEGREGATION = "Segregation";
+  public static final String SIMULATION_TYPE_FALLING_SAND = "FallingSand";
   private static final int MIN_PARAMS_TO_APPLY = 1;
   private static final String ERROR_MESSAGE_INVALID_CONFIG = "Invalid simulation configuration: ";
-  public static final String SIMULATION_TYPE_SEGREGATION = "Segregation";
   private static final String ERROR_UNKNOWN_TYPE = "Unknown simulation type: '%s'. Supported: "
-      + SIMULATION_TYPE_GAME_OF_LIFE + ", " + SIMULATION_TYPE_SPREADING_OF_FIRE + ", " + SIMULATION_TYPE_SEGREGATION;
+      + SIMULATION_TYPE_GAME_OF_LIFE + ", " + SIMULATION_TYPE_SPREADING_OF_FIRE + ", " + SIMULATION_TYPE_SEGREGATION + ", " + SIMULATION_TYPE_FALLING_SAND;
 
   public static final Map<String, GameRule> GAME_RULES = Map.of(
       SIMULATION_TYPE_GAME_OF_LIFE, new ConwayGameOfLifeRule(),
       SIMULATION_TYPE_SPREADING_OF_FIRE, new SpreadingOfFireRule(),
-      SIMULATION_TYPE_SEGREGATION, new SegregationRule());
+      SIMULATION_TYPE_SEGREGATION, new SegregationRule(),
+      SIMULATION_TYPE_FALLING_SAND, new FallingSandRule());
 
   public static Simulation createSimulation(SimulationConfig config) throws IllegalArgumentException {
     try {
