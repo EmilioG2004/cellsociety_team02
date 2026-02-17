@@ -70,7 +70,33 @@ public abstract class GameRule {
     }
     return neighbors;
   }
-
+  /** simple helper method used by getNeighborPositions to return the new row or column given an offset and using wrap around */
+  protected int getNewPosition(int total, int i, int offset)
+  {
+    int newPosition = i + offset;
+    if(newPosition < 0)
+    {
+      newPosition = total - 1;
+    }
+    else if(newPosition >= total)
+    {
+      newPosition = 0;
+    }
+    return newPosition;
+  }
+  /** Returns positions of a given position's neighbors with wrap around*/
+  protected List<int[]> getNeighborPositions(int rows, int cols, int r, int c)
+  {
+    List<int[]> neighborPositions= new ArrayList<>();
+    for (int[] offset : neighborStrategy.getNeighborOffsets())
+    {
+      int nr = getNewPosition(rows, r, offset[OFFSET_ROW_INDEX]);
+      int nc = getNewPosition(cols, c, offset[OFFSET_COL_INDEX]);
+      neighborPositions.add(new int[] { nr, nc});
+    }
+    return neighborPositions;
+  }
+  
   /** Counts neighbors that equal targetState. */
   protected static int countNeighborsWithState(List<CellState> neighbors, CellState targetState) {
     int count = 0;
@@ -80,6 +106,19 @@ public abstract class GameRule {
       }
     }
     return count;
+  }
+  /** returns neighbor positions that equal targetState */
+  protected List<int[]> getNeighborPositionsForState(List<int[]> neighborPositions, CellState targetState, CellState[][] currentStates)
+  {
+    List<int[]> targetPositions= new ArrayList<>();
+    for (int[] neighborPos : neighborPositions)
+    {
+      if(currentStates[neighborPos[0]][neighborPos[1]]==targetState)
+      {
+        targetPositions.add(neighborPos);
+      }
+    }
+    return targetPositions;
   }
   public abstract CellState getNextStateInCycle(CellState current);
 }

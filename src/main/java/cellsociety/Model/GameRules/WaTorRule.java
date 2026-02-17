@@ -71,7 +71,7 @@ public class WaTorRule extends GameRule {
     }
   }
 
-  /** One chronon: fish then sharks move (or eat); reproduction and energy applied. */
+  /** One generation: fish then sharks move (or eat); reproduction and energy applied. */
   @Override
   public CellState[][] getNextStates(CellState[][] currentStates) {
     initEnduringValues(currentStates);
