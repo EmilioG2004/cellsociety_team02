@@ -10,6 +10,11 @@ final class ConfigXmlConstants {
   static final String CONFIG_METADATA = "metadata";
   static final String CONFIG_GRID = "grid";
 
+  static final String CONFIG_RANDOM_BY_COUNT = "randomByCount";
+  static final String CONFIG_RANDOM_STATE = "state";
+  static final String CONFIG_ID_ATTR = "id";
+  static final String CONFIG_COUNT_ATTR = "count";
+
   static final String CONFIG_TITLE = "title";
   static final String CONFIG_AUTHOR = "author";
   static final String CONFIG_DESCRIPTION = "description";

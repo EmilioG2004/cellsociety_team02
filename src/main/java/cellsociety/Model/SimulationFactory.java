@@ -2,6 +2,7 @@ package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.GameRules.FallingSandRule;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.GameRules.PercolationRule;
 import cellsociety.Model.GameRules.SegregationRule;
@@ -19,17 +20,20 @@ public class SimulationFactory {
   public static final String SIMULATION_TYPE_SEGREGATION = "Segregation";
   public static final String SIMULATION_TYPE_WATOR = "WaTor";
   public static final String SIMULATION_TYPE_PERCOLATION = "Percolation";
+  public static final String SIMULATION_TYPE_FALLING_SAND = "FallingSand";
   private static final String ERROR_MESSAGE_INVALID_CONFIG = "Invalid simulation configuration: ";
   private static final String ERROR_UNKNOWN_TYPE = "Unknown simulation type: '%s'. Supported: "
       + SIMULATION_TYPE_GAME_OF_LIFE + ", " + SIMULATION_TYPE_SPREADING_OF_FIRE + ", "
-      + SIMULATION_TYPE_SEGREGATION + ", " + SIMULATION_TYPE_WATOR + ", " + SIMULATION_TYPE_PERCOLATION;
+      + SIMULATION_TYPE_SEGREGATION + ", " + SIMULATION_TYPE_WATOR + ", " + SIMULATION_TYPE_PERCOLATION
+      + ", " + SIMULATION_TYPE_FALLING_SAND;
 
   private static final Map<String, Function<Map<String, Double>, GameRule>> RULE_FACTORIES = Map.of(
       SIMULATION_TYPE_GAME_OF_LIFE, p -> new ConwayGameOfLifeRule(p != null ? p : Map.of()),
       SIMULATION_TYPE_SPREADING_OF_FIRE, p -> new SpreadingOfFireRule(p != null ? p : Map.of()),
       SIMULATION_TYPE_SEGREGATION, p -> new SegregationRule(p != null ? p : Map.of()),
       SIMULATION_TYPE_WATOR, p -> new WaTorRule(p != null ? p : Map.of()),
-      SIMULATION_TYPE_PERCOLATION, p -> new PercolationRule(p != null ? p : Map.of()));
+      SIMULATION_TYPE_PERCOLATION, p -> new PercolationRule(p != null ? p : Map.of()),
+      SIMULATION_TYPE_FALLING_SAND, p -> new FallingSandRule(p != null ? p : Map.of()));
 
   public static Simulation createSimulation(SimulationConfig config) throws IllegalArgumentException {
     try {

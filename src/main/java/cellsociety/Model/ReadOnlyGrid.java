@@ -1,6 +1,7 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GameRules.GameRule;
 
 /**
  * Read-only view of a grid of cell states. Allows consumers (e.g. the view) to read
@@ -28,6 +29,19 @@ public interface ReadOnlyGrid {
         out[r][c] = grid.getCellState(r, c);
       }
     }
+    return out;
+  }
+
+  public static int[][] produceIntArray(CellState[][] states, GameRule rule){
+    int rows = states.length;
+    int cols = states[0].length;
+    int[][] out = new int[rows][cols];
+    for (int r = 0; r < rows; r++){
+      for (int c = 0; c < cols; c++){
+        out[r][c] = rule.fromState(states[r][c]);
+      }
+    }
+
     return out;
   }
 }

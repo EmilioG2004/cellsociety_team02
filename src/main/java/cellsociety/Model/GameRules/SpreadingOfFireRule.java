@@ -84,4 +84,7 @@ public class SpreadingOfFireRule extends GameRule {
   public CellState getNextStateInCycle(CellState current) {
     return SpreadingOfFireState.getNextStateInCycle(current);
   }
+
+  @Override
+  public int fromState(CellState state){ return SpreadingOfFireState.fromState(state); }
 }

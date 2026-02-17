@@ -1,8 +1,9 @@
-package cellsociety.View;
+package cellsociety.view;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -46,6 +47,8 @@ public class GridPaneView implements GridView {
   private final int myCols;
   private java.util.function.BiConsumer<Integer, Integer> myOnCellClicked;
   private boolean isOutlined;
+  private int myRotationSteps = 0;
+  private final Group myRotator;
 
   /**
    * Constructs a GridPaneView with the specified dimensions and cell size.
@@ -62,11 +65,12 @@ public class GridPaneView implements GridView {
    * @param cellSize size (in pixels) of each cell’s width and height
    */
   public GridPaneView(int rows, int cols, double cellSize) {
-    this.myCellSize = cellSize;
-    this.myCols = cols;
-    this.myRows = rows;
-    this.myCells = new Rectangle[rows][cols];
-    this.isOutlined = true;
+    myCellSize = cellSize;
+    myCols = cols;
+    myRows = rows;
+    myCells = new Rectangle[rows][cols];
+    isOutlined = true;
+    myRotator = new Group(myGridPane);
 
     buildGrid();
   }
@@ -82,7 +86,7 @@ public class GridPaneView implements GridView {
    */
   @Override
   public Node getNode() {
-    return myGridPane;
+    return myRotator;
   }
 
   /**
@@ -181,6 +185,16 @@ public class GridPaneView implements GridView {
         }
       }
     }
+  }
+
+  public void rotateRight() {
+    myRotationSteps = (myRotationSteps + 1) % 4;
+    myRotator.setRotate(myRotationSteps * 90.0);
+  }
+
+  public void rotateLeft() {
+    myRotationSteps = (myRotationSteps + 3) % 4;
+    myRotator.setRotate(myRotationSteps * 90.0);
   }
 
 }

@@ -1,7 +1,7 @@
 package cellsociety;
 
-import cellsociety.Controller.SimulationController;
-import cellsociety.View.SimulationView;
+import cellsociety.controller.SimulationController;
+import cellsociety.view.SimulationView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -40,11 +40,19 @@ public class Main extends Application {
      */
     @Override
     public void start (Stage primaryStage) {
-        SimulationView view = new SimulationView();
-        SimulationController controller = new SimulationController(view);
+        ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.Languages.English");
+        buildGUI(primaryStage, bundle, true);
+    }
+
+    private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
+        SimulationView view = new SimulationView(bundle, showSplash);
         Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        SimulationController controller = new SimulationController(view, scene);
+
+        stage.setScene(scene);
+        view.applyTheme(scene, "Light");
+
+        stage.show();
     }
 
     /**

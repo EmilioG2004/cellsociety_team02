@@ -1,11 +1,11 @@
-package cellsociety.Controller;
+package cellsociety.controller;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
-import cellsociety.View.SimulationView;
+import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.scene.Scene;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
@@ -46,11 +48,10 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final SimulationDriver myDriver;
   private final ConfigLoader myConfigLoader;
+  private final Scene myScene;
   private SimulationConfig initialConfig;
   private ConfigSaver myConfigSaver;
   private static final double cellSize = 20.0;
-  private static final boolean forward = true;
-  private static final boolean backward = false;
 
   /**
    * Constructs a SimulationController for the given view.
@@ -62,12 +63,13 @@ public class SimulationController {
    *
    * @param simView the view whose controls are connected to simulation behavior
    */
-  public SimulationController(SimulationView simView) {
+  public SimulationController(SimulationView simView, Scene scene) {
     this.mySimView = simView;
     this.myDriver = new SimulationDriver();
     this.myConfigLoader = new ConfigLoader();
     this.myConfigSaver = new ConfigSaver();
-    wireButtons();
+    this.myScene = scene;
+    wireButtons(simView);
 
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
@@ -93,6 +95,7 @@ public class SimulationController {
       Platform.runLater(this::refreshViewFromSimulation);
     });
   }
+
   /**
  * Re-renders the grid view and stack size label from the driver's current simulation.
  * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
@@ -101,14 +104,14 @@ public class SimulationController {
     if (!myDriver.hasSimulation()) return;
     Simulation sim = myDriver.getSimulation();
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
-    mySimView.getMyStateStackSizeLabel().setText("" + sim.getStateStackSize());
+    updateGenerationLabel();
   }
   /**
    * Wires all UI buttons in the view to their corresponding controller actions.
    * This method exists to keep constructor logic concise and organized.
    */
-  private void wireButtons(){
-    wireApplyChanges();
+  private void wireButtons(SimulationView view){
+    wireApplyChanges(view);
     wireSettings();
     wireForward();
     wireBackward();
@@ -122,6 +125,7 @@ public class SimulationController {
     wireReset();
     wireAbout();
     wireToggleOutline();
+    wireRotate();
   }
 
   private void wireForward() {
@@ -131,7 +135,7 @@ public class SimulationController {
       }
       myDriver.step();
       if (myDriver.hasSimulation()) {
-        mySimView.getMyStateStackSizeLabel().setText("Generation: " + myDriver.getSimulation().getGeneration());
+        updateGenerationLabel();
       }
     });
   }
@@ -144,7 +148,7 @@ public class SimulationController {
 
       myDriver.stepBack();
       if (myDriver.hasSimulation()) {
-        mySimView.getMyStateStackSizeLabel().setText("Generation: " + myDriver.getSimulation().getGeneration());
+        updateGenerationLabel();
       }
     });
   }
@@ -154,9 +158,10 @@ public class SimulationController {
       System.out.println("Changing Direction to " + (myDriver.isForwardDirection() ? "Backward" : "Forward"));
       myDriver.setDirection(!myDriver.isForwardDirection());
       if (myDriver.isForwardDirection()) {
-        mySimView.getMyChangeDirectionButton().setText("Forward");
+        mySimView.getMyChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.forward"));
       } else {
-        mySimView.getMyChangeDirectionButton().setText("Backward");
+        mySimView.getMyChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.backward"));
+
       }
     });
   }
@@ -233,6 +238,8 @@ public class SimulationController {
 
       ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
       CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
+      int[][] intSnapshot = ReadOnlyGrid.produceIntArray(stateSnapshot, myDriver.getSimulation()
+          .getRule());
       int snapshotRows = grid.getRows();
       int snapshotCols = grid.getCols();
       String type = initialConfig.getSimulationType();
@@ -243,16 +250,16 @@ public class SimulationController {
 
 
 
-      /*
+
       SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols,
-          (int[][]) Arrays.stream(stateSnapshot).toArray(), parameters);
+          intSnapshot, parameters);
 
       File saveDestination = mySimView.showSaveConfigDialog();
       if (saveDestination != null){
         myConfigSaver.saveConfig(configSnapshot, saveDestination);
       }
 
-       */
+
 
     });
   }
@@ -322,7 +329,7 @@ public class SimulationController {
           if (this.initialConfig == null) { return; }
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
           setSimulation(mySim);
-          mySimView.getMyStateStackSizeLabel().setText("Generation: 0");
+          updateGenerationLabel();
         });
   }
 
@@ -347,11 +354,51 @@ public class SimulationController {
     });
   }
 
-  private void wireApplyChanges(){
-    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> mySimView.closeSettings());
+  private void wireApplyChanges(SimulationView view){
+    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
+      String choice = view.getMySettings().getMyLanguages().getValue();
+      ResourceBundle chosenBundle = loadLanguageBundle(choice);
+      view.applyLanguage(chosenBundle);
+
+      String themeChoice = view.getMySettings().getMyThemes().getValue();
+      view.applyTheme(myScene, themeChoice);
+
+      view.closeSettings();
+      mySimView.closeSettings();
+
+    });
   }
 
   private void wireSettings(){
     mySimView.getMySettingsButton().setOnAction(e -> mySimView.openSettings());
   }
+
+  private void wireRotate(){
+    mySimView.getMyRotateLeftButton().setOnAction(e -> {
+      mySimView.getMyGridView().rotateLeft();
+    });
+
+    mySimView.getMyRotateRightButton().setOnAction(e -> {
+      mySimView.getMyGridView().rotateRight();
+    });
+  }
+
+  private void updateGenerationLabel() {
+    Simulation sim = myDriver.getSimulation();
+    if (sim == null) return;
+
+    int generation = sim.getGeneration();
+
+    mySimView.getMyStateStackSizeLabel()
+        .setText("Generation: " + generation);
+  }
+
+  private ResourceBundle loadLanguageBundle(String choice) {
+    return switch (choice) {
+      case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
+      case "Portuguese" -> ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
+      default -> ResourceBundle.getBundle("cellsociety.Languages.English");
+    };
+  }
+
 }
