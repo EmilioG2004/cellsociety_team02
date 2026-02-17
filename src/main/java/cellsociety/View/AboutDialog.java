@@ -22,8 +22,8 @@ public class AboutDialog extends StackPane{
   private final Text myDescription;
   private final Text myParameters;
 
-  public AboutDialog(double width, double height){
-    setPrefSize(width, height);
+  public AboutDialog(){
+    setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     myCloseButton = new Button();
     myTitle = new Text();
     myType = new Text();

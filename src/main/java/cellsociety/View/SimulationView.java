@@ -40,12 +40,10 @@ public class SimulationView {
   private final Button myAboutButton;
   private final Button myToggleOutlineButton;
   private final Button mySettingsButton;
+
   private StackPane centerPane;
-  private final AboutDialog myAboutDialog = new AboutDialog(Main.APP_WIDTH, Main.APP_HEIGHT);
+  private final AboutDialog myAboutDialog = new AboutDialog();
   private final SettingsSplash mySettings = new SettingsSplash();
-
-
-  private final double myCellSize = 20.0;
 
   private GridView myGridView;
 
@@ -73,20 +71,31 @@ public class SimulationView {
     applyLanguage(myBundle);
 
     buildTop();
+
     myMain.setPadding(new Insets(12));
     myMain.setStyle("-fx-background-color: #f6f7fb;");
 
     myRoot.getChildren().addAll(myMain, mySettings);
 
-    mySettings.prefWidthProperty().bind(myRoot.widthProperty());
-    mySettings.prefHeightProperty().bind(myRoot.heightProperty());
-    mySettings.maxWidthProperty().bind(myRoot.widthProperty());
-    mySettings.maxHeightProperty().bind(myRoot.heightProperty());
+    bindSplashToWindow();
+
     if (showSplash){
       openSettings();
     } else {
       closeSettings();
     }
+  }
+
+  private void bindSplashToWindow() {
+    mySettings.prefWidthProperty().bind(myRoot.widthProperty());
+    mySettings.prefHeightProperty().bind(myRoot.heightProperty());
+    mySettings.maxWidthProperty().bind(myRoot.widthProperty());
+    mySettings.maxHeightProperty().bind(myRoot.heightProperty());
+
+    myAboutDialog.prefWidthProperty().bind(myRoot.widthProperty());
+    myAboutDialog.prefHeightProperty().bind(myRoot.heightProperty());
+    myAboutDialog.maxWidthProperty().bind(myRoot.widthProperty());
+    myAboutDialog.maxHeightProperty().bind(myRoot.heightProperty());
   }
 
   private void buildTop(){
