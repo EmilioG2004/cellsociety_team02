@@ -55,6 +55,9 @@ public class SimulationView {
   private final Button myAboutButton;
   private final Button myToggleOutlineButton;
   private final Button mySettingsButton;
+  private final Button myRotateLeftButton;
+  private final Button myRotateRightButton;
+
 
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog();
@@ -84,10 +87,13 @@ public class SimulationView {
     mySettingsButton = new Button();
     myRoot.getStyleClass().add("app-root");
     myMain.getStyleClass().add("main-pane");
+    myRotateLeftButton = new Button();
+    myRotateRightButton = new Button();
 
     applyLanguage(myBundle);
 
     buildTop();
+
 
     myMain.setPadding(new Insets(12));
 
@@ -161,10 +167,17 @@ public class SimulationView {
     card.setPrefSize(760,520);
     card.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
     card.getStyleClass().add("card");
+    card.setAlignment(Pos.CENTER);
 
     Node gridNode = myGridView.getNode();
     card.getChildren().setAll(gridNode);
     centerPane.getChildren().setAll(card);
+  }
+
+  private void buildBottom(){
+    HBox bottomBox = new HBox(myRotateLeftButton, myRotateRightButton);
+    bottomBox.setAlignment(Pos.BOTTOM_CENTER);
+    myMain.setBottom(bottomBox);
   }
 
   public File showOpenConfigDialog() {
@@ -274,6 +287,7 @@ public class SimulationView {
   public void setGrid(int rows, int cols, double cellSize){
     this.myGridView = new GridPaneView(rows, cols, cellSize);
     buildCenter();
+    buildBottom();
   }
 
 
@@ -314,6 +328,8 @@ public class SimulationView {
     myAboutButton.setText(myBundle.getString("button.aboutConfig"));
     myToggleOutlineButton.setText(myBundle.getString("button.toggleOutlines"));
     mySettingsButton.setText(myBundle.getString("button.settings"));
+    myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
+    myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
 
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
@@ -327,4 +343,8 @@ public class SimulationView {
     };
     scene.getStylesheets().setAll(BASE_CSS, themeCss);
   }
+
+  public Button getMyRotateLeftButton(){ return myRotateLeftButton; }
+
+  public Button getMyRotateRightButton(){ return myRotateRightButton; }
 }
