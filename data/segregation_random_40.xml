@@ -1,0 +1,18 @@
+<simulation type="Segregation">
+  <metadata>
+    <title>Segregation Random 40</title>
+    <author>Ixa Sigler</author>
+    <description>A segregation model with 40 of each party randomly placed.</description>
+  </metadata>
+
+  <grid rows="15" cols="15">
+    <randomByCount>
+      <state id="1" count="40"/>
+      <state id="2" count="40"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="satisfactionThreshold" value="0.6"/>
+  </parameters>
+</simulation>
