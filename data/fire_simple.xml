@@ -1,0 +1,26 @@
+<simulation type="SpreadingOfFire" class="cellsociety.Model.GameRules.SpreadingOfFireRule">
+  <metadata>
+    <title>Test Spreading of Fire</title>
+    <author>Ixa Sigler</author>
+    <description>A simple spreading of fire test using patterns.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" proportion="0.2"/>
+      <state id="2" proportion="0.2"/>
+    </randomByCount>
+
+    <pattern row="5" col="5">
+      <states>
+        1,0,1
+        0,0,0
+        1,0,1
+        1,1,1
+      </states>
+    </pattern>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
