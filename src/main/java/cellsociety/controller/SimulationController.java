@@ -1,24 +1,14 @@
 package cellsociety.controller;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationDriver;
-import cellsociety.Model.SimulationFactory;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
 
 /**
  * Connects user interactions in the SimulationView to the underlying simulation logic.
@@ -52,7 +42,7 @@ public class SimulationController {
   private final Scene myScene;
   private SimulationConfig initialConfig;
   private final ConfigSaver myConfigSaver;
-  private static final double cellSize = 20.0;
+  private final WiringManager myWires;
 
   /**
    * Constructs a SimulationController for the given view.
@@ -65,13 +55,22 @@ public class SimulationController {
    * @param simView the view whose controls are connected to simulation behavior
    */
   public SimulationController(SimulationView simView, Scene scene) {
-    this.mySimView = simView;
-    this.myDriver = new SimulationDriver();
-    this.myConfigLoader = new ConfigLoader();
-    this.myConfigSaver = new ConfigSaver();
-    this.myScene = scene;
-    wireButtons(simView);
-
+    mySimView = simView;
+    myDriver = new SimulationDriver();
+    myConfigLoader = new ConfigLoader();
+    myConfigSaver = new ConfigSaver();
+    myScene = scene;
+    myWires = new WiringManager(
+        mySimView,
+        myDriver,
+        myConfigLoader,
+        myConfigSaver,
+        myScene,
+        this::setSimulation,
+        this::setInitialConfig,
+        () -> initialConfig
+    );
+    myWires.wireAll();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
   }
@@ -110,286 +109,8 @@ public class SimulationController {
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     updateGenerationLabel();
   }
-  /**
-   * Wires all UI buttons in the view to their corresponding controller actions.
-   * This method exists to keep constructor logic concise and organized.
-   */
-  private void wireButtons(SimulationView view){
-
-    // create buttonWirer to move all this out of this file
-    wireApplyChanges(view);
-    wireSettings();
-    wireForward();
-    wireBackward();
-    wireChangeDirection();
-    wireStart();
-    wirePause();
-    wireSave();
-    wireUpload();
-    wireSpeedUp();
-    wireSlowDown();
-    wireReset();
-    wireAbout();
-    wireToggleOutline();
-    wireRotate();
-  }
-
-  // fix these by making the lambda method a function pass in bc same code
-
-  private void wireForward() {
-    mySimView.getMyButtons().getForwardButton().setOnAction(e -> {
-      if (myDriver.isRunning()) {
-        myDriver.pause();
-      }
-      myDriver.step();
-      if (myDriver.hasSimulation()) {
-        updateGenerationLabel();
-      }
-    });
-  }
-
-  private void wireBackward() {
-    mySimView.getMyButtons().getBackButton().setOnAction(e -> {
-      if (myDriver.isRunning()) {
-        myDriver.pause();
-      }
-
-      myDriver.stepBack();
-      if (myDriver.hasSimulation()) {
-        updateGenerationLabel();
-      }
-    });
-  }
-
-  private void wireChangeDirection() {
-    mySimView.getMyButtons().getChangeDirectionButton().setOnAction(e -> {
-      System.out.println("Changing Direction to " + (myDriver.isForwardDirection() ? "Backward" : "Forward"));
-      myDriver.setDirection(!myDriver.isForwardDirection());
-      if (myDriver.isForwardDirection()) {
-        mySimView.getMyButtons().getChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.forward"));
-      } else {
-        mySimView.getMyButtons().getChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.backward"));
-
-      }
-    });
-  }
-
-  private void wireStart(){
-    mySimView.getMyButtons().getStartButton().setOnAction(e -> {
-      System.out.println("Start pressed");
-      myDriver.start();
-    });
-  }
-
-  /**
-   * Wires the Pause button to stop stepping the simulation.
-   */
-  private void wirePause() {
-    mySimView.getMyButtons().getPauseButton().setOnAction(e -> myDriver.pause());
-  }
-
-  /**
-   * Wires the Speed Up button to increase the simulation speed.
-   *
-   * Assumptions:
-   * - The driver accepts the updated speed value.
-   */
-  private void wireSpeedUp() {
-    mySimView
-        .getMyButtons()
-        .getSpeedUpButton()
-        .setOnAction(e -> {
-          if (mySimView.getMySpeedMultiplier() >= 4){
-            return;
-          }
-          myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
-          mySimView.doubleMySpeed();
-          mySimView.updateSpeedLabel();
-
-        });
-  }
-
-  /**
-   * Wires the Slow Down button to decrease the simulation speed.
-   *
-   * Assumptions:
-   * - The driver accepts the updated speed value.
-   */
-  private void wireSlowDown() {
-    mySimView
-        .getMyButtons()
-        .getSlowDownButton()
-        .setOnAction(e -> {
-          if (mySimView.getMySpeedMultiplier() <= 0.25){
-            return;
-          }
-          myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
-          mySimView.halveMySpeed();
-          mySimView.updateSpeedLabel();
-
-        });
-  }
-
-  /**
-   * Wires the Save button.
-   * This method exists to connect the save control to the controller layer.
-   */
-  private void wireSave() {
-    mySimView.getMyButtons().getSaveButton().setOnAction(e -> {
-      if (initialConfig == null) {
-        return;
-      }
-      if (!myDriver.hasSimulation()) {
-        return;
-      }
-      if (myDriver.isRunning()){
-        myDriver.pause();
-      }
-
-      ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
-      CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
-      int[][] intSnapshot = ReadOnlyGrid.produceIntArray(stateSnapshot, myDriver.getSimulation()
-          .getRule());
-      int snapshotRows = grid.getRows();
-      int snapshotCols = grid.getCols();
-      String type = initialConfig.getSimulationType();
-      String ruleClass = initialConfig.getRuleClass();
-      String title = initialConfig.getTitle();
-      String author = initialConfig.getAuthor();
-      String description = initialConfig.getDescription();
-      Map<String, Double> parameters = new HashMap<>(initialConfig.getParameters());
-
-      SimulationConfig configSnapshot = new SimulationConfig(type, ruleClass, title, author, description, snapshotRows, snapshotCols,
-          intSnapshot, parameters);
-
-      File saveDestination = mySimView.showSaveConfigDialog();
-      if (saveDestination != null){
-        myConfigSaver.saveConfig(configSnapshot, saveDestination);
-      }
-
-
-
-    });
-  }
-
-  /**
-   * Wires the Upload button to load a configuration file, create a simulation,
-   * and render the resulting grid.
-   *
-   * Purpose:
-   * Allows users to select a configuration file and replace the current simulation.
-   *
-   * Assumptions:
-   * - The file chooser returns a valid File.
-   * - The selected file can be parsed into a SimulationConfig.
-   *
-   * Exceptions:
-   * - ParserConfigurationException if the XML parser cannot be configured.
-   * - SAXException if the file does not match the expected XML structure.
-   * - IOException if the file cannot be read.
-   */
-  private void wireUpload() {
-    mySimView
-        .getMyButtons()
-        .getUploadButton()
-        .setOnAction(
-            e -> {
-              handleUpload();
-            });
-
-    mySimView.getMySettings().getMyUploadButton().setOnAction(e -> {
-      handleUpload();
-    });
-  }
-
-  private void handleUpload() {
-    File myFile = mySimView.showOpenConfigDialog();
-    try {
-      SimulationConfig myConfig = myConfigLoader.loadConfig(myFile);
-      setInitialConfig(myConfig);
-      Simulation mySim = SimulationFactory.createSimulation(myConfig);
-      ReadOnlyGrid readOnlyGrid = mySim.getReadOnlyGrid();
-      mySimView.setGrid(
-          readOnlyGrid.getRows(),
-          readOnlyGrid.getCols());
-      setSimulation(mySim);
-    } catch (ParserConfigurationException | SAXException | IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
 
   public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
-
-
-  /**
-   * Wires the reset button to allow the simulation to be reset to its original state.
-   *
-   * Purpose:
-   * Allows users to reset the current simulation to its original state while maintaining runtime
-   * settings like speed.
-   *
-   * Assumptions:
-   * - The initial config is not null and has a value
-   */
-  private void wireReset(){
-    mySimView.getMyButtons().getResetButton()
-        .setOnAction(e -> {
-          if (this.initialConfig == null) { return; }
-          Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
-          setSimulation(mySim);
-          updateGenerationLabel();
-        });
-  }
-
-  private void wireAbout(){
-    mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
-        mySimView.getMyAboutDialog().closeInfo()
-    );
-
-    mySimView.getMyButtons().getAboutButton().setOnAction(e -> {
-          if (initialConfig == null) {
-            throw new IllegalStateException("No configuration loaded");
-          }
-        mySimView.showAboutSplash(initialConfig);
-    }
-    );
-  }
-
-  private void wireToggleOutline(){
-    mySimView.getMyButtons().getToggleOutlineButton().setOnAction(e -> {
-      Simulation sim = myDriver.getSimulation();
-      mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
-    });
-  }
-
-  private void wireApplyChanges(SimulationView view){
-    mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
-      String choice = view.getMySettings().getMyLanguages().getValue();
-      ResourceBundle chosenBundle = loadLanguageBundle(choice);
-      view.applyLanguage(chosenBundle);
-
-      String themeChoice = view.getMySettings().getMyThemes().getValue();
-      view.applyTheme(myScene, themeChoice);
-
-      view.closeSettings();
-      mySimView.closeSettings();
-
-    });
-  }
-
-  private void wireSettings(){
-    mySimView.getMyButtons().getSettingsButton().setOnAction(e -> mySimView.openSettings());
-  }
-
-  private void wireRotate(){
-    mySimView.getMyButtons().getRotateLeftButton().setOnAction(e -> {
-      mySimView.getMyGridView().rotateLeft();
-    });
-
-    mySimView.getMyButtons().getRotateRightButton().setOnAction(e -> {
-      mySimView.getMyGridView().rotateRight();
-    });
-  }
 
   private void updateGenerationLabel() {
     Simulation sim = myDriver.getSimulation();
@@ -400,13 +121,4 @@ public class SimulationController {
     mySimView.getMyButtons().getStateStackSizeLabel()
         .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
   }
-
-  private ResourceBundle loadLanguageBundle(String choice) {
-    return switch (choice) {
-      case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
-      case "Portuguese" -> ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
-      default -> ResourceBundle.getBundle("cellsociety.Languages.English");
-    };
-  }
-
 }
