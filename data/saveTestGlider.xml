@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<simulation type="GameOfLife">
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
     <metadata>
         <title>Test Glider</title>
         <author>Ixa Sigler</author>

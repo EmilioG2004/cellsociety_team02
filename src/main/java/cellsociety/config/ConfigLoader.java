@@ -10,10 +10,24 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import static cellsociety.config.ConfigXmlConstants.*;
 
+/**
+ * Loads simulation configuration from XML files. Expects a root or nested {@code <simulation>} element
+ * with {@code type} and {@code class} attributes, plus {@code <metadata>}, {@code <grid>}, and optional {@code <parameters>}.
+ */
 public class ConfigLoader {
 
   private final ConfigGridParser gridParser = new ConfigGridParser();
 
+  /**
+   * Parses an XML config file into a {@link SimulationConfig}.
+   *
+   * @param xmlFile path to a valid simulation XML file
+   * @return the parsed configuration (never null)
+   * @throws ParserConfigurationException if the XML parser cannot be configured
+   * @throws IOException                  if the file cannot be read
+   * @throws SAXException                 if the XML is not well-formed
+   * @throws IllegalArgumentException     if required elements or attributes are missing or invalid
+   */
   public SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
@@ -22,8 +36,9 @@ public class ConfigLoader {
         .newDocumentBuilder()
         .parse(xmlFile);
 
-    String simulationType = getSimulationType(xmlDocument);
-
+    SimulationTypeAndClass simulationTypeAndClass= getSimulationType(xmlDocument);
+    String simulationType = simulationTypeAndClass.simulationType;
+    String ruleClass = simulationTypeAndClass.ruleClass;
     Element metadata = getMetadata(xmlDocument);
     String title = getChildText(metadata, CONFIG_TITLE);
     String author = getChildText(metadata, CONFIG_AUTHOR);
@@ -39,6 +54,7 @@ public class ConfigLoader {
 
     return new SimulationConfig(
         simulationType,
+        ruleClass,
         title,
         author,
         description,
@@ -58,9 +74,8 @@ public class ConfigLoader {
     return element;
   }
 
-  private String getSimulationType(Document xmlDocument) {
+  private SimulationTypeAndClass getSimulationType(Document xmlDocument) {
     Element root = xmlDocument.getDocumentElement();
-
     Element simulation;
     if (root != null && root.getTagName().equals(CONFIG_SIMULATION)) {
       simulation = root;
@@ -68,18 +83,13 @@ public class ConfigLoader {
       simulation = getFirstElementByTag(xmlDocument, CONFIG_SIMULATION);
     }
 
-    String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR);
-    if (!typeAttr.isBlank()) {
-      return typeAttr.trim();
+    String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR).trim();
+    String classAttr = simulation.getAttribute(CONFIG_SIM_CLASS_ATTR).trim();
+    if (typeAttr.isEmpty() || classAttr.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Simulation element must have both 'type' and 'class' attributes (e.g. type=\"GameOfLife\" class=\"cellsociety.Model.GameRules.ConwayGameOfLifeRule\")");
     }
-
-    // if no attributes try plaintext
-    String text = simulation.getTextContent();
-    if (text != null && !text.isBlank()) {
-      return text.trim();
-    }
-
-    throw new IllegalArgumentException("Simulation type not specified");
+    return new SimulationTypeAndClass(typeAttr, classAttr);
   }
 
   private Element getMetadata(Document xmlDocument) {
@@ -91,7 +101,9 @@ public class ConfigLoader {
     if (child == null) return "";
     return child.getTextContent().trim();
   }
-
+  /** Result of parsing the {@code <simulation>} element: display type and fully qualified rule class name. */
+  public record SimulationTypeAndClass(String simulationType, String ruleClass) {}
+  
 
   private HashMap<String, Double> getParameters(Document xmlDocument) {
     HashMap<String, Double> params = new HashMap<>();

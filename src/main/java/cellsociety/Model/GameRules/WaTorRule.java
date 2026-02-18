@@ -10,14 +10,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
 /** Wa-Tor World: fish and sharks move on cardinal neighbors; fish reproduce after N chronons, sharks eat fish for energy and reproduce after M chronons. */
 public class WaTorRule extends GameRule {
   private static final String SHARK_START_ENERGY = "sharkStartEnergy";
   private static final String SHARK_ENERGY_FROM_FISH = "sharkEnergyFromFish";
   private static final int DEFAULT_FISH_BIRTH_GENS = 2;
-  private static final int DEFAULT_SHARK_BIRTH_GENS = 3;
-  private static final int DEFAULT_SHARK_START_ENERGY = 10;
-  private static final int DEFAULT_ENERGY_FROM_EATING_FISH = 5;
+  private static final int DEFAULT_SHARK_BIRTH_GENS = 6;
+  /** Sharks lose 1 energy per chronon; this gives at most 5 steps without food so they die off when no fish. */
+  private static final int DEFAULT_SHARK_START_ENERGY = 5;
+  /** Energy gained per fish eaten; 1 offsets the 1 lost per turn so sharks must keep eating to survive. */
+  private static final int DEFAULT_ENERGY_FROM_EATING_FISH = 1;
+
+  /** Default parameters for logical predator-prey behavior: sharks die when fish are scarce. */
+  private static final Map<String, Double> DEFAULT_PARAMETERS = Map.of(
+      SHARK_START_ENERGY, (double) DEFAULT_SHARK_START_ENERGY,
+      SHARK_ENERGY_FROM_FISH, (double) DEFAULT_ENERGY_FROM_EATING_FISH);
   private int[][] fishGenCount;
   private int[][] sharkGenCount;
   private int[][] sharkEnergy;
@@ -27,10 +35,9 @@ public class WaTorRule extends GameRule {
     return r + "," + c;
   }
 
-  /** Wa-Tor rule with default parameters. */
+  /** Wa-Tor rule with default parameters (sharks die off when no fish). */
   public WaTorRule() {
-    super(new CardinalNeighborStrategy());
-    rand = new Random();
+    this(DEFAULT_PARAMETERS);
   }
 
   /** Wa-Tor rule with the given parameters (e.g. sharkStartEnergy, sharkEnergyFromFish). */
