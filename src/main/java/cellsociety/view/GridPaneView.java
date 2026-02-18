@@ -3,9 +3,16 @@ package cellsociety.view;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -41,14 +48,17 @@ import javafx.scene.shape.Rectangle;
 public class GridPaneView implements GridView {
 
   private final GridPane myGridPane = new GridPane();
-  private final double myCellSize;
-  private final Rectangle[][] myCells;
-  private final int myRows;
-  private final int myCols;
+  private Rectangle[][] myCells;
+  private int myRows;
+  private int myCols;
   private java.util.function.BiConsumer<Integer, Integer> myOnCellClicked;
   private boolean isOutlined;
-  private int myRotationSteps = 0;
+  private final IntegerProperty myRotationSteps = new SimpleIntegerProperty(0);
+
+  // rotate the GridPane, but return a layout-friendly wrapper
   private final Group myRotator;
+  private final StackPane myWrapper = new StackPane();
+
 
   /**
    * Constructs a GridPaneView with the specified dimensions and cell size.
@@ -62,17 +72,30 @@ public class GridPaneView implements GridView {
    *
    * @param rows number of rows in the grid
    * @param cols number of columns in the grid
-   * @param cellSize size (in pixels) of each cell’s width and height
    */
-  public GridPaneView(int rows, int cols, double cellSize) {
-    myCellSize = cellSize;
+  public GridPaneView(int rows, int cols) {
     myCols = cols;
     myRows = rows;
     myCells = new Rectangle[rows][cols];
     isOutlined = true;
     myRotator = new Group(myGridPane);
-
+    bindWrapper();
     buildGrid();
+
+  }
+
+  private void bindWrapper() {
+    myWrapper.setAlignment(Pos.CENTER);
+    myWrapper.getChildren().add(myRotator);
+
+    myWrapper.prefWidthProperty().bind(Bindings.createDoubleBinding(
+        () -> myRotator.getBoundsInParent().getWidth(),
+        myRotator.boundsInParentProperty()
+    ));
+    myWrapper.prefHeightProperty().bind(Bindings.createDoubleBinding(
+        () -> myRotator.getBoundsInParent().getHeight(),
+        myRotator.boundsInParentProperty()
+    ));
   }
 
   /**
@@ -86,7 +109,7 @@ public class GridPaneView implements GridView {
    */
   @Override
   public Node getNode() {
-    return myRotator;
+    return myWrapper;
   }
 
   /**
@@ -104,7 +127,7 @@ public class GridPaneView implements GridView {
 
     for (int r = 0; r < myRows; r++) {
       for (int c = 0; c < myCols; c++) {
-        Rectangle cell = new Rectangle(myCellSize, myCellSize);
+        Rectangle cell = new Rectangle();
         cell.setFill(Color.WHITE);
         cell.setStroke(Color.BLACK);
 
@@ -188,13 +211,50 @@ public class GridPaneView implements GridView {
   }
 
   public void rotateRight() {
-    myRotationSteps = (myRotationSteps + 1) % 4;
-    myRotator.setRotate(myRotationSteps * 90.0);
+    myRotationSteps.set((myRotationSteps.get() + 1) % 4);
+    myRotator.setRotate(myRotationSteps.get() * 90.0);
   }
 
   public void rotateLeft() {
-    myRotationSteps = (myRotationSteps + 3) % 4;
-    myRotator.setRotate(myRotationSteps * 90.0);
+    myRotationSteps.set((myRotationSteps.get() + 3) % 4);
+    myRotator.setRotate(myRotationSteps.get() * 90.0);
+  }
+
+  @Override
+  public void bindToContainer(Region container){
+    DoubleBinding cellSize = Bindings.createDoubleBinding(() -> computeCellSize(container), container.widthProperty(), container.heightProperty(), myRotationSteps);
+
+    for (int r = 0; r < myRows; r++) {
+      for (int c = 0; c < myCols; c++) {
+        Rectangle rect = myCells[r][c];
+        rect.widthProperty().bind(cellSize);
+        rect.heightProperty().bind(cellSize);
+      }
+    }
+  }
+
+  private double computeCellSize(Region container) {
+    double width = container.getWidth();
+    double height = container.getHeight();
+
+    double padWidth = 0;
+    double padHeight = 0;
+    if (container.getPadding() != null) {
+      padWidth = container.getPadding().getLeft() + container.getPadding().getRight();
+      padHeight = container.getPadding().getTop() + container.getPadding().getBottom();
+    }
+
+    double availWidth = Math.max(1, width - padWidth);
+    double availHeight = Math.max(1, height - padHeight);
+
+    boolean rotated90 = (myRotationSteps.get() % 2 != 0);
+
+    int effectiveCols = rotated90 ? myRows : myCols;
+    int effectiveRows = rotated90 ? myCols : myRows;
+
+    double raw = Math.min(availWidth / effectiveCols, availHeight / effectiveRows);
+
+    return Math.max(1, Math.floor(raw - 1));
   }
 
 }
