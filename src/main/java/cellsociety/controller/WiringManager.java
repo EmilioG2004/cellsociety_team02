@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javafx.scene.Scene;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
@@ -34,15 +36,27 @@ public class WiringManager {
   private final java.util.function.Consumer<SimulationConfig> setInitialConfig;
 
   private final java.util.function.Supplier<SimulationConfig> getInitialConfig;
+  private final Runnable myOpenMulti;
+  private final Supplier<Boolean> isMultiMode;
+  private final Runnable startAllLoaded;
+  private final Runnable pauseAll;
+  private final Runnable stepAllLoaded;
+  private final Runnable stepBackAllLoaded;
 
   public WiringManager(SimulationView simView,
       SimulationDriver driver,
       ConfigLoader loader,
       ConfigSaver saver,
       Scene scene,
-      java.util.function.Consumer<Simulation> setSimulationCallback,
-      java.util.function.Consumer<SimulationConfig> setInitialConfigCallback,
-      java.util.function.Supplier<SimulationConfig> getInitialConfigSupplier) {
+      Consumer<Simulation> setSimulationCallback,
+      Consumer<SimulationConfig> setInitialConfigCallback,
+      Supplier<SimulationConfig> getInitialConfigSupplier,
+      Runnable multiSimCallback,
+      Supplier<Boolean> isMultiModeSupplier,
+      Runnable startAllLoadedCallback,
+      Runnable pauseAllCallback,
+      Runnable stepAllLoadedCallback,
+      Runnable stepBackAllLoadedCallback) {
     mySimView = simView;
     myDriver = driver;
     myConfigLoader = loader;
@@ -52,6 +66,12 @@ public class WiringManager {
     setSimulation = setSimulationCallback;
     setInitialConfig = setInitialConfigCallback;
     getInitialConfig = getInitialConfigSupplier;
+    myOpenMulti = multiSimCallback;
+    isMultiMode = isMultiModeSupplier;
+    startAllLoaded = startAllLoadedCallback;
+    pauseAll = pauseAllCallback;
+    stepAllLoaded = stepAllLoadedCallback;
+    stepBackAllLoaded = stepBackAllLoadedCallback;
   }
 
   /** Public entrypoint: wires every UI interaction. */
@@ -71,10 +91,15 @@ public class WiringManager {
     wireAbout();
     wireToggleOutline();
     wireRotate();
+    wireMultiSim();
   }
 
   private void wireForward() {
     mySimView.getMyButtons().getForwardButton().setOnAction(e -> {
+      if (isMultiMode.get()) {
+        stepAllLoaded.run();
+        return;
+      }
       if (myDriver.isRunning()) myDriver.pause();
       myDriver.step();
       if (myDriver.hasSimulation()) updateGenerationLabel();
@@ -83,6 +108,10 @@ public class WiringManager {
 
   private void wireBackward() {
     mySimView.getMyButtons().getBackButton().setOnAction(e -> {
+      if (isMultiMode.get()) {
+        stepBackAllLoaded.run();
+        return;
+      }
       if (myDriver.isRunning()) myDriver.pause();
       myDriver.stepBack();
       if (myDriver.hasSimulation()) updateGenerationLabel();
@@ -103,11 +132,23 @@ public class WiringManager {
   }
 
   private void wireStart() {
-    mySimView.getMyButtons().getStartButton().setOnAction(e -> myDriver.start());
+    mySimView.getMyButtons().getStartButton().setOnAction(e -> {
+      if (isMultiMode.get()) {
+        startAllLoaded.run();
+        return;
+      }
+      myDriver.start();
+    });
   }
 
   private void wirePause() {
-    mySimView.getMyButtons().getPauseButton().setOnAction(e -> myDriver.pause());
+    mySimView.getMyButtons().getPauseButton().setOnAction(e -> {
+      if (isMultiMode.get()) {
+        pauseAll.run();
+        return;
+      }
+      myDriver.pause();
+    });
   }
 
   private void wireSpeedUp() {
@@ -238,6 +279,10 @@ public class WiringManager {
     mySimView.getMyButtons().getRotateRightButton().setOnAction(e -> mySimView.getMyGridView().rotateRight());
   }
 
+  private void wireMultiSim() {
+    mySimView.getMyButtons().getMyMultiSimButton().setOnAction(e -> myOpenMulti.run());
+  }
+
   private void updateGenerationLabel() {
     Simulation sim = myDriver.getSimulation();
     if (sim == null) return;
@@ -254,4 +299,6 @@ public class WiringManager {
       default -> ResourceBundle.getBundle("cellsociety.Languages.English");
     };
   }
+
+
 }

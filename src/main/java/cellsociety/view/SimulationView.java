@@ -30,8 +30,8 @@ public class SimulationView {
   private static final String DUKE_CSS =
       SimulationView.class.getResource("/cellsociety/stylesheets/duke.css").toExternalForm();
 
-  private ResourceBundle myBundle;
-  private ButtonManager myButtons;
+  private final ResourceBundle myBundle;
+  private final ButtonManager myButtons;
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
@@ -245,4 +245,16 @@ public class SimulationView {
   public ButtonManager getMyButtons() { return myButtons; }
 
   public double getMySpeedMultiplier() { return mySpeedMultiplier; }
+
+  public void setCenterContent(Node content) {
+    if (centerPane == null) {
+      centerPane = new StackPane();
+      centerPane.setPadding(new Insets(18,0,18,0));
+      myMain.setCenter(centerPane);
+    }
+    StackPane card = buildCenterCard();
+    card.getChildren().setAll(content);
+    centerPane.getChildren().setAll(card);
+  }
+
 }

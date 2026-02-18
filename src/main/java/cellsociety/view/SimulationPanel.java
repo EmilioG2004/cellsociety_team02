@@ -8,9 +8,12 @@ import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
@@ -31,6 +34,7 @@ public class SimulationPanel implements SimulationRenderer {
 
   private final VBox myRoot;
   private final Label myGenerationLabel;
+  private final Button myLoadButton;
 
   private final StackPane myGridContainer;
 
@@ -42,15 +46,24 @@ public class SimulationPanel implements SimulationRenderer {
     myRoot = new VBox(SPACING);
     myRoot.setPadding(new Insets(8));
     myRoot.setAlignment(Pos.CENTER);
+    myRoot.setFillWidth(true);
 
     myGenerationLabel = new Label();
     myGenerationLabel.setMaxWidth(Double.MAX_VALUE);
     myGenerationLabel.setAlignment(Pos.CENTER);
 
+    myLoadButton = new Button(myBundle.getString("button.loadsim"));
+
     myGridContainer = new StackPane();
     myGridContainer.setPadding(new Insets(8));
+    myGridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-    myRoot.getChildren().addAll(myGenerationLabel, myGridContainer);
+    HBox header = new HBox(8, myGenerationLabel, myLoadButton);
+    header.setAlignment(Pos.CENTER);
+    HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
+
+    myRoot.getChildren().addAll(header, myGridContainer);
+    VBox.setVgrow(myGridContainer, Priority.ALWAYS);
   }
 
   @Override
@@ -59,7 +72,6 @@ public class SimulationPanel implements SimulationRenderer {
     Node gridNode = myGridView.getNode();
     myGridContainer.getChildren().setAll(gridNode);
 
-    // match your existing pattern in GridPaneView usage
     myGridView.bindToContainer((Region) myGridContainer);
   }
 
@@ -78,5 +90,9 @@ public class SimulationPanel implements SimulationRenderer {
   @Override
   public Node getNode() {
     return myRoot;
+  }
+
+  public void setOnLoad(Runnable action) {
+    myLoadButton.setOnAction(e -> action.run());
   }
 }

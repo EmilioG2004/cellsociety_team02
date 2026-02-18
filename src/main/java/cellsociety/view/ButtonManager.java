@@ -35,6 +35,7 @@ public class ButtonManager {
   private final Button mySettingsButton = new Button();
   private final Button myRotateLeftButton = new Button();
   private final Button myRotateRightButton = new Button();
+  private final Button myMultiSimButton = new Button();
 
   public ButtonManager(ResourceBundle bundle) {
     myBundle = bundle;
@@ -65,8 +66,9 @@ public class ButtonManager {
     myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
     myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
     myChangeDirectionButton.setText(myBundle.getString("button.changeDirection"));
+    myMultiSimButton.setText(myBundle.getString("button.multisim"));
 
-    // This label is not a button, but it is language-dependent.
+
     myStateStackSizeLabel.setText(myBundle.getString("label.generation.unset"));
   }
 
@@ -82,7 +84,7 @@ public class ButtonManager {
    * Convenience: controls used in the upload row (top-left row).
    */
   public List<Button> getUploadRowButtons() {
-    return List.of(myUploadButton, mySaveButton, myAboutButton, mySettingsButton);
+    return List.of(myUploadButton, mySaveButton, myAboutButton, mySettingsButton, myMultiSimButton);
   }
 
   /**
@@ -128,4 +130,5 @@ public class ButtonManager {
   public Button getSettingsButton() { return mySettingsButton; }
   public Button getRotateLeftButton() { return myRotateLeftButton; }
   public Button getRotateRightButton() { return myRotateRightButton; }
+  public Button getMyMultiSimButton() { return myMultiSimButton; }
 }

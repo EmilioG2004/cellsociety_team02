@@ -43,6 +43,8 @@ public class SimulationController {
   private SimulationConfig initialConfig;
   private final ConfigSaver myConfigSaver;
   private final WiringManager myWires;
+  private final MultiSimController myMultiController;
+  private boolean myMultiMode;
 
   /**
    * Constructs a SimulationController for the given view.
@@ -60,6 +62,7 @@ public class SimulationController {
     myConfigLoader = new ConfigLoader();
     myConfigSaver = new ConfigSaver();
     myScene = scene;
+    myMultiController = new MultiSimController(mySimView.getMyBundle());
     myWires = new WiringManager(
         mySimView,
         myDriver,
@@ -68,8 +71,16 @@ public class SimulationController {
         myScene,
         this::setSimulation,
         this::setInitialConfig,
-        () -> initialConfig
+        () -> initialConfig,
+        this:: openMultiSimDashboard,
+        this::isMultiMode,
+        () -> myMultiController.startAllLoaded(),
+        () -> myMultiController.pauseAll(),
+        () -> myMultiController.stepAllLoaded(),
+        () -> myMultiController.stepBackAllLoaded()
     );
+    myMultiMode = false;
+
     myWires.wireAll();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
@@ -88,6 +99,7 @@ public class SimulationController {
    * @param sim the simulation to run and display
    */
   public void setSimulation(Simulation sim) {
+    myMultiMode = false;
     myDriver.setSimulation(sim);
     mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     mySimView.getMyGridView().setOnCellClicked((row, col) -> {
@@ -120,5 +132,14 @@ public class SimulationController {
 
     mySimView.getMyButtons().getStateStackSizeLabel()
         .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
+  }
+
+  public void openMultiSimDashboard() {
+    myMultiMode = true;
+    mySimView.setCenterContent(myMultiController.getNode());
+  }
+
+  public boolean isMultiMode() {
+    return myMultiMode;
   }
 }

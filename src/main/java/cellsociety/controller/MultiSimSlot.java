@@ -38,7 +38,6 @@ public class MultiSimSlot {
   }
 
   public void setSimulation(Simulation sim) {
-    // SimulationPanel uses the bundle it was constructed with for labels.
     myPresenter.setSimulation(sim, sim.getReadOnlyGrid().getRows(), sim.getReadOnlyGrid().getCols());
   }
 
