@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import static cellsociety.config.ConfigXmlConstants.*;
 
@@ -30,17 +32,24 @@ public class ConfigGridParser {
   }
 
   public int[][] parseInitialStates(Document xmlDocument, int rows, int cols) {
-    Element grid = getGridElement(xmlDocument);
+    Element gridEl = getGridElement(xmlDocument);
 
-    Element statesElement = (Element) grid.getElementsByTagName(CONFIG_STATES).item(0);
+    Element statesElement = getFirstDirectChild(gridEl, CONFIG_STATES);
+
+    int[][] base;
     if (statesElement != null) {
-      return parseExplicitStates(statesElement, rows, cols);
+      base = parseExplicitStates(statesElement, rows, cols);
+    } else {
+      base = parseRandomByCountStates(gridEl, rows, cols);
     }
-    return parseRandomByCountStates(grid, rows, cols);
+
+    applyPatterns(gridEl, base, rows, cols);
+
+    return base;
   }
 
   private int[][] parseRandomByCountStates(Element grid, int rows, int cols) {
-    Element randomElement = (Element) grid.getElementsByTagName(CONFIG_RANDOM_BY_COUNT).item(0);
+    Element randomElement = getFirstDirectChild(grid, CONFIG_RANDOM_BY_COUNT);
     if (randomElement == null) {
       throw new IllegalArgumentException(
           "Missing <" + CONFIG_STATES + "> and no <" + CONFIG_RANDOM_BY_COUNT + "> provided."
@@ -117,7 +126,9 @@ public class ConfigGridParser {
   /**
    * Turns proportion weights into integer counts over 'remainingCells' and puts them into 'counts'
    */
-  private void allocateProportionsIntoCounts(Map<Integer, Integer> counts, Map<Integer, Double> proportions, int remainingCells) {
+  private void allocateProportionsIntoCounts(Map<Integer, Integer> counts,
+      Map<Integer, Double> proportions,
+      int remainingCells) {
 
     double sumProps = 0.0;
     for (double p : proportions.values()) sumProps += p;
@@ -158,6 +169,56 @@ public class ConfigGridParser {
     String rawText = statesElement.getTextContent();
     List<String> lines = nonEmptyLines(rawText);
     return iterateThroughRows(lines, rows, cols);
+  }
+
+  private void applyPatterns(Element gridEl, int[][] grid, int rows, int cols) {
+    NodeList patternNodes = gridEl.getElementsByTagName(CONFIG_PATTERN);
+    for (int i = 0; i < patternNodes.getLength(); i++) {
+      Element patternEl = (Element) patternNodes.item(i);
+
+      int startRow = parseNonNegativeInt(patternEl, CONFIG_ROWS);
+      int startCol = parseNonNegativeInt(patternEl, CONFIG_COLUMNS);
+
+      // pattern must contain its own <states> direct child
+      Element patternStatesEl = getFirstDirectChild(patternEl, CONFIG_STATES);
+      if (patternStatesEl == null) {
+        throw new IllegalArgumentException("Missing <" + CONFIG_STATES + "> inside <" + CONFIG_PATTERN + ">");
+      }
+
+      List<String> lines = nonEmptyLines(patternStatesEl.getTextContent());
+      if (lines.isEmpty()) continue;
+
+      int patternCols = lines.get(0).split(",").length;
+
+      if (startRow + lines.size() > rows || startCol + patternCols > cols) {
+        throw new IllegalArgumentException(
+            "Pattern at (" + startRow + "," + startCol + ") with size " +
+                lines.size() + "x" + patternCols + " exceeds grid bounds " + rows + "x" + cols
+        );
+      }
+
+      // apply pattern
+      for (int pr = 0; pr < lines.size(); pr++) {
+        int[] patternRow = parseRow(lines.get(pr), patternCols, pr);
+        for (int pc = 0; pc < patternCols; pc++) {
+          grid[startRow + pr][startCol + pc] = patternRow[pc];
+        }
+      }
+    }
+  }
+
+  private Element getFirstDirectChild(Element parent, String tagName) {
+    NodeList children = parent.getChildNodes();
+    for (int i = 0; i < children.getLength(); i++) {
+      Node n = children.item(i);
+      if (n.getNodeType() == Node.ELEMENT_NODE) {
+        Element el = (Element) n;
+        if (tagName.equals(el.getTagName())) {
+          return el;
+        }
+      }
+    }
+    return null;
   }
 
   private int parseNonNegativeInt(Element el, String attr) {

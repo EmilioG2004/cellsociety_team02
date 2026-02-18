@@ -17,6 +17,8 @@ final class ConfigXmlConstants {
   static final String CONFIG_COUNT_ATTR = "count";
   static final String CONFIG_PROPORTION_ATTR = "proportion";
 
+  static final String CONFIG_PATTERN = "pattern";
+
   static final String CONFIG_TITLE = "title";
   static final String CONFIG_AUTHOR = "author";
   static final String CONFIG_DESCRIPTION = "description";
