@@ -1,4 +1,4 @@
-<simulation type="FallingSand">
+<simulation type="FallingSand" class="cellsociety.Model.GameRules.FallingSandRule">
   <metadata>
     <title>Water Ladder</title>
     <author>Ixa Sigler</author>

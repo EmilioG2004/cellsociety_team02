@@ -1,4 +1,4 @@
-<simulation type="GameOfLife">
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
   <metadata>
     <title>Random 40 Alive</title>
     <author>Ixa Sigler</author>

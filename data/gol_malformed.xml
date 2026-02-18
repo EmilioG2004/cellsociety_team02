@@ -1,4 +1,4 @@
-<simulation type="GameOfLife">
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
   <metadata>
     <title>Test Malformed</title>
     <author>Ixa Sigler</author>
