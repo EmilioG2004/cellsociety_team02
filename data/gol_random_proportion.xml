@@ -1,0 +1,16 @@
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
+  <metadata>
+    <title>One Quarter Alive</title>
+    <author>Ixa Sigler</author>
+    <description>40x20 grid that is 25% full of living cells on start. Uses new CELL-32B random config feature.</description>
+  </metadata>
+
+  <grid rows="40" cols="20">
+    <randomByCount>
+      <state id="1" proportion="0.25"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
