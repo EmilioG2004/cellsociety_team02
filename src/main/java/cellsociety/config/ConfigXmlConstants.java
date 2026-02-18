@@ -15,6 +15,7 @@ final class ConfigXmlConstants {
   static final String CONFIG_RANDOM_STATE = "state";
   static final String CONFIG_ID_ATTR = "id";
   static final String CONFIG_COUNT_ATTR = "count";
+  static final String CONFIG_PROPORTION_ATTR = "proportion";
 
   static final String CONFIG_TITLE = "title";
   static final String CONFIG_AUTHOR = "author";
