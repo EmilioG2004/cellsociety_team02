@@ -1,0 +1,32 @@
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
+  <metadata>
+    <title>Gliders Collide</title>
+    <author>Ixa Sigler</author>
+    <description>20x20 grid with two gliders inserted via CELL-32C patterns so they crash into each other.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="0" count="400"/>
+    </randomByCount>
+
+    <pattern row="2" col="2">
+      <states>
+        0,1,0
+        0,0,1
+        1,1,1
+      </states>
+    </pattern>
+
+    <pattern row="2" col="15">
+      <states>
+        0,1,0
+        1,0,0
+        1,1,1
+      </states>
+    </pattern>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
