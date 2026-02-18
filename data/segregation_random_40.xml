@@ -1,4 +1,4 @@
-<simulation type="Segregation">
+<simulation type="Segregation" class="cellsociety.Model.GameRules.SegregationRule">
   <metadata>
     <title>Segregation Random 40</title>
     <author>Ixa Sigler</author>

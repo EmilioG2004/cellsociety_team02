@@ -36,7 +36,15 @@ public class ConfigGridParser {
     return new int[] { rows, cols };
   }
 
-  // check for explicit states; if not provided, then check if counts for random grid are given
+  /**
+   * Parses initial cell states from the grid section: either explicit {@code <states>} CSV or {@code <randomByCount>}.
+   *
+   * @param xmlDocument the parsed XML document
+   * @param rows        expected number of rows
+   * @param cols        expected number of columns
+   * @return a rows x cols matrix of integer state codes
+   * @throws IllegalArgumentException if grid/states are missing or dimensions do not match
+   */
   public int[][] parseInitialStates(Document xmlDocument, int rows, int cols) {
     Element grid = getGridElement(xmlDocument);
 

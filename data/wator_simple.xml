@@ -1,0 +1,17 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Simple</title>
+    <author>cellsociety</author>
+    <description>Predator-prey: fish and sharks in water. 0=water, 1=fish, 2=shark.</description>
+  </metadata>
+
+  <grid rows="15" cols="15">
+    <randomByCount>
+      <state id="1" count="25"/>
+      <state id="2" count="8"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
