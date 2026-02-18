@@ -1,0 +1,35 @@
+<simulation type="TotallyReal" class="cellsociety.Model.GameRules.TotallyRealRule">
+<metadata>
+    <title>Test Exception</title>
+    <author>Ixa Sigler</author>
+    <description>Invalid simulation type.</description>
+  </metadata>
+
+  <grid rows="20" cols="5">
+    <states>
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,1,1,1,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,1,0,0
+      0,0,1,0,0
+      0,0,1,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

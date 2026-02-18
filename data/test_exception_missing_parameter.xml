@@ -1,0 +1,34 @@
+
+  <metadata>
+    <title>Test Exception</title>
+    <author>Ixa Sigler</author>
+    <description>Missing vital simulation parameter.</description>
+  </metadata>
+
+  <grid rows="20" cols="5">
+    <states>
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,1,1,1,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,1,0,0
+      0,0,1,0,0
+      0,0,1,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+      0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
