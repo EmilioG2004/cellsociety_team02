@@ -24,10 +24,11 @@ public class ConfigLoaderTest {
     SimulationConfig config = loader.loadConfig(file);
 
     assertEquals("GameOfLife", config.getSimulationType());
-    assertEquals(5, config.getRows());
+    assertEquals("cellsociety.Model.GameRules.ConwayGameOfLifeRule", config.getRuleClass());
+    assertEquals(20, config.getRows());
     assertEquals(20, config.getCols());
     int[][] states = config.getInitialStates();
-    assertEquals(5, states.length);
+    assertEquals(20, states.length);
     assertEquals(20, states[0].length);
     assertEquals(0, states[0][0]);
     assertEquals(1, states[1][1]);
