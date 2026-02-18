@@ -243,15 +243,13 @@ public class SimulationController {
       int snapshotRows = grid.getRows();
       int snapshotCols = grid.getCols();
       String type = initialConfig.getSimulationType();
+      String ruleClass = initialConfig.getRuleClass();
       String title = initialConfig.getTitle();
       String author = initialConfig.getAuthor();
       String description = initialConfig.getDescription();
-      Map<String, Double> parameters = new HashMap<> (initialConfig.getParameters());
+      Map<String, Double> parameters = new HashMap<>(initialConfig.getParameters());
 
-
-
-
-      SimulationConfig configSnapshot = new SimulationConfig(type, title, author, description, snapshotRows, snapshotCols,
+      SimulationConfig configSnapshot = new SimulationConfig(type, ruleClass, title, author, description, snapshotRows, snapshotCols,
           intSnapshot, parameters);
 
       File saveDestination = mySimView.showSaveConfigDialog();

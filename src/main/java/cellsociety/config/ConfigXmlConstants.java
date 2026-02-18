@@ -6,7 +6,8 @@ final class ConfigXmlConstants {
 
   static final String CONFIG_SIMULATION = "simulation";
   static final String CONFIG_SIM_TYPE_ATTR = "type";
-
+  static final String CONFIG_SIM_CLASS_ATTR = "class";
+  
   static final String CONFIG_METADATA = "metadata";
   static final String CONFIG_GRID = "grid";
 

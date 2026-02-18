@@ -15,8 +15,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import static cellsociety.config.ConfigXmlConstants.*;
 
+/**
+ * Writes a {@link SimulationConfig} to an XML file in the format expected by {@link ConfigLoader}.
+ */
 public class ConfigSaver {
 
+  /**
+   * Serializes the given config to XML and writes it to the specified file.
+   *
+   * @param config  the configuration to save (must have valid type, rule class, grid, and states)
+   * @param outFile the destination file (will be overwritten if it exists)
+   * @throws IllegalArgumentException if config or outFile is null, or config fails validation
+   * @throws RuntimeException        if writing the file fails
+   */
   public void saveConfig(SimulationConfig config, File outFile) {
     if (config == null) throw new IllegalArgumentException("config cannot be null");
     if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
@@ -36,6 +47,8 @@ public class ConfigSaver {
   private void validateConfig(SimulationConfig config) {
     if (trimmed(config.getSimulationType()).isEmpty())
       throw new IllegalArgumentException("simulation type is blank");
+    if (trimmed(config.getRuleClass()).isEmpty())
+      throw new IllegalArgumentException("rule class is blank");
 
     int rows = config.getRows();
     int cols = config.getCols();
@@ -61,6 +74,7 @@ public class ConfigSaver {
   private Element buildSimulationElement(Document doc, SimulationConfig config) {
     Element simulationEl = doc.createElement(CONFIG_SIMULATION);
     simulationEl.setAttribute(CONFIG_SIM_TYPE_ATTR, trimmed(config.getSimulationType()));
+    simulationEl.setAttribute(CONFIG_SIM_CLASS_ATTR, trimmed(config.getRuleClass()));
 
     simulationEl.appendChild(buildMetadataElement(doc, config));
     simulationEl.appendChild(buildGridElement(doc, config));
