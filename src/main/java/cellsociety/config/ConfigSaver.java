@@ -1,11 +1,9 @@
 package cellsociety.config;
 
 import java.io.File;
-import java.io.IOException;
-
 import java.util.Map;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -13,21 +11,29 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import static cellsociety.config.ConfigXmlConstants.*;
 
 /**
- * Writes a {@link SimulationConfig} to an XML file in the format expected by {@link ConfigLoader}.
+ * Writes a {@link SimulationState} to an XML file.
+ * Contains global settings + a list of simulation configs.
  */
 public class ConfigSaver {
 
-  /**
-   * Serializes the given config to XML and writes it to the specified file.
-   *
-   * @param config  the configuration to save (must have valid type, rule class, grid, and states)
-   * @param outFile the destination file (will be overwritten if it exists)
-   * @throws IllegalArgumentException if config or outFile is null, or config fails validation
-   * @throws RuntimeException        if writing the file fails
-   */
+  public void saveState(SimulationState state, File outFile) {
+    if (state == null) throw new IllegalArgumentException("state cannot be null");
+    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+
+    try {
+      Document doc = newDocument();
+      Element root = buildSimulationStateElement(doc, state);
+      doc.appendChild(root);
+      writeXml(doc, outFile);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to save state to " + outFile.getPath(), e);
+    }
+  }
+
   public void saveConfig(SimulationConfig config, File outFile) {
     if (config == null) throw new IllegalArgumentException("config cannot be null");
     if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
@@ -42,6 +48,35 @@ public class ConfigSaver {
     } catch (Exception e) {
       throw new RuntimeException("Failed to save config to " + outFile.getPath(), e);
     }
+  }
+
+  private Element buildSimulationStateElement(Document doc, SimulationState state) {
+    Element root = doc.createElement(CONFIG_SIMULATION_STATE);
+
+    // settings
+    root.appendChild(buildSettingsElement(doc, state));
+
+    // simulations
+    Element simsEl = doc.createElement(CONFIG_SIMULATIONS);
+    List<SimulationConfig> configs = state.getActiveSimulations();
+    for (SimulationConfig cfg : configs) {
+      if (cfg == null) throw new IllegalArgumentException("activeSimulations contains null config");
+      validateConfig(cfg);
+      simsEl.appendChild(buildSimulationElement(doc, cfg));
+    }
+    root.appendChild(simsEl);
+
+    return root;
+  }
+
+  private Element buildSettingsElement(Document doc, SimulationState state) {
+    Element settingsEl = doc.createElement(CONFIG_SETTINGS);
+
+    settingsEl.appendChild(textElement(doc, CONFIG_THEME, Integer.toString(state.getTheme())));
+    settingsEl.appendChild(textElement(doc, CONFIG_SIMULATION_SPEED, Double.toString(state.getSimulationSpeed())));
+    settingsEl.appendChild(textElement(doc, CONFIG_LANGUAGE, state.getLanguage()));
+
+    return settingsEl;
   }
 
   private void validateConfig(SimulationConfig config) {
@@ -146,7 +181,6 @@ public class ConfigSaver {
     );
   }
 
-  // ensures proper formatting for states i.e. 0,0,0,0,0
   private String toMultilineCsv(int[][] states, int rows, int cols) {
     StringBuilder sb = new StringBuilder();
     for (int r = 0; r < rows; r++) {
