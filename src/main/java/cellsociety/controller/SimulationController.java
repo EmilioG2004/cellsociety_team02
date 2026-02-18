@@ -137,7 +137,7 @@ public class SimulationController {
   // fix these by making the lambda method a function pass in bc same code
 
   private void wireForward() {
-    mySimView.getMyForwardButton().setOnAction(e -> {
+    mySimView.getMyButtons().getForwardButton().setOnAction(e -> {
       if (myDriver.isRunning()) {
         myDriver.pause();
       }
@@ -149,7 +149,7 @@ public class SimulationController {
   }
 
   private void wireBackward() {
-    mySimView.getMyBackButton().setOnAction(e -> {
+    mySimView.getMyButtons().getBackButton().setOnAction(e -> {
       if (myDriver.isRunning()) {
         myDriver.pause();
       }
@@ -162,20 +162,20 @@ public class SimulationController {
   }
 
   private void wireChangeDirection() {
-    mySimView.getMyChangeDirectionButton().setOnAction(e -> {
+    mySimView.getMyButtons().getChangeDirectionButton().setOnAction(e -> {
       System.out.println("Changing Direction to " + (myDriver.isForwardDirection() ? "Backward" : "Forward"));
       myDriver.setDirection(!myDriver.isForwardDirection());
       if (myDriver.isForwardDirection()) {
-        mySimView.getMyChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.forward"));
+        mySimView.getMyButtons().getChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.forward"));
       } else {
-        mySimView.getMyChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.backward"));
+        mySimView.getMyButtons().getChangeDirectionButton().setText(mySimView.getMyBundle().getString("button.direction.backward"));
 
       }
     });
   }
 
   private void wireStart(){
-    mySimView.getMyStartButton().setOnAction(e -> {
+    mySimView.getMyButtons().getStartButton().setOnAction(e -> {
       System.out.println("Start pressed");
       myDriver.start();
     });
@@ -185,7 +185,7 @@ public class SimulationController {
    * Wires the Pause button to stop stepping the simulation.
    */
   private void wirePause() {
-    mySimView.getMyPauseButton().setOnAction(e -> myDriver.pause());
+    mySimView.getMyButtons().getPauseButton().setOnAction(e -> myDriver.pause());
   }
 
   /**
@@ -196,7 +196,8 @@ public class SimulationController {
    */
   private void wireSpeedUp() {
     mySimView
-        .getMySpeedUpButton()
+        .getMyButtons()
+        .getSpeedUpButton()
         .setOnAction(e -> {
           if (mySimView.getMySpeedMultiplier() >= 4){
             return;
@@ -216,7 +217,8 @@ public class SimulationController {
    */
   private void wireSlowDown() {
     mySimView
-        .getMySlowDownButton()
+        .getMyButtons()
+        .getSlowDownButton()
         .setOnAction(e -> {
           if (mySimView.getMySpeedMultiplier() <= 0.25){
             return;
@@ -233,7 +235,7 @@ public class SimulationController {
    * This method exists to connect the save control to the controller layer.
    */
   private void wireSave() {
-    mySimView.getMySaveButton().setOnAction(e -> {
+    mySimView.getMyButtons().getSaveButton().setOnAction(e -> {
       if (initialConfig == null) {
         return;
       }
@@ -290,7 +292,8 @@ public class SimulationController {
    */
   private void wireUpload() {
     mySimView
-        .getMyUploadButton()
+        .getMyButtons()
+        .getUploadButton()
         .setOnAction(
             e -> {
               handleUpload();
@@ -331,7 +334,7 @@ public class SimulationController {
    * - The initial config is not null and has a value
    */
   private void wireReset(){
-    mySimView.getMyResetButton()
+    mySimView.getMyButtons().getResetButton()
         .setOnAction(e -> {
           if (this.initialConfig == null) { return; }
           Simulation mySim = SimulationFactory.createSimulation(this.initialConfig);
@@ -345,7 +348,7 @@ public class SimulationController {
         mySimView.getMyAboutDialog().closeInfo()
     );
 
-    mySimView.getMyAboutButton().setOnAction(e -> {
+    mySimView.getMyButtons().getAboutButton().setOnAction(e -> {
           if (initialConfig == null) {
             throw new IllegalStateException("No configuration loaded");
           }
@@ -355,7 +358,7 @@ public class SimulationController {
   }
 
   private void wireToggleOutline(){
-    mySimView.getMyToggleOutlineButton().setOnAction(e -> {
+    mySimView.getMyButtons().getToggleOutlineButton().setOnAction(e -> {
       Simulation sim = myDriver.getSimulation();
       mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     });
@@ -377,15 +380,15 @@ public class SimulationController {
   }
 
   private void wireSettings(){
-    mySimView.getMySettingsButton().setOnAction(e -> mySimView.openSettings());
+    mySimView.getMyButtons().getSettingsButton().setOnAction(e -> mySimView.openSettings());
   }
 
   private void wireRotate(){
-    mySimView.getMyRotateLeftButton().setOnAction(e -> {
+    mySimView.getMyButtons().getRotateLeftButton().setOnAction(e -> {
       mySimView.getMyGridView().rotateLeft();
     });
 
-    mySimView.getMyRotateRightButton().setOnAction(e -> {
+    mySimView.getMyButtons().getRotateRightButton().setOnAction(e -> {
       mySimView.getMyGridView().rotateRight();
     });
   }
@@ -396,7 +399,7 @@ public class SimulationController {
 
     int generation = sim.getGeneration();
 
-    mySimView.getMyStateStackSizeLabel()
+    mySimView.getMyButtons().getStateStackSizeLabel()
         .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
   }
 

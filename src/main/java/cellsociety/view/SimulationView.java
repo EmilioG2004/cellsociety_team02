@@ -1,8 +1,6 @@
 package cellsociety.view;
 
-
 import cellsociety.config.SimulationConfig;
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -32,38 +30,14 @@ public class SimulationView {
   private static final String DUKE_CSS =
       SimulationView.class.getResource("/cellsociety/stylesheets/duke.css").toExternalForm();
 
-
-
   private ResourceBundle myBundle;
-
-  //button manager class
-
+  private ButtonManager myButtons;
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
 
-  //pull from backend
+  //TODO: pull from backend
   private double mySpeedMultiplier;
-
-  private final Label myTitle;
-  private final Button myUploadButton;
-  private final Button myForwardButton;
-  private final Button myBackButton;
-  private final Button myStartButton;
-  private final Button myPauseButton;
-  private final Button mySpeedUpButton;
-  private final Button mySlowDownButton;
-  private final Button mySaveButton;
-  private final Button myResetButton;
-  private final Button myChangeDirectionButton;
-  private final Label mySpeedLabel;
-  private final Label myStateStackSizeLabel;
-  private final Button myAboutButton;
-  private final Button myToggleOutlineButton;
-  private final Button mySettingsButton;
-  private final Button myRotateLeftButton;
-  private final Button myRotateRightButton;
-
 
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog();
@@ -77,40 +51,15 @@ public class SimulationView {
 
   public SimulationView(ResourceBundle bundle, boolean showSplash){
     myBundle = bundle;
-    myTitle = new Label();
-    myUploadButton = new Button();
-    myForwardButton = new Button();
-    myBackButton = new Button();
-    myStartButton = new Button();
-    myPauseButton = new Button();
-    mySpeedUpButton = new Button();
-    mySlowDownButton = new Button();
-    mySaveButton = new Button();
-    myResetButton = new Button();
-    myChangeDirectionButton = new Button();
-    myAboutButton = new Button();
-    myToggleOutlineButton = new Button();
-    mySettingsButton = new Button();
-    mySpeedLabel = new Label();
+    myButtons = new ButtonManager(myBundle);
     myRoot.getStyleClass().add("app-root");
     myMain.getStyleClass().add("main-pane");
-    myRotateLeftButton = new Button();
-    myRotateRightButton = new Button();
-    myStateStackSizeLabel = new Label();
-    myForwardButton.setText(myBundle.getString("button.stepForward"));
     mySpeedMultiplier = 1.0;
-
     applyLanguage(myBundle);
-
     buildTop();
-
-
     myMain.setPadding(new Insets(12));
-
     myRoot.getChildren().addAll(myMain, mySettings);
-
     bindSplashToWindow();
-
     if (showSplash){
       openSettings();
     } else {
@@ -131,25 +80,36 @@ public class SimulationView {
   }
 
   private void buildTop(){
-    myTitle.setFont(Font.font(28));
-    VBox.setMargin(myTitle, new Insets(8,0,6,0));
-    myTitle.setMaxWidth(Double.MAX_VALUE);
-    myTitle.setAlignment(Pos.CENTER);
-
-    HBox myUploadRow = new HBox(myUploadButton, mySaveButton, myAboutButton, mySettingsButton);
-    myUploadRow.setAlignment(Pos.CENTER_LEFT);
-    myUploadRow.setPadding(new Insets(6,10,10,10));
-    myUploadRow.getStyleClass().add("upload-row");
-
+    Label myTitle = buildTitle();
+    HBox myUploadRow = buildUploadRow();
     HBox myControlBar = buildControlBar();
+
     VBox myTopBox = new VBox(myTitle, myUploadRow, myControlBar);
     myTopBox.setSpacing(8);
     myMain.setTop(myTopBox);
   }
 
-  //get control bar button in button manager, ask chat gpt to auto parse lists
+  private Label buildTitle() {
+    Label myTitle = myButtons.getTitleLabel();
+    myTitle.setFont(Font.font(28));
+    VBox.setMargin(myTitle, new Insets(8,0,6,0));
+    myTitle.setMaxWidth(Double.MAX_VALUE);
+    myTitle.setAlignment(Pos.CENTER);
+    return myTitle;
+  }
+
+  private HBox buildUploadRow() {
+    HBox myUploadRow = new HBox(12);
+    myUploadRow.getChildren().addAll(myButtons.getUploadRowButtons());
+    myUploadRow.setAlignment(Pos.CENTER_LEFT);
+    myUploadRow.setPadding(new Insets(6,10,10,10));
+    myUploadRow.getStyleClass().add("upload-row");
+    return myUploadRow;
+  }
+
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12, myStartButton, myPauseButton, mySpeedUpButton, mySlowDownButton, myResetButton, myForwardButton, myBackButton, myChangeDirectionButton, myToggleOutlineButton, mySpeedLabel, myStateStackSizeLabel);
+    HBox leftBox = new HBox(12);
+    leftBox.getChildren().addAll(myButtons.getControlBarLeftNodes());
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Region spacer = new Region();
@@ -161,7 +121,6 @@ public class SimulationView {
     bar.setMinHeight(64);
     bar.getStyleClass().add("control-bar");
 
-
     return bar;
   }
 
@@ -172,7 +131,15 @@ public class SimulationView {
       centerPane.setPadding(new Insets(18,0,18,0));
       myMain.setCenter(centerPane);
     }
+    StackPane card = buildCenterCard();
+    Node gridNode = myGridView.getNode();
+    card.getChildren().setAll(gridNode);
+    centerPane.getChildren().setAll(card);
+    myGridView.bindToContainer(card);
 
+  }
+
+  private StackPane buildCenterCard() {
     StackPane card = new StackPane();
     card.setPadding(new Insets(18));
     card.prefWidthProperty().bind(centerPane.widthProperty());
@@ -181,16 +148,12 @@ public class SimulationView {
     card.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     card.getStyleClass().add("card");
     card.setAlignment(Pos.CENTER);
-
-    Node gridNode = myGridView.getNode();
-    card.getChildren().setAll(gridNode);
-    centerPane.getChildren().setAll(card);
-    myGridView.bindToContainer(card);
-
+    return card;
   }
 
   private void buildBottom(){
-    HBox bottomBox = new HBox(myRotateLeftButton, myRotateRightButton);
+    HBox bottomBox = new HBox();
+    bottomBox.getChildren().addAll(myButtons.getRotateLeftButton(), myButtons.getRotateRightButton());
     bottomBox.setAlignment(Pos.BOTTOM_CENTER);
     myMain.setBottom(bottomBox);
   }
@@ -241,57 +204,7 @@ public class SimulationView {
     mySettings.setManaged(true);
   }
 
-  public Parent getRoot(){
-    return myRoot;
-  }
-
-  public Button getMyUploadButton(){
-    return myUploadButton;
-  }
-
-  public Button getMyStartButton(){
-    return myStartButton;
-  }
-
-  public Button getMyPauseButton(){
-    return myPauseButton;
-  }
-
-  public Button getMySpeedUpButton(){
-    return mySpeedUpButton;
-  }
-
-  public Button getMySlowDownButton(){
-    return mySlowDownButton;
-  }
-
-  public Button getMyForwardButton(){
-    return myForwardButton;
-  }
-
-  public Button getMyBackButton(){
-    return myBackButton;
-  }
-
-  public Button getMyChangeDirectionButton(){
-    return myChangeDirectionButton;
-  }
-
-  public Button getMySaveButton(){
-    return mySaveButton;
-  }
-
-  public Button getMyAboutButton(){
-    return myAboutButton;
-  }
-
-  public Button getMyToggleOutlineButton() { return myToggleOutlineButton; }
-
-  public Button getMySettingsButton() { return mySettingsButton; }
-
-  public Label getMyStateStackSizeLabel(){
-    return myStateStackSizeLabel;
-  }
+  public Parent getRoot(){ return myRoot; }
 
   public SettingsSplash getMySettings() { return mySettings; }
 
@@ -305,50 +218,15 @@ public class SimulationView {
     buildBottom();
   }
 
-
-  /**
-   * Provides access to the Reset button so a controller can attach behavior.
-   *
-   * @return the button used to clear and reset the grid to its initial configuration
-   */
-  public Button getMyResetButton() {
-    return myResetButton;
-  }
-
-  public double getMySpeedMultiplier(){
-    return mySpeedMultiplier;
-  }
-
   public void doubleMySpeed() { this.mySpeedMultiplier *= 2; }
 
   public void halveMySpeed() { this.mySpeedMultiplier /= 2; }
 
-  public void updateSpeedLabel(){
-    String pattern = myBundle.getString("label.currentSpeed");
-    mySpeedLabel.setText(MessageFormat.format(pattern, mySpeedMultiplier));
-  }
+  public void updateSpeedLabel() { myButtons.setSpeedLabel(mySpeedMultiplier); }
 
   public void applyLanguage(ResourceBundle bundle) {
-    myBundle = bundle;
-
-    myTitle.setText(myBundle.getString("app.title"));
-    myUploadButton.setText(myBundle.getString("button.uploadConfig"));
-    myForwardButton.setText(myBundle.getString("button.stepForward"));
-    myBackButton.setText(myBundle.getString("button.stepBackward"));
-    myStartButton.setText(myBundle.getString("button.start"));
-    myPauseButton.setText(myBundle.getString("button.pause"));
-    mySpeedUpButton.setText(myBundle.getString("button.speedUp"));
-    mySlowDownButton.setText(myBundle.getString("button.slowDown"));
-    mySaveButton.setText(myBundle.getString("button.saveState"));
-    myResetButton.setText(myBundle.getString("button.resetGrid"));
-    myAboutButton.setText(myBundle.getString("button.aboutConfig"));
-    myToggleOutlineButton.setText(myBundle.getString("button.toggleOutlines"));
-    mySettingsButton.setText(myBundle.getString("button.settings"));
-    myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
-    myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
-    myChangeDirectionButton.setText(myBundle.getString("button.changeDirection"));
-    myStateStackSizeLabel.setText(myBundle.getString("label.generation.unset"));
     updateSpeedLabel();
+    myButtons.applyLanguage(bundle);
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
   }
@@ -362,9 +240,9 @@ public class SimulationView {
     scene.getStylesheets().setAll(BASE_CSS, themeCss);
   }
 
-  public Button getMyRotateLeftButton(){ return myRotateLeftButton; }
-
-  public Button getMyRotateRightButton(){ return myRotateRightButton; }
-
   public ResourceBundle getMyBundle() { return myBundle; }
+
+  public ButtonManager getMyButtons() { return myButtons; }
+
+  public double getMySpeedMultiplier() { return mySpeedMultiplier; }
 }
