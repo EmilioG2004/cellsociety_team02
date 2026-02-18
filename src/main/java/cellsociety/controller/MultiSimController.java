@@ -25,15 +25,25 @@ import javafx.scene.layout.VBox;
 import org.xml.sax.SAXException;
 
 /**
- * Controller for a "multi-simulation dashboard" that displays 1-4 render-only simulation panels.
+ * Controller for a multi-simulation dashboard that displays multiple render-only panels.
  *
- * Purpose:
- * - Create/remove simulation slots (panels)
- * - Load a config into a slot (build Simulation via ConfigLoader + SimulationFactory)
- * - Start/pause/step per slot
+ * <p>Purpose: manages creation/removal of simulation slots, loads configurations
+ * into individual slots, and provides bulk actions (start/pause/step) across slots.</p>
  *
- * This controller intentionally does NOT reuse WiringManager or SimulationView controls.
- * It keeps multi-sim logic separate from the main interactive SimulationController.
+ * <p>Assumptions: configuration files are valid; UI actions are executed on the JavaFX
+ * application thread.</p>
+ *
+ * <p>Dependencies: {@link ConfigLoader}/{@link SimulationFactory} for building simulations,
+ * {@link SimulationPanel} for rendering, and JavaFX layout controls.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * MultiSimController multi = new MultiSimController(bundle);
+ * root.setCenter(multi.getNode());
+ * }</pre>
+ *
+ * <p>Other details: this controller does not reuse {@link WiringManager} or the
+ * single-sim control bar; it stays focused on multi-sim rendering.</p>
  *
  * @author Emilio Garcia
  */
@@ -53,6 +63,19 @@ public class MultiSimController {
   private final VBox myRoot;
   private final ChoiceBox<Integer> mySlotChoice;
 
+  /**
+   * Creates a multi-simulation controller with the default number of slots.
+   *
+   * <p>Purpose: initializes the dashboard UI and slot list.</p>
+   *
+   * <p>Assumptions: {@code bundle} contains {@code label.slots}.</p>
+   *
+   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param bundle localization bundle for UI strings
+   */
   public MultiSimController(ResourceBundle bundle) {
     myBundle = bundle;
     myConfigLoader = new ConfigLoader();
@@ -89,7 +112,13 @@ public class MultiSimController {
   }
 
   /**
-   * @return a Node you can place in a Scene or in SimulationView's center.
+   * Returns the root node for embedding in the main view.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return dashboard root node
    */
   public Node getNode() {
     return myRoot;
@@ -97,7 +126,16 @@ public class MultiSimController {
 
   /**
    * Sets how many slots exist (clamped to [1, MAX_SLOTS]).
-   * Removing a slot pauses its driver.
+   *
+   * <p>Purpose: allows the user to choose how many panels to display.</p>
+   *
+   * <p>Assumptions: {@code desired} may be any integer; values outside the range are clamped.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param desired requested number of slots
    */
   public void setSlotCount(int desired) {
     int count = clamp(desired, 1, MAX_SLOTS);
@@ -120,10 +158,30 @@ public class MultiSimController {
     rebuildTileChildren();
   }
 
+  /**
+   * Returns the current slot count.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return number of slots managed by this controller
+   */
   public int getSlotCount() {
     return mySlots.size();
   }
 
+  /**
+   * Returns the slot object for a given index.
+   *
+   * <p>Assumptions: {@code slotIndex} is within range.</p>
+   *
+   * <p>Exceptions: {@link IndexOutOfBoundsException} if the index is invalid.</p>
+   *
+   * @param slotIndex zero-based slot index
+   * @return slot at the given index
+   * @throws IndexOutOfBoundsException if the index is invalid
+   */
   public MultiSimSlot getSlot(int slotIndex) {
     checkIndex(slotIndex);
     return mySlots.get(slotIndex);
@@ -131,6 +189,19 @@ public class MultiSimController {
 
   /**
    * Loads an XML config file into the given slot index.
+   *
+   * <p>Purpose: instantiate and display a simulation for the selected slot.</p>
+   *
+   * <p>Assumptions: {@code xmlFile} is non-null and readable.</p>
+   *
+   * <p>Exceptions: may throw parsing/IO exceptions if loading fails.</p>
+   *
+   * @param slotIndex zero-based slot index
+   * @param xmlFile configuration file to load
+   * @throws ParserConfigurationException if the XML parser cannot be configured
+   * @throws IOException if the file cannot be read
+   * @throws SAXException if the XML is malformed
+   * @throws IllegalArgumentException if the configuration is invalid
    */
   public void loadConfigIntoSlot(int slotIndex, File xmlFile)
       throws ParserConfigurationException, IOException, SAXException, IllegalArgumentException {
@@ -168,28 +239,81 @@ public class MultiSimController {
     return chooser.showOpenDialog(w);
   }
 
+  /**
+   * Starts the simulation in a specific slot.
+   *
+   * <p>Assumptions: {@code slotIndex} is valid.</p>
+   *
+   * <p>Exceptions: {@link IndexOutOfBoundsException} if the index is invalid.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param slotIndex zero-based slot index
+   * @throws IndexOutOfBoundsException if the index is invalid
+   */
   public void startSlot(int slotIndex) {
     checkIndex(slotIndex);
     mySlots.get(slotIndex).start();
   }
 
+  /**
+   * Pauses the simulation in a specific slot.
+   *
+   * <p>Assumptions: {@code slotIndex} is valid.</p>
+   *
+   * <p>Exceptions: {@link IndexOutOfBoundsException} if the index is invalid.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param slotIndex zero-based slot index
+   * @throws IndexOutOfBoundsException if the index is invalid
+   */
   public void pauseSlot(int slotIndex) {
     checkIndex(slotIndex);
     mySlots.get(slotIndex).pause();
   }
 
+  /**
+   * Steps the simulation forward once in a specific slot.
+   *
+   * <p>Assumptions: {@code slotIndex} is valid.</p>
+   *
+   * <p>Exceptions: {@link IndexOutOfBoundsException} if the index is invalid.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param slotIndex zero-based slot index
+   * @throws IndexOutOfBoundsException if the index is invalid
+   */
   public void stepSlot(int slotIndex) {
     checkIndex(slotIndex);
     mySlots.get(slotIndex).step();
   }
 
+  /**
+   * Steps the simulation backward once in a specific slot.
+   *
+   * <p>Assumptions: {@code slotIndex} is valid.</p>
+   *
+   * <p>Exceptions: {@link IndexOutOfBoundsException} if the index is invalid.</p>
+   *
+   * @param slotIndex zero-based slot index
+   * @return true if the step-back succeeded, false if no history is available
+   * @throws IndexOutOfBoundsException if the index is invalid
+   */
   public boolean stepBackSlot(int slotIndex) {
     checkIndex(slotIndex);
     return mySlots.get(slotIndex).stepBack();
   }
 
   /**
-   * Manage all slots that currently have simulations installed.
+   * Starts all slots that currently have simulations installed.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
    */
   public void startAllLoaded() {
     for (MultiSimSlot slot : mySlots) {
@@ -199,12 +323,30 @@ public class MultiSimController {
     }
   }
 
+  /**
+   * Pauses all slots, regardless of whether they are running.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void pauseAll() {
     for (MultiSimSlot slot : mySlots) {
       slot.pause();
     }
   }
 
+  /**
+   * Resets all loaded slots to their initial configurations.
+   *
+   * <p>Assumptions: each slot has a stored initial configuration.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void resetAllLoaded() {
     for (MultiSimSlot slot : mySlots) {
       if (slot.hasSimulation()) {
@@ -213,6 +355,17 @@ public class MultiSimController {
     }
   }
 
+  /**
+   * Multiplies the speed of all loaded slots by a given factor.
+   *
+   * <p>Assumptions: {@code factor} is positive.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param factor multiplier applied to each slot's speed
+   */
   public void speedUpAll(double factor) {
     for (MultiSimSlot slot : mySlots) {
       if (slot.hasSimulation()) {
@@ -221,6 +374,17 @@ public class MultiSimController {
     }
   }
 
+  /**
+   * Divides the speed of all loaded slots by a given factor.
+   *
+   * <p>Assumptions: {@code factor} is positive.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param factor divisor applied to each slot's speed
+   */
   public void slowDownAll(double factor) {
     for (MultiSimSlot slot : mySlots) {
       if (slot.hasSimulation()) {
@@ -229,6 +393,17 @@ public class MultiSimController {
     }
   }
 
+  /**
+   * Toggles stepping direction for all loaded slots.
+   *
+   * <p>Purpose: keeps all simulations moving in the same direction.</p>
+   *
+   * <p>Assumptions: at least one slot is loaded to determine current direction.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return the new direction (true for forward, false for backward)
+   */
   public boolean toggleDirectionAll() {
     Boolean forward = null;
     for (MultiSimSlot slot : mySlots) {
@@ -246,6 +421,15 @@ public class MultiSimController {
     return newDirection;
   }
 
+  /**
+   * Toggles grid outlines for all loaded slots.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void toggleOutlineAll() {
     for (MultiSimSlot slot : mySlots) {
       if (slot.hasSimulation()) {
@@ -254,6 +438,15 @@ public class MultiSimController {
     }
   }
 
+  /**
+   * Steps all loaded slots forward once.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void stepAllLoaded() {
     for (MultiSimSlot slot : mySlots) {
       if (slot.hasSimulation()) {
@@ -262,6 +455,17 @@ public class MultiSimController {
     }
   }
 
+  /**
+   * Steps all loaded slots backward once.
+   *
+   * <p>Slots with no history will remain unchanged.</p>
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void stepBackAllLoaded() {
     for (MultiSimSlot slot : mySlots) {
       if (slot.hasSimulation()) {

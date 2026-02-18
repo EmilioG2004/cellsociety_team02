@@ -18,29 +18,25 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 /**
- * A concrete GridView implementation that renders a simulation grid using a JavaFX GridPane.
- * Each cell in the grid is represented visually by a Rectangle whose fill color corresponds
- * to the cell’s current state.
+ * GridPane-based {@link GridView} implementation that renders cells as rectangles.
  *
- * Purpose:
- * This class provides a simple, rectangular, grid-based visualization for cellular automata.
- * It allows the simulation view layer to display cell states without exposing or depending
- * on the underlying grid data structure.
+ * <p>Purpose: provide a straightforward grid visualization for cellular automata
+ * while remaining compatible with the {@link GridView} interface.</p>
  *
- * Assumptions:
- * - The number of rows and columns is fixed for the lifetime of this view.
- * - The provided ReadOnlyGrid has dimensions that match the rows and columns used to
- *   construct this GridPaneView.
- * - The stateColors map contains a color entry for every possible cell state.
+ * <p>Assumptions: grid dimensions are fixed for the lifetime of the view; the
+ * provided {@link ReadOnlyGrid} matches those dimensions; {@code stateColors}
+ * contains entries for every possible cell state.</p>
  *
- * Dependencies:
- * - ReadOnlyGrid for accessing simulation state (rows, cols, getCellState) without mutation.
- * - JavaFX GridPane and Rectangle for rendering.
- * - JavaFX Color and Paint for visual styling.
+ * <p>Dependencies: JavaFX {@link GridPane}, {@link Rectangle}, and binding APIs.</p>
  *
- * Example usage:
- * GridView gridView = new GridPaneView(20, 20, 15);
- * Node gridNode = gridView.getNode();
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * GridView gridView = new GridPaneView(20, 20);
+ * gridView.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * }</pre>
+ *
+ * <p>Other details: rotation is implemented by rotating the underlying GridPane
+ * and exposing a layout-friendly wrapper node.</p>
  *
  * @author Emilio Garcia
  * @author Michael Lei
@@ -61,14 +57,15 @@ public class GridPaneView implements GridView {
 
 
   /**
-   * Constructs a GridPaneView with the specified dimensions and cell size.
+   * Constructs a GridPaneView with the specified dimensions.
    *
-   * Purpose:
-   * Initializes the visual grid and allocates rectangle objects for each cell.
+   * <p>Purpose: initializes the visual grid and allocates rectangles for each cell.</p>
    *
-   * Assumptions:
-   * - rows and cols are positive integers.
-   * - cellSize is a positive value representing pixel dimensions.
+   * <p>Assumptions: {@code rows} and {@code cols} are positive integers.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
    *
    * @param rows number of rows in the grid
    * @param cols number of columns in the grid
@@ -99,13 +96,13 @@ public class GridPaneView implements GridView {
   }
 
   /**
-   * Returns the JavaFX node representing this grid view.
+   * {@inheritDoc}
    *
-   * Purpose:
-   * Allows this view to be embedded in higher-level UI layouts without exposing
-   * internal implementation details.
+   * <p>Assumptions: none.</p>
    *
-   * @return Node containing the rendered grid
+   * <p>Exceptions: none.</p>
+   *
+   * @return node used to display the grid
    */
   @Override
   public Node getNode() {
@@ -143,13 +140,13 @@ public class GridPaneView implements GridView {
   }
 
   /**
-   * Clears the grid by resetting all cells to the default background color.
+   * {@inheritDoc}
    *
-   * Purpose:
-   * Provides a simple way to visually reset the grid without reconstructing it.
+   * <p>Assumptions: the grid has been constructed.</p>
    *
-   * Assumptions:
-   * - The grid has already been built and all cell rectangles exist.
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
    */
   @Override
   public void clear() {
@@ -161,18 +158,13 @@ public class GridPaneView implements GridView {
   }
 
   /**
-   * Renders the current simulation state onto the grid.
+   * {@inheritDoc}
    *
-   * Purpose:
-   * Updates each cell’s color based on the state values provided by the ReadOnlyGrid
-   * and the corresponding color mapping.
+   * <p>Assumptions: {@code grid} dimensions match the view's dimensions.</p>
    *
-   * Assumptions:
-   * - The dimensions of the ReadOnlyGrid match this view’s row and column counts.
-   * - stateColors contains a valid color string for every state value returned by the grid.
+   * <p>Exceptions: none.</p>
    *
-   * @param grid read-only view of the simulation grid (rows, cols, getCellState)
-   * @param stateColors mapping from cell state values to color strings
+   * <p>Return value: none.</p>
    */
   @Override
   public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
@@ -189,12 +181,29 @@ public class GridPaneView implements GridView {
       }
     }
   }
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   @Override
-  public void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler)
-  {
+  public void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler) {
     this.myOnCellClicked = handler;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Assumptions: {@code grid} dimensions match the view's dimensions.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   @Override
   public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors){
     isOutlined = !isOutlined;
@@ -210,16 +219,43 @@ public class GridPaneView implements GridView {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Assumptions: rotation state is maintained internally.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void rotateRight() {
     myRotationSteps.set((myRotationSteps.get() + 1) % 4);
     myRotator.setRotate(myRotationSteps.get() * 90.0);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Assumptions: rotation state is maintained internally.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void rotateLeft() {
     myRotationSteps.set((myRotationSteps.get() + 3) % 4);
     myRotator.setRotate(myRotationSteps.get() * 90.0);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Assumptions: {@code container} is a Region that participates in layout.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   @Override
   public void bindToContainer(Region container){
     DoubleBinding cellSize = Bindings.createDoubleBinding(() -> computeCellSize(container), container.widthProperty(), container.heightProperty(), myRotationSteps);

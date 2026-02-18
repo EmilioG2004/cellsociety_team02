@@ -21,8 +21,24 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 /**
- * Centralizes wiring of SimulationView UI controls to controller/driver behavior.
- * Mirrors ButtonManager's goal: keep SimulationController small by moving wiring out.
+ * Centralizes wiring of {@link SimulationView} controls to controller logic.
+ *
+ * <p>Purpose: keep {@link SimulationController} concise by encapsulating all event
+ * handler registrations in one place.</p>
+ *
+ * <p>Assumptions: all UI controls in {@link SimulationView} are non-null and already
+ * constructed; configuration loaders/savers are available.</p>
+ *
+ * <p>Dependencies: {@link SimulationView}, {@link SimulationDriver},
+ * {@link ConfigLoader}, {@link ConfigSaver}, and {@link Scene} for theme changes.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * WiringManager wires = new WiringManager(view, driver, loader, saver, scene, ...);
+ * wires.wireAll();
+ * }</pre>
+ *
+ * @author Emilio Garcia
  */
 public class WiringManager {
 
@@ -48,6 +64,37 @@ public class WiringManager {
   private final Runnable slowDownAll;
   private final Supplier<Boolean> toggleDirectionAll;
 
+  /**
+   * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
+   *
+   * <p>Purpose: injects the dependencies and callbacks needed to attach event handlers.</p>
+   *
+   * <p>Assumptions: all callbacks are non-null.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param simView view whose controls will be wired
+   * @param driver simulation driver for single-sim mode
+   * @param loader configuration loader
+   * @param saver configuration saver
+   * @param scene scene used for applying themes
+   * @param setSimulationCallback installs a simulation into the main driver
+   * @param setInitialConfigCallback stores the initial config for resets/saves
+   * @param getInitialConfigSupplier provides the initial config snapshot
+   * @param multiSimCallback opens the multi-sim dashboard
+   * @param isMultiModeSupplier indicates whether multi-sim mode is active
+   * @param startAllLoadedCallback starts all loaded multi-sim slots
+   * @param pauseAllCallback pauses all multi-sim slots
+   * @param stepAllLoadedCallback steps all loaded multi-sim slots forward
+   * @param stepBackAllLoadedCallback steps all loaded multi-sim slots backward
+   * @param resetAllLoadedCallback resets all loaded multi-sim slots to initial configs
+   * @param toggleOutlineAllCallback toggles outlines for all loaded slots
+   * @param speedUpAllCallback speeds up all loaded slots
+   * @param slowDownAllCallback slows down all loaded slots
+   * @param toggleDirectionAllCallback toggles stepping direction for all loaded slots
+   */
   public WiringManager(SimulationView simView,
       SimulationDriver driver,
       ConfigLoader loader,
@@ -89,7 +136,17 @@ public class WiringManager {
     toggleDirectionAll = toggleDirectionAllCallback;
   }
 
-  /** Public entrypoint: wires every UI interaction. */
+  /**
+   * Wires every UI interaction for the main view.
+   *
+   * <p>Purpose: attaches event handlers for uploads, controls, settings, and multi-sim.</p>
+   *
+   * <p>Assumptions: controls are already constructed.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void wireAll() {
     wireApplyChanges();
     wireSettings();

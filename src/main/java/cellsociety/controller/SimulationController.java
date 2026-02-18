@@ -11,26 +11,27 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 
 /**
- * Connects user interactions in the SimulationView to the underlying simulation logic.
- * This class is responsible for wiring UI controls to simulation actions, loading
- * configuration files, and triggering rendering updates as the simulation advances.
+ * Primary controller that wires {@link SimulationView} to simulation logic.
  *
- * Assumptions:
- * - The SimulationView provided to this controller is fully initialized.
- * - All buttons and the grid view returned by the view are non-null.
- * - A Simulation is set on the SimulationDriver before the driver begins stepping.
- * - Configuration files selected by the user conform to the format expected by ConfigLoader.
+ * <p>Purpose: connects UI controls to a {@link SimulationDriver}, handles configuration
+ * loading/saving through the {@link cellsociety.config} package, and refreshes the view
+ * after simulation steps.</p>
  *
- * Dependencies:
- * - SimulationView for UI controls and rendering.
- * - SimulationDriver for managing simulation execution and timing.
- * - SimulationFactory for constructing simulations from configuration data.
- * - ConfigLoader and SimulationConfig for reading configuration files.
- * - JavaFX Platform to ensure UI updates occur on the JavaFX Application Thread.
+ * <p>Assumptions: {@link SimulationView} is fully initialized before wiring; configuration
+ * files are valid and compatible with {@link cellsociety.config.ConfigLoader}.</p>
  *
- * Example usage:
- * SimulationView view = new SimulationView();
- * SimulationController controller = new SimulationController(view);
+ * <p>Dependencies: {@link SimulationView}, {@link SimulationDriver}, configuration loaders/savers,
+ * and JavaFX {@link Platform} for UI thread updates.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * SimulationView view = new SimulationView(bundle);
+ * Scene scene = new Scene(view.getRoot());
+ * SimulationController controller = new SimulationController(view, scene);
+ * }</pre>
+ *
+ * <p>Other details: when multi-sim mode is active, some controls route to
+ * {@link MultiSimController} instead of the single-simulation driver.</p>
  *
  * @author Emilio Garcia
  */
@@ -47,14 +48,19 @@ public class SimulationController {
   private boolean myMultiMode;
 
   /**
-   * Constructs a SimulationController for the given view.
-   * Initializes the simulation driver and configuration loader, wires all UI controls,
-   * and registers a callback to re-render the grid after each simulation step.
+   * Constructs a controller and wires all UI controls.
    *
-   * Assumptions:
-   * - simView is non-null and exposes all required UI components.
+   * <p>Purpose: initializes the driver, loaders/savers, and the multi-sim controller, then
+   * registers callbacks to refresh the UI after each step.</p>
+   *
+   * <p>Assumptions: {@code simView} is non-null and already constructed; {@code scene} is non-null.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
    *
    * @param simView the view whose controls are connected to simulation behavior
+   * @param scene the scene used for theme updates
    */
   public SimulationController(SimulationView simView, Scene scene) {
     mySimView = simView;
@@ -92,14 +98,15 @@ public class SimulationController {
   }
 
   /**
-   * Sets the active simulation in the driver and renders its current state in the view.
+   * Installs a simulation into the driver and renders it immediately.
    *
-   * Purpose:
-   * Allows a simulation to be installed programmatically without using the upload button.
+   * <p>Purpose: allows a simulation to be installed programmatically without the upload flow.</p>
    *
-   * Assumptions:
-   * - sim is non-null.
-   * - The simulation's rule provides a complete mapping of states to colors.
+   * <p>Assumptions: {@code sim} is non-null and provides a complete state-color mapping.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
    *
    * @param sim the simulation to run and display
    */
@@ -127,6 +134,19 @@ public class SimulationController {
     updateGenerationLabel();
   }
 
+  /**
+   * Stores the initial configuration used for reset/save operations.
+   *
+   * <p>Purpose: enables resets to the original configuration snapshot.</p>
+   *
+   * <p>Assumptions: {@code config} is non-null.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param config initial configuration associated with the current simulation
+   */
   public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
 
   private void updateGenerationLabel() {
@@ -139,11 +159,31 @@ public class SimulationController {
         .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
   }
 
+  /**
+   * Switches the center pane to the multi-simulation dashboard.
+   *
+   * <p>Purpose: allows users to view and control multiple simulations simultaneously.</p>
+   *
+   * <p>Assumptions: the multi-simulation controller is initialized.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void openMultiSimDashboard() {
     myMultiMode = true;
     mySimView.setCenterContent(myMultiController.getNode());
   }
 
+  /**
+   * Indicates whether multi-sim mode is currently active.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return true if the multi-simulation dashboard is displayed
+   */
   public boolean isMultiMode() {
     return myMultiMode;
   }
