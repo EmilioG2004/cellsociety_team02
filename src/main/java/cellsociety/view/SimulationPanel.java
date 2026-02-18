@@ -95,4 +95,9 @@ public class SimulationPanel implements SimulationRenderer {
   public void setOnLoad(Runnable action) {
     myLoadButton.setOnAction(e -> action.run());
   }
+
+  public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+    if (myGridView == null) return;
+    myGridView.toggleOutline(grid, stateColors);
+  }
 }

@@ -84,7 +84,7 @@ public class ButtonManager {
    * Convenience: controls used in the upload row (top-left row).
    */
   public List<Button> getUploadRowButtons() {
-    return List.of(myUploadButton, mySaveButton, myAboutButton, mySettingsButton, myMultiSimButton);
+    return List.of(myUploadButton, myMultiSimButton, mySaveButton, myAboutButton, mySettingsButton);
   }
 
   /**

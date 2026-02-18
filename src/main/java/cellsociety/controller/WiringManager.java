@@ -42,6 +42,11 @@ public class WiringManager {
   private final Runnable pauseAll;
   private final Runnable stepAllLoaded;
   private final Runnable stepBackAllLoaded;
+  private final Runnable resetAllLoaded;
+  private final Runnable toggleOutlineAll;
+  private final Runnable speedUpAll;
+  private final Runnable slowDownAll;
+  private final Supplier<Boolean> toggleDirectionAll;
 
   public WiringManager(SimulationView simView,
       SimulationDriver driver,
@@ -56,7 +61,12 @@ public class WiringManager {
       Runnable startAllLoadedCallback,
       Runnable pauseAllCallback,
       Runnable stepAllLoadedCallback,
-      Runnable stepBackAllLoadedCallback) {
+      Runnable stepBackAllLoadedCallback,
+      Runnable resetAllLoadedCallback,
+      Runnable toggleOutlineAllCallback,
+      Runnable speedUpAllCallback,
+      Runnable slowDownAllCallback,
+      Supplier<Boolean> toggleDirectionAllCallback) {
     mySimView = simView;
     myDriver = driver;
     myConfigLoader = loader;
@@ -72,6 +82,11 @@ public class WiringManager {
     pauseAll = pauseAllCallback;
     stepAllLoaded = stepAllLoadedCallback;
     stepBackAllLoaded = stepBackAllLoadedCallback;
+    resetAllLoaded = resetAllLoadedCallback;
+    toggleOutlineAll = toggleOutlineAllCallback;
+    speedUpAll = speedUpAllCallback;
+    slowDownAll = slowDownAllCallback;
+    toggleDirectionAll = toggleDirectionAllCallback;
   }
 
   /** Public entrypoint: wires every UI interaction. */
@@ -120,8 +135,14 @@ public class WiringManager {
 
   private void wireChangeDirection() {
     mySimView.getMyButtons().getChangeDirectionButton().setOnAction(e -> {
-      myDriver.setDirection(!myDriver.isForwardDirection());
-      if (myDriver.isForwardDirection()) {
+      boolean forward;
+      if (isMultiMode.get()) {
+        forward = toggleDirectionAll.get();
+      } else {
+        myDriver.setDirection(!myDriver.isForwardDirection());
+        forward = myDriver.isForwardDirection();
+      }
+      if (forward) {
         mySimView.getMyButtons().getChangeDirectionButton()
             .setText(mySimView.getMyBundle().getString("button.direction.forward"));
       } else {
@@ -154,7 +175,11 @@ public class WiringManager {
   private void wireSpeedUp() {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
       if (mySimView.getMySpeedMultiplier() >= 4) return;
-      myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
+      if (isMultiMode.get()) {
+        speedUpAll.run();
+      } else {
+        myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
+      }
       mySimView.doubleMySpeed();
       mySimView.updateSpeedLabel();
     });
@@ -163,7 +188,11 @@ public class WiringManager {
   private void wireSlowDown() {
     mySimView.getMyButtons().getSlowDownButton().setOnAction(e -> {
       if (mySimView.getMySpeedMultiplier() <= 0.25) return;
-      myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
+      if (isMultiMode.get()) {
+        slowDownAll.run();
+      } else {
+        myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
+      }
       mySimView.halveMySpeed();
       mySimView.updateSpeedLabel();
     });
@@ -201,7 +230,6 @@ public class WiringManager {
 
   private void wireUpload() {
     mySimView.getMyButtons().getUploadButton().setOnAction(e -> handleUpload());
-    mySimView.getMySettings().getMyUploadButton().setOnAction(e -> handleUpload());
   }
 
   private void handleUpload() {
@@ -226,6 +254,10 @@ public class WiringManager {
 
   private void wireReset() {
     mySimView.getMyButtons().getResetButton().setOnAction(e -> {
+      if (isMultiMode.get()) {
+        resetAllLoaded.run();
+        return;
+      }
       SimulationConfig initialConfig = getInitialConfig.get();
       if (initialConfig == null) return;
 
@@ -251,6 +283,10 @@ public class WiringManager {
 
   private void wireToggleOutline() {
     mySimView.getMyButtons().getToggleOutlineButton().setOnAction(e -> {
+      if (isMultiMode.get()) {
+        toggleOutlineAll.run();
+        return;
+      }
       if (!myDriver.hasSimulation()) return;
       Simulation sim = myDriver.getSimulation();
       mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());

@@ -19,7 +19,6 @@ public class SettingsSplash extends StackPane {
   private final ChoiceBox<String> myLanguages = new ChoiceBox<>();
   private final ChoiceBox<String> myThemes = new ChoiceBox<>();
   private final Button myApplyChanges;
-  private final Button myUploadButton;
   private final Button myLoadButton;
   public SettingsSplash(){
     setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -30,7 +29,6 @@ public class SettingsSplash extends StackPane {
     myLanguage = new Label();
     myTheme = new Label();
     myApplyChanges = new Button();
-    myUploadButton = new Button();
     myLoadButton = new Button();
     buildDropdowns();
     buildDialog();
@@ -43,7 +41,7 @@ public class SettingsSplash extends StackPane {
 
   private void buildDialog(){
     getChildren().clear();
-    VBox myPane = new VBox(12, myTitle, mySubtitle, myLanguage, myLanguages, myTheme, myThemes, myUploadButton, myLoadButton, myApplyChanges);
+    VBox myPane = new VBox(12, myTitle, mySubtitle, myLanguage, myLanguages, myTheme, myThemes, myLoadButton, myApplyChanges);
     myPane.setPadding(new Insets(20,20,20,20));
     myPane.setAlignment(Pos.CENTER);
 
@@ -61,7 +59,6 @@ public class SettingsSplash extends StackPane {
     myLanguage.setText(bundle.getString("settings.language"));
     myTheme.setText(bundle.getString("settings.theme"));
     myApplyChanges.setText(bundle.getString("button.applyChanges"));
-    myUploadButton.setText(bundle.getString("button.uploadConfiguration"));
     myLoadButton.setText(bundle.getString("button.loadSimulation"));
 
     myLanguages.setConverter(new StringConverter<>() {
@@ -102,8 +99,6 @@ public class SettingsSplash extends StackPane {
   }
 
   public Button getMyApplyChanges(){ return myApplyChanges; }
-
-  public Button getMyUploadButton() { return myUploadButton; }
 
   public ChoiceBox<String> getMyLanguages() { return myLanguages; }
 

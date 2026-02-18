@@ -77,7 +77,12 @@ public class SimulationController {
         () -> myMultiController.startAllLoaded(),
         () -> myMultiController.pauseAll(),
         () -> myMultiController.stepAllLoaded(),
-        () -> myMultiController.stepBackAllLoaded()
+        () -> myMultiController.stepBackAllLoaded(),
+        () -> myMultiController.resetAllLoaded(),
+        () -> myMultiController.toggleOutlineAll(),
+        () -> myMultiController.speedUpAll(2.0),
+        () -> myMultiController.slowDownAll(2.0),
+        () -> myMultiController.toggleDirectionAll()
     );
     myMultiMode = false;
 

@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class MultiSimController {
 
-  private static final int MAX_SLOTS = 4;
+  private static final int MAX_SLOTS = 3;
   private static final int DEFAULT_SLOTS = 1;
   private static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
 
@@ -142,6 +142,7 @@ public class MultiSimController {
     Simulation sim = SimulationFactory.createSimulation(config);
 
     mySlots.get(slotIndex).setSimulation(sim);
+    mySlots.get(slotIndex).setConfig(config);
   }
 
   private void handleLoadForSlot(int slotIndex) {
@@ -201,6 +202,55 @@ public class MultiSimController {
   public void pauseAll() {
     for (MultiSimSlot slot : mySlots) {
       slot.pause();
+    }
+  }
+
+  public void resetAllLoaded() {
+    for (MultiSimSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        slot.reset();
+      }
+    }
+  }
+
+  public void speedUpAll(double factor) {
+    for (MultiSimSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        slot.setSpeed(slot.getStepsPerSecond() * factor);
+      }
+    }
+  }
+
+  public void slowDownAll(double factor) {
+    for (MultiSimSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        slot.setSpeed(slot.getStepsPerSecond() / factor);
+      }
+    }
+  }
+
+  public boolean toggleDirectionAll() {
+    Boolean forward = null;
+    for (MultiSimSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        forward = slot.isForwardDirection();
+        break;
+      }
+    }
+    boolean newDirection = (forward == null) || !forward;
+    for (MultiSimSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        slot.setDirection(newDirection);
+      }
+    }
+    return newDirection;
+  }
+
+  public void toggleOutlineAll() {
+    for (MultiSimSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        slot.toggleOutline();
+      }
     }
   }
 
