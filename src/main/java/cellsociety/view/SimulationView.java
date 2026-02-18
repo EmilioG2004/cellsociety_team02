@@ -15,7 +15,30 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 import java.io.File;
 
-
+/**
+ * Primary JavaFX view for interacting with a single simulation.
+ *
+ * <p>Purpose: constructs the main application layout (title, upload row, control bar,
+ * center grid card, and optional dialogs) and exposes accessors for controller wiring.</p>
+ *
+ * <p>Assumptions: a valid {@link ResourceBundle} is supplied; controllers will call
+ * {@link #setGrid(int, int)} before attempting to render, and apply themes on a live {@link Scene}.</p>
+ *
+ * <p>Dependencies: {@link ButtonManager} for controls, JavaFX layout panes,
+ * {@link GridView} implementations for rendering, and dialog components
+ * {@link AboutDialog} and {@link SettingsSplash}.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * SimulationView view = new SimulationView(bundle);
+ * Scene scene = new Scene(view.getRoot());
+ * stage.setScene(scene);
+ * }</pre>
+ *
+ * <p>Other details: this class is UI-only; controllers own simulation logic and event wiring.</p>
+ *
+ * @author Emilio Garcia
+ */
 public class SimulationView {
   public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
   private static final String BASE_CSS =
@@ -30,8 +53,8 @@ public class SimulationView {
   private static final String DUKE_CSS =
       SimulationView.class.getResource("/cellsociety/stylesheets/duke.css").toExternalForm();
 
-  private ResourceBundle myBundle;
-  private ButtonManager myButtons;
+  private final ResourceBundle myBundle;
+  private final ButtonManager myButtons;
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
@@ -45,10 +68,37 @@ public class SimulationView {
 
   private GridView myGridView;
 
+  /**
+   * Creates a SimulationView without showing the settings splash.
+   *
+   * <p>Purpose: convenience constructor for the typical application startup path.</p>
+   *
+   * <p>Assumptions: {@code bundle} contains all required keys.</p>
+   *
+   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param bundle localization bundle for UI strings
+   */
   public SimulationView(ResourceBundle bundle){
     this(bundle, false);
   }
 
+  /**
+   * Creates a SimulationView with optional initial settings splash.
+   *
+   * <p>Purpose: allows a startup flow where settings are shown before any simulation is loaded.</p>
+   *
+   * <p>Assumptions: {@code bundle} contains all required keys.</p>
+   *
+   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param bundle localization bundle for UI strings
+   * @param showSplash true to display the settings splash immediately
+   */
   public SimulationView(ResourceBundle bundle, boolean showSplash){
     myBundle = bundle;
     myButtons = new ButtonManager(myBundle);
@@ -158,6 +208,17 @@ public class SimulationView {
     myMain.setBottom(bottomBox);
   }
 
+  /**
+   * Shows a file chooser for opening a simulation configuration.
+   *
+   * <p>Purpose: provides a UI entry point for loading XML configuration files.</p>
+   *
+   * <p>Assumptions: the {@link Scene} is attached to a {@link Window}.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return selected XML file, or {@code null} if the user cancels
+   */
   public File showOpenConfigDialog() {
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Open Simulation Configuration");
@@ -170,6 +231,17 @@ public class SimulationView {
     return chooser.showOpenDialog(w);
   }
 
+  /**
+   * Shows a file chooser for saving a simulation configuration.
+   *
+   * <p>Purpose: provides a UI entry point for exporting the current state.</p>
+   *
+   * <p>Assumptions: the {@link Scene} is attached to a {@link Window}.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return destination XML file, or {@code null} if the user cancels
+   */
   public File showSaveConfigDialog(){
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Open Simulation Configuration");
@@ -181,6 +253,19 @@ public class SimulationView {
     return chooser.showSaveDialog(w);
   }
 
+  /**
+   * Displays the "About" dialog for a specific configuration.
+   *
+   * <p>Purpose: surface simulation metadata without leaving the main view.</p>
+   *
+   * <p>Assumptions: {@code config} is non-null.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param config configuration used to populate the dialog
+   */
   public void showAboutSplash(SimulationConfig config){
     if (centerPane == null){
       centerPane = new StackPane();
@@ -194,36 +279,152 @@ public class SimulationView {
     StackPane.setAlignment(myAboutDialog, Pos.CENTER);
   }
 
+  /**
+   * Hides the settings splash and removes it from layout calculations.
+   *
+   * <p>Purpose: returns focus to the main simulation UI.</p>
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void closeSettings(){
     mySettings.setVisible(false);
     mySettings.setManaged(false);
   }
 
+  /**
+   * Shows the settings splash and makes it participate in layout.
+   *
+   * <p>Purpose: allows the user to change language/theme or upload a config.</p>
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void openSettings(){
     mySettings.setVisible(true);
     mySettings.setManaged(true);
   }
 
+  /**
+   * Returns the root node for scene construction.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return root JavaFX node for this view
+   */
   public Parent getRoot(){ return myRoot; }
 
+  /**
+   * Returns the settings splash component.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return settings splash UI
+   */
   public SettingsSplash getMySettings() { return mySettings; }
 
+  /**
+   * Returns the about dialog component.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return about dialog UI
+   */
   public AboutDialog getMyAboutDialog() { return myAboutDialog; }
 
+  /**
+   * Returns the current grid view instance.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return grid view, or {@code null} if not yet created
+   */
   public GridView getMyGridView() { return myGridView; }
 
+  /**
+   * Creates and installs a new grid view for the given dimensions.
+   *
+   * <p>Purpose: prepares the center card to render a simulation grid.</p>
+   *
+   * <p>Assumptions: rows and cols are positive.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param rows number of grid rows
+   * @param cols number of grid columns
+   */
   public void setGrid(int rows, int cols){
     this.myGridView = new GridPaneView(rows, cols);
     buildCenter();
     buildBottom();
   }
 
+  /**
+   * Doubles the stored speed multiplier.
+   *
+   * <p>Purpose: keeps UI speed label in sync with controller speed changes.</p>
+   *
+   * <p>Assumptions: current multiplier is positive.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void doubleMySpeed() { this.mySpeedMultiplier *= 2; }
 
+  /**
+   * Halves the stored speed multiplier.
+   *
+   * <p>Purpose: keeps UI speed label in sync with controller speed changes.</p>
+   *
+   * <p>Assumptions: current multiplier is positive.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void halveMySpeed() { this.mySpeedMultiplier /= 2; }
 
+  /**
+   * Refreshes the speed label using the current multiplier.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   public void updateSpeedLabel() { myButtons.setSpeedLabel(mySpeedMultiplier); }
 
+  /**
+   * Applies a new language bundle to all view components.
+   *
+   * <p>Purpose: updates all visible strings without rebuilding the UI.</p>
+   *
+   * <p>Assumptions: {@code bundle} contains required keys.</p>
+   *
+   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param bundle localization bundle for UI strings
+   */
   public void applyLanguage(ResourceBundle bundle) {
     updateSpeedLabel();
     myButtons.applyLanguage(bundle);
@@ -231,6 +432,20 @@ public class SimulationView {
     myAboutDialog.applyLanguage(bundle);
   }
 
+  /**
+   * Applies the selected theme stylesheet to the scene.
+   *
+   * <p>Purpose: changes the application's visual theme without recreating nodes.</p>
+   *
+   * <p>Assumptions: {@code scene} is non-null and attached to a Stage.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param scene JavaFX scene to update
+   * @param themeChoice theme name (e.g., "Light", "Dark", "Duke")
+   */
   public void applyTheme(Scene scene, String themeChoice) {
     String themeCss = switch (themeChoice) {
       case "Dark" -> DARK_CSS;
@@ -240,9 +455,61 @@ public class SimulationView {
     scene.getStylesheets().setAll(BASE_CSS, themeCss);
   }
 
+  /**
+   * Returns the resource bundle used by this view.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return current localization bundle
+   */
   public ResourceBundle getMyBundle() { return myBundle; }
 
+  /**
+   * Returns the button manager that owns the UI controls.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return button manager
+   */
   public ButtonManager getMyButtons() { return myButtons; }
 
+  /**
+   * Returns the current speed multiplier tracked by the view.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return speed multiplier used for display
+   */
   public double getMySpeedMultiplier() { return mySpeedMultiplier; }
+
+  /**
+   * Replaces the center content with a provided node wrapped in a card.
+   *
+   * <p>Purpose: allows controllers to swap the center display (e.g., multi-sim dashboard).</p>
+   *
+   * <p>Assumptions: {@code content} is non-null.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param content node to display in the center card
+   */
+  public void setCenterContent(Node content) {
+    if (centerPane == null) {
+      centerPane = new StackPane();
+      centerPane.setPadding(new Insets(18,0,18,0));
+      myMain.setCenter(centerPane);
+    }
+    StackPane card = buildCenterCard();
+    card.getChildren().setAll(content);
+    centerPane.getChildren().setAll(card);
+  }
+
 }
