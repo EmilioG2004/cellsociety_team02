@@ -18,6 +18,8 @@ final class ConfigXmlConstants {
   static final String CONFIG_PROPORTION_ATTR = "proportion";
 
   static final String CONFIG_PATTERN = "pattern";
+  static final String CONFIG_ROW = "row";
+  static final String CONFIG_COLUMN = "col";
 
   static final String CONFIG_TITLE = "title";
   static final String CONFIG_AUTHOR = "author";

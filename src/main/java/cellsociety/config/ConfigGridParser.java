@@ -176,8 +176,8 @@ public class ConfigGridParser {
     for (int i = 0; i < patternNodes.getLength(); i++) {
       Element patternEl = (Element) patternNodes.item(i);
 
-      int startRow = parseNonNegativeInt(patternEl, CONFIG_ROWS);
-      int startCol = parseNonNegativeInt(patternEl, CONFIG_COLUMNS);
+      int startRow = parseNonNegativeInt(patternEl, CONFIG_ROW);
+      int startCol = parseNonNegativeInt(patternEl, CONFIG_COLUMN);
 
       // pattern must contain its own <states> direct child
       Element patternStatesEl = getFirstDirectChild(patternEl, CONFIG_STATES);
