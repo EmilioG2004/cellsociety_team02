@@ -1,0 +1,20 @@
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
+  <metadata>
+    <title>Test Exception</title>
+    <author>Ixa Sigler</author>
+    <description>Invalid grid bounds.</description>
+  </metadata>
+
+  <grid rows="3" cols="3">
+    <states>
+      1,1,1,1,1
+      1,1,1,1,1
+      1,1,1,1,1
+      1,1,1,1,1
+      1,1,1,1,1
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
