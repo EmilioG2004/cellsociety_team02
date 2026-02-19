@@ -4,77 +4,149 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import java.util.Map;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 
 /**
- * Defines a common interface for visual components that render a simulation grid.
+ * Defines the view contract for rendering a simulation grid.
  *
- * Purpose:
- * This interface allows the view layer to support multiple grid-rendering
- * implementations (such as GridPane-based or Canvas-based views) without
- * coupling the rest of the application to a specific JavaFX layout or drawing
- * technique.
+ * <p>Purpose: lets the rest of the UI depend on a stable grid-rendering API while
+ * allowing multiple implementations (e.g., GridPane, Canvas) without rewriting
+ * controllers or views.</p>
  *
- * Assumptions:
- * - Implementations are responsible for managing their own internal visual state.
- * - The provided ReadOnlyGrid accurately represents the current simulation state
- *   and should not be modified by implementations.
+ * <p>Assumptions: the {@link ReadOnlyGrid} dimensions match the implementation's
+ * internal grid dimensions; implementers do not mutate the grid.</p>
  *
- * Dependencies:
- * - ReadOnlyGrid for accessing grid state (rows, cols, cell state per index).
- * - JavaFX Node so implementations can be embedded in the UI layout.
+ * <p>Dependencies: {@link ReadOnlyGrid} for state access, JavaFX {@link Node} and
+ * {@link Region} for embedding and sizing, and state-color mappings.</p>
  *
- * Example usage:
- * GridView gridView = new GridPaneView(rows, cols, cellSize);
- * rootPane.setCenter(gridView.getNode());
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * GridView gridView = new GridPaneView(rows, cols);
+ * container.getChildren().add(gridView.getNode());
+ * gridView.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * }</pre>
+ *
+ * <p>Other details: implementations should keep rendering fast and avoid allocating
+ * new nodes on each frame.</p>
  *
  * @author Emilio Garcia
-
  */
 public interface GridView {
 
   /**
-   * Renders the current state of the simulation grid.
+   * Renders the current simulation state.
    *
-   * Purpose:
-   * Updates the visual representation of each cell based on the data provided
-   * by the ReadOnlyGrid and the associated state-to-color mapping.
+   * <p>Purpose: updates the visual representation of each cell using the provided
+   * grid state and state-to-color mapping.</p>
    *
-   * Assumptions:
-   * - The dimensions of the ReadOnlyGrid are compatible with the implementation’s
-   *   internal grid representation.
-   * - The stateColors map contains entries for all possible cell states.
+   * <p>Assumptions: {@code grid} dimensions match the view's dimensions; {@code stateColors}
+   * contains an entry for every possible cell state.</p>
    *
-   * @param grid read-only view of the simulation grid (rows, cols, getCellState)
-   * @param stateColors mapping from cell state values to color strings
+   * <p>Exceptions: may throw {@link IllegalArgumentException} if dimensions do not match
+   * (implementation-defined).</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param grid read-only view of the simulation grid
+   * @param stateColors mapping from cell states to color strings (e.g., "#RRGGBB")
    */
   void render(ReadOnlyGrid grid, Map<CellState, String> stateColors);
 
   /**
    * Clears the visual grid.
    *
-   * Purpose:
-   * Resets the grid to a default visual state without modifying the underlying
-   * simulation data.
+   * <p>Purpose: resets the view to a default appearance without mutating simulation data.</p>
    *
-   * Assumptions:
-   * - Implementations define what constitutes a "cleared" state.
+   * <p>Assumptions: implementations define what "cleared" means (often a blank grid).</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
    */
   void clear();
+
+  /**
+   * Registers a click handler for individual cells.
+   *
+   * <p>Purpose: enables interactive editing or inspection by reporting the clicked row/column.</p>
+   *
+   * <p>Assumptions: handler may be {@code null} to disable interaction.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param handler callback that receives (row, col) for a clicked cell
+   */
   void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler);
   /**
    * Returns the JavaFX node representing this grid view.
    *
-   * Purpose:
-   * Allows the grid view to be inserted into higher-level layouts without exposing
-   * implementation details.
+   * <p>Purpose: allows the grid view to be inserted into higher-level layouts without
+   * exposing implementation details.</p>
    *
-   * @return Node used to display the grid
+   * <p>Assumptions: implementers return a stable node instance.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return node used to display the grid
    */
   Node getNode();
 
+  /**
+   * Toggles whether cell outlines are visible.
+   *
+   * <p>Purpose: provide a quick visual switch between bordered and borderless grids.</p>
+   *
+   * <p>Assumptions: {@code grid} matches the current dimensions; {@code stateColors} is complete.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param grid read-only grid used to re-apply outlines correctly
+   * @param stateColors mapping for state-dependent outline colors (if used)
+   */
   void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors);
 
+  /**
+   * Rotates the grid 90 degrees counterclockwise.
+   *
+   * <p>Purpose: lets users view the simulation from different orientations.</p>
+   *
+   * <p>Assumptions: the underlying implementation supports rotation.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   void rotateLeft();
 
+  /**
+   * Rotates the grid 90 degrees clockwise.
+   *
+   * <p>Purpose: lets users view the simulation from different orientations.</p>
+   *
+   * <p>Assumptions: the underlying implementation supports rotation.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   */
   void rotateRight();
+
+  /**
+   * Binds cell sizing to a container region.
+   *
+   * <p>Purpose: ensures the grid scales to available space while preserving cell shape.</p>
+   *
+   * <p>Assumptions: {@code container} provides valid width/height during layout passes.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param container the region whose size drives cell sizing
+   */
+  void bindToContainer(Region container);
 }
