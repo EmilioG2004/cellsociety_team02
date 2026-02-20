@@ -19,8 +19,8 @@ class CellTest {
 
   @BeforeEach
   void setUp() {
-    deadCell = new Cell(GameOfLifeState.DEAD);
-    aliveCell = new Cell(GameOfLifeState.ALIVE);
+    deadCell = new BasicCell(GameOfLifeState.DEAD);
+    aliveCell = new BasicCell(GameOfLifeState.ALIVE);
   }
 
   // Z - Zero: initial/default state
@@ -32,7 +32,7 @@ class CellTest {
 
   @Test
   void cell_initializedWithNull_returnsNull() {
-    Cell cell = new Cell(null);
+    Cell cell = new BasicCell(null);
     assertNull(cell.getState());
   }
 
@@ -52,7 +52,7 @@ class CellTest {
   // M - Many: multiple operations
   @Test
   void multipleStateUpdates_retainLatestState() {
-    Cell cell = new Cell(GameOfLifeState.DEAD);
+    Cell cell = new BasicCell(GameOfLifeState.DEAD);
     cell.setState(GameOfLifeState.ALIVE);
     cell.setState(GameOfLifeState.DEAD);
     assertEquals(GameOfLifeState.DEAD, cell.getState());
@@ -69,7 +69,7 @@ class CellTest {
   @Test
   void getState_afterConstruction_matchesConstructorArg() {
     for (GameOfLifeState state : GameOfLifeState.values()) {
-      Cell cell = new Cell(state);
+      Cell cell = new BasicCell(state);
       assertEquals(state, cell.getState());
     }
   }
@@ -77,7 +77,7 @@ class CellTest {
   // E - Exceptional: state transitions
   @Test
   void setState_fromNullToValid_works() {
-    Cell cell = new Cell(null);
+    Cell cell = new BasicCell(null);
     cell.setState(GameOfLifeState.ALIVE);
     assertEquals(GameOfLifeState.ALIVE, cell.getState());
   }

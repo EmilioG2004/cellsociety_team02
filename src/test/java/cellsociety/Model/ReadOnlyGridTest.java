@@ -1,6 +1,7 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -17,16 +18,18 @@ class ReadOnlyGridTest {
 
   private Grid grid;
   private ReadOnlyGrid readOnlyGrid;
+  private ConwayGameOfLifeRule cellFactory;
 
   @BeforeEach
   void setUp() {
     grid = new Grid(3, 3);
+    cellFactory = new ConwayGameOfLifeRule();
     CellState[][] initial = {
         {DEAD, ALIVE, DEAD},
         {ALIVE, DEAD, ALIVE},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(initial);
+    grid.setCellsState(initial, cellFactory);
     readOnlyGrid = grid;
   }
 
@@ -34,7 +37,7 @@ class ReadOnlyGridTest {
   @Test
   void emptyGrid_hasDimensionsZero() {
     Grid emptyGrid = new Grid(0, 0);
-    emptyGrid.setCellsState(new CellState[0][0]);
+    emptyGrid.setCellsState(new CellState[0][0], cellFactory);
     ReadOnlyGrid ro = emptyGrid;
     assertEquals(0, ro.getRows());
     assertEquals(0, ro.getCols());
@@ -44,7 +47,7 @@ class ReadOnlyGridTest {
   @Test
   void singleCellGrid_returnsCellState() {
     Grid singleGrid = new Grid(1, 1);
-    singleGrid.setCellsState(new CellState[][]{{ALIVE}});
+    singleGrid.setCellsState(new CellState[][]{{ALIVE}}, cellFactory);
     ReadOnlyGrid ro = singleGrid;
     assertEquals(1, ro.getRows());
     assertEquals(1, ro.getCols());
@@ -114,7 +117,7 @@ class ReadOnlyGridTest {
         states[r][c] = (r + c) % 2 == 0 ? ALIVE : DEAD;
       }
     }
-    largeGrid.setCellsState(states);
+    largeGrid.setCellsState(states, cellFactory);
     ReadOnlyGrid ro = largeGrid;
     assertEquals(size, ro.getRows());
     assertEquals(size, ro.getCols());
@@ -129,7 +132,7 @@ class ReadOnlyGridTest {
   @Test
   void typicalUsage_createAndRead() {
     Grid g = new Grid(2, 2);
-    g.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}});
+    g.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, cellFactory);
     ReadOnlyGrid ro = g;
     assertEquals(ALIVE, ro.getCellState(0, 0));
     assertEquals(DEAD, ro.getCellState(0, 1));

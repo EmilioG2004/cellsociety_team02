@@ -35,8 +35,8 @@ class SimulationDriverTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(initial);
     rules = new ConwayGameOfLifeRule();
+    grid.setCellsState(initial, rules);
     simulation = new Simulation(grid, rules);
   }
 
@@ -298,7 +298,7 @@ class SimulationDriverTest {
     driver.start();
 
     Grid newGrid = new Grid(2, 2);
-    newGrid.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}});
+    newGrid.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, new ConwayGameOfLifeRule());
     Simulation newSim = new Simulation(newGrid, new ConwayGameOfLifeRule());
     driver.setSimulation(newSim);
 
