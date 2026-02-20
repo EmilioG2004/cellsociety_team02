@@ -1,5 +1,7 @@
 package cellsociety.Model.GameRules;
 
+import cellsociety.Model.Cell;
+import cellsociety.Model.CellFactory;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.ArrayList;
@@ -10,9 +12,10 @@ import java.util.Map;
 /**
  * Abstract base class for cellular automaton transition rules. Each simulation type (e.g.,
  * Game of Life, Fire, Percolation) extends this class and defines its own state-transition
- * logic and neighbor semantics.
+ * logic and neighbor semantics. Implements CellFactory so grids can create cells without
+ * depending on GameRule directly.
  */
-public abstract class GameRule {
+public abstract class GameRule implements CellFactory {
 
   /** Index of row component in neighbor offset arrays. */
   protected static final int OFFSET_ROW_INDEX = 0;
@@ -55,6 +58,8 @@ public abstract class GameRule {
     }
     return Map.copyOf(m);
   }
+  /** Creates a cell for the grid */
+  public abstract Cell createCell(CellState state);
 
   public abstract CellState fromInt(int value);
 

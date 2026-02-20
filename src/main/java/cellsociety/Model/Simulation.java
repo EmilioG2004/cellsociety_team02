@@ -23,7 +23,7 @@ public class Simulation {
     public void step() {
         CellState[][] currentStates = myGrid.getCellStates();
         CellState[][] nextStates = myRule.getNextStates(currentStates);
-        myGrid.setCellsState(nextStates);
+        myGrid.setCellsState(nextStates, myRule);
         myStateStack.push(currentStates);
     }
     public int getStateStackSize() {
@@ -36,7 +36,7 @@ public class Simulation {
 
         }
         myStateStack.pop();
-        myGrid.setCellsState(myStateStack.peek());
+        myGrid.setCellsState(myStateStack.peek(), myRule);
     }
  
 
@@ -45,7 +45,7 @@ public class Simulation {
      */
     public void toggleCellState(int row, int col) {
         CellState next = myRule.getNextStateInCycle(myGrid.getCellState(row, col));
-        myGrid.setCellState(row, col, next);
+        myGrid.setCellState(row, col, next, myRule);
         myStateStack.peek()[row][col] = next;
     }
     /**
@@ -53,7 +53,7 @@ public class Simulation {
      * history stays correct. Use this instead of modifying the grid directly.
      */
     public void setState(CellState[][] state) {
-        myGrid.setCellsState(state);
+        myGrid.setCellsState(state, myRule);
         myStateStack.clear();
         myStateStack.push(state);
     }

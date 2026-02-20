@@ -1,16 +1,13 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Collection;
 /**
- * Stores a rectangular arrangement of cells, applies neighbor logic using the strategy from
- * GameRule, and drives the two-pass update (compute next state for all, then commit).
- * Does not store a NeighborStrategy; obtains it from GameRule during updates.
+ * Stores a rectangular arrangement of cells. Cell creation is delegated to a
+ * {@link CellFactory} so the grid does not depend on game rules.
  */
 public class Grid implements MutableGrid {
 
@@ -26,7 +23,7 @@ public class Grid implements MutableGrid {
   private final int cols;
 
   /**
-   * Constructs a grid with the given dimensions. Call {@link #setCellsState(CellState[][])} to populate.
+   * Constructs a grid with the given dimensions. Call {@link #setCellsState(CellState[][], CellFactory)} to populate.
    */
   public Grid(int rows, int cols) {
     this.rows = rows;
@@ -35,7 +32,7 @@ public class Grid implements MutableGrid {
   }
 
   @Override
-  public void setCellsState(CellState[][] state) {
+  public void setCellsState(CellState[][] state, CellFactory cellFactory) {
     if (state.length != rows || (rows > FIRST_ROW_INDEX && state[FIRST_ROW_INDEX].length != cols)) {
       throw new IllegalArgumentException(
           "Initial state dimensions " + state.length + "x"
@@ -47,7 +44,7 @@ public class Grid implements MutableGrid {
         if (cells[r][c] != null) {
           cells[r][c].setState(state[r][c]);
         } else {
-          cells[r][c] = new Cell(state[r][c]);
+          cells[r][c] = cellFactory.createCell(state[r][c]);
         }
       }
     }
@@ -95,12 +92,12 @@ public class Grid implements MutableGrid {
   }
 
   @Override
-  public void setCellState(int row, int col, CellState state) {
+  public void setCellState(int row, int col, CellState state, CellFactory cellFactory) {
     checkBounds(row, col);
     if (cells[row][col] != null) {
       cells[row][col].setState(state);
     } else {
-      cells[row][col] = new Cell(state);
+      cells[row][col] = cellFactory.createCell(state);
     }
   }
 
