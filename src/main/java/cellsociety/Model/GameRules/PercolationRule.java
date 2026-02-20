@@ -1,5 +1,6 @@
 package cellsociety.Model.GameRules;
-
+import cellsociety.Model.BasicCell;
+import cellsociety.Model.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Utils.MooreNeighborStrategy;
 import java.util.Map;
@@ -19,6 +20,12 @@ public class PercolationRule extends GameRule {
     public PercolationRule(Map<String, Double> parameters) {
         super(new MooreNeighborStrategy(), parameters);
     }
+
+    @Override
+    public Cell createCell(CellState state) {
+        return new BasicCell(state);
+    }
+
     @Override
     public CellState[][] getNextStates(CellState[][] currentStates) {
         int rows = currentStates.length;

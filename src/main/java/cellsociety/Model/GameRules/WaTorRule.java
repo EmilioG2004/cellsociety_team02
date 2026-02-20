@@ -1,4 +1,6 @@
 package cellsociety.Model.GameRules;
+import cellsociety.Model.BasicCell;
+import cellsociety.Model.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.WaTorState;
 import cellsociety.Model.Utils.CardinalNeighborStrategy;
@@ -76,6 +78,10 @@ public class WaTorRule extends GameRule {
         }
       }
     }
+  }
+  @Override
+  public Cell createCell(CellState state) {
+    return new BasicCell(state);
   }
 
   /** One generation: fish then sharks move (or eat); reproduction and energy applied. */
