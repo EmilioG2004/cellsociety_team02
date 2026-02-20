@@ -49,6 +49,12 @@
   -fx-border-radius: 10;
 }
 
+/* ScrollPane inside a card should not paint its own white background */
+.card-scroll,
+.card-scroll > .viewport {
+  -fx-background-color: transparent;
+}
+
 /* =========================================================
    THEME TEXT (Labels + Text nodes)
    ========================================================= */

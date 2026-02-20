@@ -15,6 +15,11 @@ final class ConfigXmlConstants {
   static final String CONFIG_RANDOM_STATE = "state";
   static final String CONFIG_ID_ATTR = "id";
   static final String CONFIG_COUNT_ATTR = "count";
+  static final String CONFIG_PROPORTION_ATTR = "proportion";
+
+  static final String CONFIG_PATTERN = "pattern";
+  static final String CONFIG_ROW = "row";
+  static final String CONFIG_COLUMN = "col";
 
   static final String CONFIG_TITLE = "title";
   static final String CONFIG_AUTHOR = "author";
@@ -28,4 +33,12 @@ final class ConfigXmlConstants {
   static final String CONFIG_PARAM = "param";
   static final String CONFIG_PARAM_NAME_ATTR = "name";
   static final String CONFIG_PARAM_VALUE_ATTR = "value";
+
+  public static final String CONFIG_SIMULATION_STATE = "simulationState";
+  public static final String CONFIG_SETTINGS = "settings";
+  public static final String CONFIG_SIMULATIONS = "simulations";
+
+  public static final String CONFIG_THEME = "theme";
+  public static final String CONFIG_SIMULATION_SPEED = "simulationSpeed";
+  public static final String CONFIG_LANGUAGE = "language";
 }

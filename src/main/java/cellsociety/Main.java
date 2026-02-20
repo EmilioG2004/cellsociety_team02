@@ -44,6 +44,7 @@ public class Main extends Application {
         buildGUI(primaryStage, bundle, true);
     }
 
+    //TO-DO REFACTOR: leave view creation, remove scene creation, in controller when creating controller then create scene
     private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
         SimulationView view = new SimulationView(bundle, showSplash);
         Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
@@ -51,6 +52,7 @@ public class Main extends Application {
 
         stage.setScene(scene);
         view.applyTheme(scene, "Light");
+        stage.setMaximized(true);
 
         stage.show();
     }

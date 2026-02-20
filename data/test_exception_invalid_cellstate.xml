@@ -1,0 +1,20 @@
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule">
+  <metadata>
+    <title>Test Exception</title>
+    <author>Ixa Sigler</author>
+    <description>Invalid cell state.</description>
+  </metadata>
+
+  <grid rows="5" cols="5">
+    <states>
+      9,9,9,9,9
+      9,9,9,9,9
+      9,9,9,9,9
+      9,9,9,9,9
+      9,9,9,9,9
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
