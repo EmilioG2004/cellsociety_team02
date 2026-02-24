@@ -1,5 +1,7 @@
 package cellsociety.Model;
 
+import cellsociety.Model.Cell.BasicCell;
+import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.GameOfLifeState;
 

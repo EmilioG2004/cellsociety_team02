@@ -186,4 +186,15 @@ public class SettingsSplash extends StackPane {
    */
   public ChoiceBox<String> getMyThemes() { return myThemes; }
 
+  /**
+   * Returns the Load Simulation button for controller wiring.
+   *
+   * <p>Assumptions: none.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * @return load simulation button
+   */
+  public Button getMyLoadButton() { return myLoadButton; }
+
 }

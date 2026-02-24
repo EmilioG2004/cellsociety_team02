@@ -1,7 +1,8 @@
 package cellsociety.view;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.ReadOnlyGrid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.ResourceBundle;

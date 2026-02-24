@@ -2,6 +2,8 @@ package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;

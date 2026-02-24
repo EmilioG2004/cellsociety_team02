@@ -4,7 +4,9 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.ReadOnlyGrid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationFactory;
 import cellsociety.config.SimulationConfig;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
