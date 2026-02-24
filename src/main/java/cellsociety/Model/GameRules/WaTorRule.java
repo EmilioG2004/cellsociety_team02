@@ -4,6 +4,7 @@ import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.WaTorState;
 import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +46,11 @@ public class WaTorRule extends GameRule {
   /** Wa-Tor rule with the given parameters (e.g. sharkStartEnergy, sharkEnergyFromFish). */
   public WaTorRule(Map<String, Double> parameters) {
     super(new CardinalNeighborStrategy(), parameters);
+    rand = new Random();
+  }
+
+  public WaTorRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(strategy, parameters);
     rand = new Random();
   }
 

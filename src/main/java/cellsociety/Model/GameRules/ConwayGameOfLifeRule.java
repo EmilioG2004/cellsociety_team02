@@ -4,6 +4,7 @@ import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,10 @@ public class ConwayGameOfLifeRule extends GameRule {
 
   public ConwayGameOfLifeRule(Map<String, Double> parameters) {
     super(new MooreNeighborStrategy(), parameters);
+  }
+
+  public ConwayGameOfLifeRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(strategy, parameters);
   }
 
   @Override

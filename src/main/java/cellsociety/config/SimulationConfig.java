@@ -10,6 +10,7 @@ public final class SimulationConfig {
 
   private final String simulationType;
   private final String ruleClass;
+  private final String neighborStrategyClass;
 
   private final String title;
   private final String author;
@@ -24,19 +25,21 @@ public final class SimulationConfig {
   /**
    * Constructs a simulation config.
    *
-   * @param simulationType display name for the simulation (e.g. "GameOfLife")
-   * @param ruleClass      fully qualified class name of the rule (e.g. "cellsociety.Model.GameRules.ConwayGameOfLifeRule")
-   * @param title          simulation title
-   * @param author         author
-   * @param description    description
-   * @param rows           number of grid rows
-   * @param cols           number of grid columns
-   * @param initialStates  initial cell state matrix (rows x cols)
-   * @param parameters     optional parameters for the rule (not null; may be empty)
+   * @param simulationType        display name for the simulation (e.g. "GameOfLife")
+   * @param ruleClass             fully qualified class name of the rule
+   * @param neighborStrategyClass fully qualified class name of the neighbor strategy, or null/blank to use the rule's default
+   * @param title                 simulation title
+   * @param author                author
+   * @param description           description
+   * @param rows                  number of grid rows
+   * @param cols                  number of grid columns
+   * @param initialStates         initial cell state matrix (rows x cols)
+   * @param parameters            optional parameters for the rule (not null; may be empty)
    */
   public SimulationConfig(
       String simulationType,
       String ruleClass,
+      String neighborStrategyClass,
       String title,
       String author,
       String description,
@@ -47,6 +50,7 @@ public final class SimulationConfig {
   ) {
     this.simulationType = simulationType;
     this.ruleClass = ruleClass;
+    this.neighborStrategyClass = neighborStrategyClass;
     this.title = title;
     this.author = author;
     this.description = description;
@@ -61,9 +65,13 @@ public final class SimulationConfig {
   public String getSimulationType() {
     return simulationType;
   }
-  public String getRuleClass()
-  {
+  public String getRuleClass() {
     return ruleClass;
+  }
+
+  /** Fully qualified class name of the neighbor strategy to use, or null/blank to use the rule's default. */
+  public String getNeighborStrategyClass() {
+    return neighborStrategyClass;
   }
   public String getTitle() {
     return title;
