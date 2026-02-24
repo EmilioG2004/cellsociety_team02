@@ -1,8 +1,11 @@
 package cellsociety.Model;
 
+import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationDriver;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -35,8 +38,8 @@ class SimulationDriverTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(initial);
     rules = new ConwayGameOfLifeRule();
+    grid.setCellsState(initial, rules);
     simulation = new Simulation(grid, rules);
   }
 
@@ -298,7 +301,7 @@ class SimulationDriverTest {
     driver.start();
 
     Grid newGrid = new Grid(2, 2);
-    newGrid.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}});
+    newGrid.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, new ConwayGameOfLifeRule());
     Simulation newSim = new Simulation(newGrid, new ConwayGameOfLifeRule());
     driver.setSimulation(newSim);
 

@@ -1,8 +1,10 @@
 package cellsociety.Model.GameRules;
-
+import cellsociety.Model.Cell.BasicCell;
+import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.GameOfLifeState;
-import cellsociety.Model.Utils.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,10 @@ public class ConwayGameOfLifeRule extends GameRule {
   public Map<CellState, String> getStateColors() {
     return stateColorsFor(GameOfLifeState.DEAD, GameOfLifeState.ALIVE);
   }
-
+  @Override
+  public Cell createCell(CellState state) {
+    return new BasicCell(state);
+  }
   @Override
   public CellState fromInt(int value) {
     return GameOfLifeState.fromInt(value);

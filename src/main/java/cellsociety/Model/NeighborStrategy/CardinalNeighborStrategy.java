@@ -1,4 +1,4 @@
-package cellsociety.Model.Utils;
+package cellsociety.Model.NeighborStrategy;
 
 import java.util.List;
 

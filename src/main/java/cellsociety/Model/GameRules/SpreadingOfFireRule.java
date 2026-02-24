@@ -1,8 +1,10 @@
 package cellsociety.Model.GameRules;
-
+import cellsociety.Model.Cell.BasicCell;
+import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SpreadingOfFireState;
-import cellsociety.Model.Utils.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +68,10 @@ public class SpreadingOfFireRule extends GameRule {
     }
     return nextStates;
   }
-
+  @Override
+  public Cell createCell(CellState state) {
+    return new BasicCell(state);
+  }
   @Override
   public Map<CellState, String> getStateColors() {
     return stateColorsFor(

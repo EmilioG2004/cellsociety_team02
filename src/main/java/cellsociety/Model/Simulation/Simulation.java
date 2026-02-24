@@ -1,8 +1,11 @@
-package cellsociety.Model;
+package cellsociety.Model.Simulation;
 
 import java.util.Stack;
+import cellsociety.Model.Cell.CellFactory;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.Grid.MutableGrid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
 
 /** Runs a single simulation: applies a GameRule to a grid and maintains step-back history. */
 public class Simulation {
@@ -12,18 +15,20 @@ public class Simulation {
 
     private final MutableGrid myGrid;
     private final GameRule myRule;
+    private final CellFactory myCellFactory;
     private final Stack<CellState[][]> myStateStack;
 
     public Simulation(MutableGrid grid, GameRule rule) {
         this.myGrid = grid;
         this.myRule = rule;
+        this.myCellFactory = rule;
         this.myStateStack = new Stack<>();
         this.myStateStack.push(myGrid.getCellStates());
     }
     public void step() {
         CellState[][] currentStates = myGrid.getCellStates();
         CellState[][] nextStates = myRule.getNextStates(currentStates);
-        myGrid.setCellsState(nextStates);
+        myGrid.setCellsState(nextStates, myCellFactory);
         myStateStack.push(currentStates);
     }
     public int getStateStackSize() {
@@ -36,7 +41,7 @@ public class Simulation {
 
         }
         myStateStack.pop();
-        myGrid.setCellsState(myStateStack.peek());
+        myGrid.setCellsState(myStateStack.peek(), myCellFactory);
     }
  
 
@@ -45,7 +50,7 @@ public class Simulation {
      */
     public void toggleCellState(int row, int col) {
         CellState next = myRule.getNextStateInCycle(myGrid.getCellState(row, col));
-        myGrid.setCellState(row, col, next);
+        myGrid.setCellState(row, col, next, myCellFactory);
         myStateStack.peek()[row][col] = next;
     }
     /**
@@ -53,7 +58,7 @@ public class Simulation {
      * history stays correct. Use this instead of modifying the grid directly.
      */
     public void setState(CellState[][] state) {
-        myGrid.setCellsState(state);
+        myGrid.setCellsState(state, myCellFactory);
         myStateStack.clear();
         myStateStack.push(state);
     }

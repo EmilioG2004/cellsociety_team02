@@ -1,7 +1,9 @@
-package cellsociety.Model;
+package cellsociety.Model.Simulation;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.MutableGrid;
 import cellsociety.config.SimulationConfig;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -68,7 +70,7 @@ public class SimulationFactory {
         cellStates[r][c] = rule.fromInt(intStates[r][c]);
       }
     }
-    grid.setCellsState(cellStates);
+    grid.setCellsState(cellStates, rule);
     return grid;
   }
   /**

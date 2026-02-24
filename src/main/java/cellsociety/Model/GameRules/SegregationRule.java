@@ -1,8 +1,10 @@
 package cellsociety.Model.GameRules;
-
+import cellsociety.Model.Cell.BasicCell;
+import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SegregationState;
-import cellsociety.Model.Utils.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+
 import java.util.List;
 import java.util.*;
 
@@ -26,7 +28,10 @@ public class SegregationRule extends GameRule {
     }
   }
 
-
+  @Override
+  public Cell createCell(CellState state) {
+    return new BasicCell(state);
+  }
   @Override
   public CellState[][] getNextStates(CellState[][] currentStates) {
     int rows = currentStates.length;
