@@ -1,10 +1,11 @@
 package cellsociety.Model.GameRules;
 
+import cellsociety.Model.Cell.BasicCell;
+import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.BasicCell;
-import cellsociety.Model.Cell;
 import cellsociety.Model.CellState.FallingSandState;
-import cellsociety.Model.Utils.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+
 import java.util.Map;
 import java.util.Random;
 

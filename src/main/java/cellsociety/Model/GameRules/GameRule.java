@@ -1,9 +1,10 @@
 package cellsociety.Model.GameRules;
 
-import cellsociety.Model.Cell;
-import cellsociety.Model.CellFactory;
+import cellsociety.Model.Cell.Cell;
+import cellsociety.Model.Cell.CellFactory;
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Utils.NeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

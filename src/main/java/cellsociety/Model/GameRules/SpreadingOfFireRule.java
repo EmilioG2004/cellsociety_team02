@@ -1,9 +1,10 @@
 package cellsociety.Model.GameRules;
-import cellsociety.Model.BasicCell;
-import cellsociety.Model.Cell;
+import cellsociety.Model.Cell.BasicCell;
+import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SpreadingOfFireState;
-import cellsociety.Model.Utils.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+
 import java.util.List;
 import java.util.Map;
 
