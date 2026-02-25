@@ -187,4 +187,3 @@ public class SimulationController {
   public boolean isMultiMode() {
     return myMultiMode;
   }
-}

@@ -4,6 +4,7 @@ import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SegregationState;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.List;
 import java.util.*;
@@ -23,6 +24,15 @@ public class SegregationRule extends GameRule {
 
   public SegregationRule(Map<String, Double> parameters) {
     super(new MooreNeighborStrategy(), parameters);
+    validateParameters(parameters);
+  }
+
+  public SegregationRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(strategy, parameters);
+    validateParameters(parameters);
+  }
+
+  private static void validateParameters(Map<String, Double> parameters) {
     if (parameters.containsKey(PARAM_SATISFACTION_THRESHOLD) && (parameters.get(PARAM_SATISFACTION_THRESHOLD) < THRESHOLD_MIN || parameters.get(PARAM_SATISFACTION_THRESHOLD) > THRESHOLD_MAX)) {
       throw new IllegalArgumentException("satisfactionThreshold must be between 0 and 1");
     }

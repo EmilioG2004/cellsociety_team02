@@ -270,6 +270,7 @@ public class WiringManager {
       SimulationConfig configSnapshot = new SimulationConfig(
           initialConfig.getSimulationType(),
           initialConfig.getRuleClass(),
+          initialConfig.getNeighborStrategyClass(),
           initialConfig.getTitle(),
           initialConfig.getAuthor(),
           initialConfig.getDescription(),

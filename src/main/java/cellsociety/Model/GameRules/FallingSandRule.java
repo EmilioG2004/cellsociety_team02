@@ -5,6 +5,7 @@ import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.FallingSandState;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Map;
 import java.util.Random;
@@ -25,6 +26,10 @@ public class FallingSandRule extends GameRule {
 
   public FallingSandRule(Map<String, Double> parameters) {
     super(new MooreNeighborStrategy(), parameters);
+  }
+
+  public FallingSandRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(strategy, parameters);
   }
   @Override
   public Cell createCell(CellState state) {
