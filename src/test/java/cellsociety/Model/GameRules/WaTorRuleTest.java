@@ -1,8 +1,8 @@
 package cellsociety.Model.GameRules;
 
-import static cellsociety.Model.CellState.WaTorState.FISH;
-import static cellsociety.Model.CellState.WaTorState.SHARK;
-import static cellsociety.Model.CellState.WaTorState.WATER;
+import static cellsociety.Model.CellState.WaTorCellState.FISH;
+import static cellsociety.Model.CellState.WaTorCellState.SHARK;
+import static cellsociety.Model.CellState.WaTorCellState.WATER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,7 +25,7 @@ class WaTorRuleTest {
     int n = 0;
     for (CellState[] row : grid) {
       for (CellState cell : row) {
-        if (cell == state) n++;
+        if (state.equals(cell)) n++;
       }
     }
     return n;
@@ -83,7 +83,7 @@ class WaTorRuleTest {
         {FISH, FISH, WATER},
         {FISH, WATER, WATER}
     };
-    int fishBefore = count(grid, FISH);
+    int fishBefore  = count(grid, FISH);
     int sharkBefore = count(grid, SHARK);
     CellState[][] next = rule.getNextStates(grid);
     assertEquals(sharkBefore, count(next, SHARK), "Shark count unchanged");
@@ -107,9 +107,10 @@ class WaTorRuleTest {
   @Test
   void getNextStates_sharkWithStartEnergyOne_diesAfterOneStep() {
     rule = new WaTorRule(Map.of("sharkStartEnergy", 1.0));
+    CellState sharkWithLowEnergy = rule.fromInt(2); // Shark created with energy=1 from parameter
     CellState[][] grid = {
         {WATER, WATER, WATER},
-        {WATER, SHARK, WATER},
+        {WATER, sharkWithLowEnergy, WATER},
         {WATER, WATER, WATER}
     };
     CellState[][] next = rule.getNextStates(grid);
@@ -120,7 +121,7 @@ class WaTorRuleTest {
   void getNextStates_fishSurroundedBySharks_getsEaten() {
     CellState[][] grid = {
         {WATER, SHARK, WATER},
-        {SHARK, FISH, SHARK},
+        {SHARK, FISH,  SHARK},
         {WATER, SHARK, WATER}
     };
     CellState[][] next = rule.getNextStates(grid);
