@@ -1,7 +1,5 @@
 package cellsociety.Model.GameRules;
 
-import cellsociety.Model.Cell.BasicCell;
-import cellsociety.Model.Cell.Cell;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.WaTorCellState;
 import cellsociety.Model.CellState.WaTorTurnResult;
@@ -56,11 +54,6 @@ public class WaTorRule extends GameRule {
 
   public WaTorRule(NeighborStrategy strategy, Map<String, Double> parameters) {
     super(strategy, parameters);
-  }
-
-  @Override
-  public Cell createCell(CellState state) {
-    return new BasicCell(state);
   }
 
   @Override
@@ -230,3 +223,4 @@ public class WaTorRule extends GameRule {
         : Shark.DEFAULT_MAX_ENERGY;
   }
 }
+
