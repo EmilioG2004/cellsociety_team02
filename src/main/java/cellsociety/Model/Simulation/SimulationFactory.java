@@ -114,7 +114,7 @@ public class SimulationFactory {
         cellStates[r][c] = rule.fromInt(intStates[r][c]);
       }
     }
-    grid.setCellsState(cellStates, rule);
+    grid.setCellsState(cellStates);
     return grid;
   }
   /**
