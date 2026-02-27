@@ -1,7 +1,6 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.CellState.GameOfLifeState;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -9,19 +8,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
-import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ArrayGrid;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GridTest {
+class ArrayGridTest {
 
-  private Grid grid;
+  private ArrayGrid grid;
   private ConwayGameOfLifeRule cellFactory;
 
   @BeforeEach
   void setUp() {
-    grid = new Grid(3, 3);
+    grid = new ArrayGrid(3, 3);
     cellFactory = new ConwayGameOfLifeRule();
   }
 
@@ -51,7 +50,7 @@ class GridTest {
   // O - One: single element
   @Test
   void singleCellGrid_storesAndRetrievesState() {
-    Grid singleGrid = new Grid(1, 1);
+    ArrayGrid singleGrid = new ArrayGrid(1, 1);
     singleGrid.setCellsState(new CellState[][]{{ALIVE}}, cellFactory);
     assertEquals(ALIVE, singleGrid.getCellStates()[0][0]);
     singleGrid.setCellsState(new CellState[][]{{DEAD}}, cellFactory);
@@ -149,7 +148,7 @@ class GridTest {
   @Test
   void largeGrid_storesAndRetrievesCorrectly() {
     int size = 50;
-    Grid largeGrid = new Grid(size, size);
+    ArrayGrid largeGrid = new ArrayGrid(size, size);
     CellState[][] states = new CellState[size][size];
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
@@ -196,7 +195,7 @@ class GridTest {
   // E - Exceptional: empty grid, uninitialized access
   @Test
   void zeroSizeGrid_hasZeroDimensionsAndEmptyGetCellStates() {
-    Grid emptyGrid = new Grid(0, 0);
+    ArrayGrid emptyGrid = new ArrayGrid(0, 0);
     assertEquals(0, emptyGrid.getRows());
     assertEquals(0, emptyGrid.getCols());
     emptyGrid.setCellsState(new CellState[0][0], cellFactory);
@@ -206,13 +205,13 @@ class GridTest {
 
   @Test
   void getCellState_beforeSetCellsState_throws() {
-    Grid uninit = new Grid(2, 2);
+    ArrayGrid uninit = new ArrayGrid(2, 2);
     assertThrows(IllegalStateException.class, () -> uninit.getCellState(0, 0));
   }
 
   @Test
   void getCellStates_beforeSetCellsState_throws() {
-    Grid uninit = new Grid(2, 2);
+    ArrayGrid uninit = new ArrayGrid(2, 2);
     assertThrows(IllegalStateException.class, () -> uninit.getCellStates());
   }
 

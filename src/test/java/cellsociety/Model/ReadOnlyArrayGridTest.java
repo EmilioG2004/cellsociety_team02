@@ -2,7 +2,7 @@ package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
-import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
@@ -16,15 +16,15 @@ import org.junit.jupiter.api.Test;
  * Tests that Grid implements ReadOnlyGrid and that ReadOnlyGrid.copyToArray works.
  * View and other consumers depend only on this read-only contract (rows, cols, getCellState).
  */
-class ReadOnlyGridTest {
+class ReadOnlyArrayGridTest {
 
-  private Grid grid;
+  private ArrayGrid grid;
   private ReadOnlyGrid readOnlyGrid;
   private ConwayGameOfLifeRule cellFactory;
 
   @BeforeEach
   void setUp() {
-    grid = new Grid(3, 3);
+    grid = new ArrayGrid(3, 3);
     cellFactory = new ConwayGameOfLifeRule();
     CellState[][] initial = {
         {DEAD, ALIVE, DEAD},
@@ -38,7 +38,7 @@ class ReadOnlyGridTest {
   // Z - Zero: empty grid
   @Test
   void emptyGrid_hasDimensionsZero() {
-    Grid emptyGrid = new Grid(0, 0);
+    ArrayGrid emptyGrid = new ArrayGrid(0, 0);
     emptyGrid.setCellsState(new CellState[0][0], cellFactory);
     ReadOnlyGrid ro = emptyGrid;
     assertEquals(0, ro.getRows());
@@ -48,7 +48,7 @@ class ReadOnlyGridTest {
   // O - One: single cell
   @Test
   void singleCellGrid_returnsCellState() {
-    Grid singleGrid = new Grid(1, 1);
+    ArrayGrid singleGrid = new ArrayGrid(1, 1);
     singleGrid.setCellsState(new CellState[][]{{ALIVE}}, cellFactory);
     ReadOnlyGrid ro = singleGrid;
     assertEquals(1, ro.getRows());
@@ -112,7 +112,7 @@ class ReadOnlyGridTest {
   @Test
   void largeGrid_returnsCorrectStates() {
     int size = 20;
-    Grid largeGrid = new Grid(size, size);
+    ArrayGrid largeGrid = new ArrayGrid(size, size);
     CellState[][] states = new CellState[size][size];
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
@@ -133,7 +133,7 @@ class ReadOnlyGridTest {
   // S - Simple: typical usage
   @Test
   void typicalUsage_createAndRead() {
-    Grid g = new Grid(2, 2);
+    ArrayGrid g = new ArrayGrid(2, 2);
     g.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, cellFactory);
     ReadOnlyGrid ro = g;
     assertEquals(ALIVE, ro.getCellState(0, 0));
