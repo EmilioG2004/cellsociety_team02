@@ -8,27 +8,44 @@ import java.util.List;
 
 /**
  * Concrete grid backed by a 2D array internally, but it never exposes that array.
- * Implements BOTH interfaces:
- *  - ReadOnlyGrid: what rules can read
- *  - WritableGrid: what simulation uses to write next grid
+ * Implements Grid (which extends ReadOnlyGrid).
  *
  * @author Ixa Sigler
  */
-public class ArrayGrid implements ReadOnlyGrid, MutableGrid {
+public class ArrayGrid implements Grid {
 
   private final CellState[][] cells;
   private final NeighborStrategy neighborStrategy;
 
   /**
-   * Create an empty grid of given dimensions. Caller populates using setCellState().
+   * Creates a grid from a 2D array of cell states. The array is copied defensively.
+   * Must be non-empty and rectangular (all rows same length).
    */
-  public ArrayGrid(int rows, int cols, NeighborStrategy strategy) {
-    if (rows <= 0 || cols <= 0) {
-      throw new IllegalArgumentException("rows and cols must be positive");
+  public ArrayGrid(CellState[][] states, NeighborStrategy strategy) {
+    if (states == null || states.length == 0) {
+      throw new IllegalArgumentException("states cannot be null or empty");
     }
     if (strategy == null) {
       throw new IllegalArgumentException("NeighborStrategy cannot be null");
     }
+    int cols = states[0].length;
+    if (cols == 0) {
+      throw new IllegalArgumentException("states must have at least one column");
+    }
+    for (int r = 0; r < states.length; r++) {
+      if (states[r] == null || states[r].length != cols) {
+        throw new IllegalArgumentException("states must be rectangular (same column count per row)");
+      }
+    }
+    this.cells = new CellState[states.length][cols];
+    for (int r = 0; r < states.length; r++) {
+      System.arraycopy(states[r], 0, this.cells[r], 0, cols);
+    }
+    this.neighborStrategy = strategy;
+  }
+
+  /** Used by emptyCopy() to create an empty grid of the same dimensions. */
+  private ArrayGrid(int rows, int cols, NeighborStrategy strategy) {
     this.cells = new CellState[rows][cols];
     this.neighborStrategy = strategy;
   }
@@ -42,7 +59,7 @@ public class ArrayGrid implements ReadOnlyGrid, MutableGrid {
 
   @Override
   public int getCols() {
-    return cells[0].length;
+    return cells.length == 0 ? 0 : cells[0].length;
   }
 
   @Override
@@ -64,19 +81,10 @@ public class ArrayGrid implements ReadOnlyGrid, MutableGrid {
   }
 
   @Override
-  public CellState getRelativeNeighbor(int row, int col, int rowOffset, int colOffset) {
-    int r = row + rowOffset;
-    int c = col + colOffset;
-    if (!isInBounds(r, c)) return null;
-    return cells[r][c];
-  }
-
-  @Override
   public List<CellState> getNeighbors(int row, int col) {
     List<CellState> neighbors = new ArrayList<>();
-    for (int[] offset : neighborStrategy.getNeighborOffsets()) {
-      CellState n = getRelativeNeighbor(row, col, offset[0], offset[1]);
-      if (n != null) neighbors.add(n);
+    for (int[] pos : neighborStrategy.getNeighborPositions(getRows(), getCols(), row, col)) {
+      neighbors.add(cells[pos[0]][pos[1]]);
     }
     return neighbors;
   }
@@ -87,5 +95,19 @@ public class ArrayGrid implements ReadOnlyGrid, MutableGrid {
       throw new IndexOutOfBoundsException("Out of bounds: (" + row + ", " + col + ")");
     }
     cells[row][col] = state;
+  }
+
+  @Override
+  public Grid emptyCopy() {
+    return new ArrayGrid(getRows(), getCols(), neighborStrategy);
+  }
+
+  @Override
+  public Grid deepCopy() {
+    CellState[][] copy = new CellState[getRows()][getCols()];
+    for (int r = 0; r < getRows(); r++) {
+      System.arraycopy(cells[r], 0, copy[r], 0, getCols());
+    }
+    return new ArrayGrid(copy, neighborStrategy);
   }
 }
