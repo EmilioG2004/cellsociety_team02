@@ -1,10 +1,10 @@
 package cellsociety.controller;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.ReadOnlyGrid;
-import cellsociety.Model.Simulation;
-import cellsociety.Model.SimulationFactory;
-import cellsociety.Model.SimulationDriver;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationFactory;
+import cellsociety.Model.Simulation.SimulationDriver;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
@@ -149,6 +149,7 @@ public class WiringManager {
    */
   public void wireAll() {
     wireApplyChanges();
+    wireSplashLoad();
     wireSettings();
     wireForward();
     wireBackward();
@@ -269,6 +270,7 @@ public class WiringManager {
       SimulationConfig configSnapshot = new SimulationConfig(
           initialConfig.getSimulationType(),
           initialConfig.getRuleClass(),
+          initialConfig.getNeighborStrategyClass(),
           initialConfig.getTitle(),
           initialConfig.getAuthor(),
           initialConfig.getDescription(),
@@ -359,6 +361,13 @@ public class WiringManager {
       String themeChoice = mySimView.getMySettings().getMyThemes().getValue();
       mySimView.applyTheme(myScene, themeChoice);
 
+      mySimView.closeSettings();
+    });
+  }
+
+  private void wireSplashLoad() {
+    mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
+      handleUpload();
       mySimView.closeSettings();
     });
   }

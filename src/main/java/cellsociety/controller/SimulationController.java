@@ -1,7 +1,7 @@
 package cellsociety.controller;
 
-import cellsociety.Model.Simulation;
-import cellsociety.Model.SimulationDriver;
+import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationDriver;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
@@ -187,4 +187,3 @@ public class SimulationController {
   public boolean isMultiMode() {
     return myMultiMode;
   }
-}

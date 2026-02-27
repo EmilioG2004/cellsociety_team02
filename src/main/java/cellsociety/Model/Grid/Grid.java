@@ -1,16 +1,12 @@
-package cellsociety.Model;
+package cellsociety.Model.Grid;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.Utils.NeighborStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Collection;
 /**
- * Stores a rectangular arrangement of cells, applies neighbor logic using the strategy from
- * GameRule, and drives the two-pass update (compute next state for all, then commit).
- * Does not store a NeighborStrategy; obtains it from GameRule during updates.
+ * Stores a rectangular arrangement of cell states.
  */
 public class Grid implements MutableGrid {
 
@@ -21,7 +17,7 @@ public class Grid implements MutableGrid {
   private static final String ERROR_ROW_OUT_OF_BOUNDS = "Row %d out of bounds [0, %d)";
   private static final String ERROR_COL_OUT_OF_BOUNDS = "Column %d out of bounds [0, %d)";
 
-  private final Cell[][] cells;
+  private final CellState[][] cells;
   private final int rows;
   private final int cols;
 
@@ -31,7 +27,7 @@ public class Grid implements MutableGrid {
   public Grid(int rows, int cols) {
     this.rows = rows;
     this.cols = cols;
-    this.cells = new Cell[rows][cols];
+    this.cells = new CellState[rows][cols];
   }
 
   @Override
@@ -44,11 +40,7 @@ public class Grid implements MutableGrid {
     }
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        if (cells[r][c] != null) {
-          cells[r][c].setState(state[r][c]);
-        } else {
-          cells[r][c] = new Cell(state[r][c]);
-        }
+        cells[r][c] = state[r][c];
       }
     }
   }
@@ -78,11 +70,11 @@ public class Grid implements MutableGrid {
    */
   public CellState getCellState(int row, int col) {
     checkBounds(row, col);
-    Cell cell = cells[row][col];
-    if (cell == null) {
+    CellState state = cells[row][col];
+    if (state == null) {
       throw new IllegalStateException(String.format(ERROR_CELL_NOT_INITIALIZED, row, col));
     }
-    return cell.getState();
+    return state;
   }
 
   private void checkBounds(int row, int col) {
@@ -97,11 +89,7 @@ public class Grid implements MutableGrid {
   @Override
   public void setCellState(int row, int col, CellState state) {
     checkBounds(row, col);
-    if (cells[row][col] != null) {
-      cells[row][col].setState(state);
-    } else {
-      cells[row][col] = new Cell(state);
-    }
+    cells[row][col] = state;
   }
 
   @Override
@@ -112,7 +100,7 @@ public class Grid implements MutableGrid {
         if (cells[r][c] == null) {
           throw new IllegalStateException(ERROR_GRID_NOT_INITIALIZED);
         }
-        states[r][c] = cells[r][c].getState();
+        states[r][c] = cells[r][c];
       }
     }
     return states;

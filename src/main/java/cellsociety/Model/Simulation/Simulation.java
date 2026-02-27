@@ -1,8 +1,10 @@
-package cellsociety.Model;
+package cellsociety.Model.Simulation;
 
 import java.util.Stack;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.Grid.MutableGrid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
 
 /** Runs a single simulation: applies a GameRule to a grid and maintains step-back history. */
 public class Simulation {
@@ -38,7 +40,7 @@ public class Simulation {
         myStateStack.pop();
         myGrid.setCellsState(myStateStack.peek());
     }
- 
+
 
     /**
      * toggles the cell at (row, col) to the next state in this simulation's
@@ -57,18 +59,18 @@ public class Simulation {
         myStateStack.clear();
         myStateStack.push(state);
     }
-
-    public GameRule getRule() {
-        return myRule;
+    public int getRows()
+    {
+        return myGrid.getRows();
     }
-    /**
-     * Returns a read-only view of the grid so the view and other consumers
-     * can query dimensions and cell state without depending on grid implementation.
-     */
-    public ReadOnlyGrid getReadOnlyGrid() {
-        return myGrid;
+    public int getCols()
+    {
+        return myGrid.getCols();
     }
-
+    public int getState(int row, int column)
+    {
+        return myGrid.getStateInt(row, column);
+    }
     public int getGeneration() {
         return myStateStack.size() - 1;
     }

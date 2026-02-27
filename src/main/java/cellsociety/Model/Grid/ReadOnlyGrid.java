@@ -1,4 +1,4 @@
-package cellsociety.Model;
+package cellsociety.Model.Grid;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;

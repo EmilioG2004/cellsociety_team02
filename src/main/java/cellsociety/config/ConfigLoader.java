@@ -39,6 +39,7 @@ public class ConfigLoader {
     SimulationTypeAndClass simulationTypeAndClass= getSimulationType(xmlDocument);
     String simulationType = simulationTypeAndClass.simulationType;
     String ruleClass = simulationTypeAndClass.ruleClass;
+    String neighborStrategyClass = simulationTypeAndClass.neighborStrategyClass;
     Element metadata = getMetadata(xmlDocument);
     String title = getChildText(metadata, CONFIG_TITLE);
     String author = getChildText(metadata, CONFIG_AUTHOR);
@@ -55,6 +56,7 @@ public class ConfigLoader {
     return new SimulationConfig(
         simulationType,
         ruleClass,
+        neighborStrategyClass,
         title,
         author,
         description,
@@ -89,7 +91,8 @@ public class ConfigLoader {
       throw new IllegalArgumentException(
           "Simulation element must have both 'type' and 'class' attributes (e.g. type=\"GameOfLife\" class=\"cellsociety.Model.GameRules.ConwayGameOfLifeRule\")");
     }
-    return new SimulationTypeAndClass(typeAttr, classAttr);
+    String neighborStrategyAttr = simulation.getAttribute(CONFIG_NEIGHBOR_STRATEGY_ATTR).trim();
+    return new SimulationTypeAndClass(typeAttr, classAttr, neighborStrategyAttr.isEmpty() ? null : neighborStrategyAttr);
   }
 
   private Element getMetadata(Document xmlDocument) {
@@ -101,8 +104,8 @@ public class ConfigLoader {
     if (child == null) return "";
     return child.getTextContent().trim();
   }
-  /** Result of parsing the {@code <simulation>} element: display type and fully qualified rule class name. */
-  public record SimulationTypeAndClass(String simulationType, String ruleClass) {}
+  /** Result of parsing the {@code <simulation>} element: display type, fully qualified rule class name, and optional neighbor strategy class name. */
+  public record SimulationTypeAndClass(String simulationType, String ruleClass, String neighborStrategyClass) {}
   
 
   private HashMap<String, Double> getParameters(Document xmlDocument) {

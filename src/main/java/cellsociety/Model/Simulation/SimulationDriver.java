@@ -1,4 +1,4 @@
-package cellsociety.Model;
+package cellsociety.Model.Simulation;
 
 import cellsociety.Model.CellState.CellState;
 

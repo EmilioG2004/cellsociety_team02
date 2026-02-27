@@ -1,10 +1,11 @@
 package cellsociety.Model.GameRules;
-
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Utils.MooreNeighborStrategy;
+
 import java.util.Map;
 import java.util.List;
 import cellsociety.Model.CellState.PercolotionState;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 /** Percolation: OPEN cells become FULL when they have enough FULL neighbors (Moore). Optional param: threshold (default 1). */
 public class PercolationRule extends GameRule {
@@ -19,6 +20,11 @@ public class PercolationRule extends GameRule {
     public PercolationRule(Map<String, Double> parameters) {
         super(new MooreNeighborStrategy(), parameters);
     }
+
+    public PercolationRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+        super(strategy, parameters);
+    }
+
     @Override
     public CellState[][] getNextStates(CellState[][] currentStates) {
         int rows = currentStates.length;

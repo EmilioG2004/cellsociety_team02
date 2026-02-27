@@ -1,8 +1,9 @@
 package cellsociety.Model.GameRules;
-
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SpreadingOfFireState;
-import cellsociety.Model.Utils.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,15 @@ public class SpreadingOfFireRule extends GameRule {
 
   public SpreadingOfFireRule(Map<String, Double> parameters) {
     super(new CardinalNeighborStrategy(), parameters);
+    validateParameters(parameters);
+  }
+
+  public SpreadingOfFireRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(strategy, parameters);
+    validateParameters(parameters);
+  }
+
+  private static void validateParameters(Map<String, Double> parameters) {
     if (parameters.containsKey(PARAM_PROB_CATCH) && (parameters.get(PARAM_PROB_CATCH) < PROBABILITY_MIN || parameters.get(PARAM_PROB_CATCH) > PROBABILITY_MAX)) {
       throw new IllegalArgumentException("probCatch must be between 0 and 1");
     }
@@ -66,7 +76,6 @@ public class SpreadingOfFireRule extends GameRule {
     }
     return nextStates;
   }
-
   @Override
   public Map<CellState, String> getStateColors() {
     return stateColorsFor(

@@ -3,7 +3,9 @@ package cellsociety.Model;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.ReadOnlyGrid;
+import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Simulation.Simulation;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -33,8 +35,8 @@ class SimulationTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(initial);
     rules = new ConwayGameOfLifeRule();
+    grid.setCellsState(initial, rules);
     simulation = new Simulation(grid, rules);
   }
 
@@ -245,7 +247,7 @@ class SimulationTest {
         {DEAD, ALIVE, ALIVE, DEAD},
         {DEAD, DEAD, DEAD, DEAD}
     };
-    blockGrid.setCellsState(block);
+    blockGrid.setCellsState(block, rules);
     Simulation blockSim = new Simulation(blockGrid, rules);
     blockSim.step();
     CellState[][] result = blockGrid.getCellStates();
@@ -314,7 +316,7 @@ class SimulationTest {
   void step_1x1Grid_aliveCellDies() {
     Grid tinyGrid = new Grid(1, 1);
     CellState[][] single = {{ALIVE}};
-    tinyGrid.setCellsState(single);
+    tinyGrid.setCellsState(single, rules);
     Simulation tinySim = new Simulation(tinyGrid, rules);
     tinySim.step();
     assertEquals(DEAD, tinyGrid.getCellStates()[0][0], "Alone cell should die");
@@ -324,7 +326,7 @@ class SimulationTest {
   void step_1x2Grid_bothAlive_bothDie() {
     Grid thinGrid = new Grid(1, 2);
     CellState[][] twoAlive = {{ALIVE, ALIVE}};
-    thinGrid.setCellsState(twoAlive);
+    thinGrid.setCellsState(twoAlive, rules);
     Simulation thinSim = new Simulation(thinGrid, rules);
     thinSim.step();
     CellState[][] result = thinGrid.getCellStates();
@@ -336,7 +338,7 @@ class SimulationTest {
   void step_2x2Grid_blockStaysStable() {
     Grid smallGrid = new Grid(2, 2);
     CellState[][] block = {{ALIVE, ALIVE}, {ALIVE, ALIVE}};
-    smallGrid.setCellsState(block);
+    smallGrid.setCellsState(block, rules);
     Simulation smallSim = new Simulation(smallGrid, rules);
     smallSim.step();
     CellState[][] result = smallGrid.getCellStates();
@@ -430,7 +432,7 @@ class SimulationTest {
   void getReadOnlyGrid_returnsNonNullWithCorrectDimensions() {
     CellState[][] initial = {{DEAD, ALIVE}, {ALIVE, DEAD}};
     Grid g = new Grid(2, 2);
-    g.setCellsState(initial);
+    g.setCellsState(initial, rules);
     Simulation sim = new Simulation(g, rules);
     ReadOnlyGrid readOnlyGrid = sim.getReadOnlyGrid();
     assertNotNull(readOnlyGrid);

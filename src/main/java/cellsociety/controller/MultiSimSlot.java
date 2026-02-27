@@ -1,7 +1,7 @@
 package cellsociety.controller;
 
-import cellsociety.Model.Simulation;
-import cellsociety.Model.SimulationFactory;
+import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationFactory;
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.SimulationPanel;
 import javafx.scene.Node;

@@ -1,10 +1,9 @@
-package cellsociety.Model;
+package cellsociety.Model.Grid;
 
 import cellsociety.Model.CellState.CellState;
-
 /**
  * Mutable grid of cell states. Extends ReadOnlyGrid with methods to update state
- * and obtain a full snapshot. Implementations hide the internal data structure.
+ * and obtain a full snapshot.
  */
 public interface MutableGrid extends ReadOnlyGrid {
 
