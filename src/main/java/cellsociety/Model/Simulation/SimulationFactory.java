@@ -2,7 +2,7 @@ package cellsociety.Model.Simulation;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.MutableGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.config.SimulationConfig;
@@ -106,7 +106,7 @@ public class SimulationFactory {
   {
     int rows = config.getRows();
     int cols = config.getCols();
-    MutableGrid grid = new Grid(rows, cols);
+    MutableGrid grid = new ArrayGrid(rows, cols);
     int[][] intStates = config.getInitialStates();
     CellState[][] cellStates = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
