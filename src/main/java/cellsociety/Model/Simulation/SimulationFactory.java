@@ -3,7 +3,7 @@ package cellsociety.Model.Simulation;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ArrayGrid;
-import cellsociety.Model.Grid.MutableGrid;
+import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.config.SimulationConfig;
 import java.lang.reflect.Constructor;
@@ -51,18 +51,13 @@ public class SimulationFactory {
 
   /**
    * Instantiates a GameRule from its fully qualified class name using reflection.
-   * If {@code strategy} is non-null the rule's {@code (NeighborStrategy, Map)} constructor is used;
-   * otherwise the {@code (Map)} constructor is used and the rule falls back to its own default.
+   * The rule must have a public constructor (Map&lt;String, Double&gt;) or ().
    *
    * @param ruleClassName fully qualified name of a class that extends GameRule
    * @param params        parameters to pass to the rule constructor (may be empty)
-   * @param strategy      neighbor strategy to inject, or null to use the rule's hardcoded default
    * @return the constructed GameRule instance
-   * @throws IllegalArgumentException if the class cannot be loaded, has no suitable constructor,
-   *                                   construction fails, or the class does not extend GameRule
    */
-  private static GameRule createRuleFromClass(String ruleClassName, Map<String, Double> params,
-      NeighborStrategy strategy) {
+  private static GameRule createRuleFromClass(String ruleClassName, Map<String, Double> params) {
     if (ruleClassName == null || ruleClassName.isBlank()) {
       throw new IllegalArgumentException(ERROR_RULE_CLASS_BLANK);
     }
@@ -72,21 +67,18 @@ public class SimulationFactory {
       if (!GameRule.class.isAssignableFrom(clazz)) {
         throw new IllegalArgumentException("Rule class must extend GameRule: " + trimmed);
       }
-      if (strategy != null) {
-        Constructor<?> constructor = clazz.getConstructor(NeighborStrategy.class, Map.class);
-        return (GameRule) constructor.newInstance(strategy, params);
-      } else {
+      try {
         Constructor<?> constructor = clazz.getConstructor(Map.class);
         return (GameRule) constructor.newInstance(params);
+      } catch (NoSuchMethodException e) {
+        Constructor<?> noArg = clazz.getConstructor();
+        return (GameRule) noArg.newInstance();
       }
     } catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("Rule class not found: " + trimmed, e);
     } catch (NoSuchMethodException e) {
-      String expected = strategy != null
-          ? "(NeighborStrategy, Map<String, Double>)"
-          : "(Map<String, Double>)";
       throw new IllegalArgumentException(
-          "Rule class must have a public constructor " + expected + ": " + trimmed, e);
+          "Rule class must have a public constructor (Map<String, Double>) or (): " + trimmed, e);
     } catch (InvocationTargetException e) {
       Throwable cause = e.getCause();
       String msg = cause != null ? cause.getMessage() : e.getMessage();
@@ -95,27 +87,25 @@ public class SimulationFactory {
       throw new IllegalArgumentException("Failed to instantiate rule: " + e.getMessage(), e);
     }
   }
+
   /**
    * Builds a grid from config dimensions and initial states, using the rule to convert int states to cell states.
-   *
-   * @param config simulation config containing rows, cols, and initial state matrix
-   * @param rule   game rule used to convert integer codes to {@link CellState} via {@link GameRule#fromInt(int)}
-   * @return a mutable grid populated with the initial states
+   * Neighbor strategy comes from config if specified, otherwise from the rule's default.
    */
-  public static MutableGrid createGrid(SimulationConfig config, GameRule rule)
-  {
+  public static Grid createGrid(SimulationConfig config, GameRule rule) {
     int rows = config.getRows();
     int cols = config.getCols();
-    MutableGrid grid = new ArrayGrid(rows, cols);
+    NeighborStrategy strategy = (config.getNeighborStrategyClass() != null && !config.getNeighborStrategyClass().isBlank())
+        ? createNeighborStrategyFromClass(config.getNeighborStrategyClass())
+        : rule.getDefaultNeighborStrategy();
     int[][] intStates = config.getInitialStates();
-    CellState[][] cellStates = new CellState[rows][cols];
+    CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        cellStates[r][c] = rule.fromInt(intStates[r][c]);
+        states[r][c] = rule.fromInt(intStates[r][c]);
       }
     }
-    grid.setCellsState(cellStates);
-    return grid;
+    return new ArrayGrid(states, strategy);
   }
   /**
    * Creates a simulation from a configuration by loading the rule class via reflection and building the grid.
@@ -133,12 +123,8 @@ public class SimulationFactory {
       String ruleClassName = config.getRuleClass();
       Map<String, Double> params =
           config.getParameters() != null ? config.getParameters() : Map.of();
-      String neighborStrategyClass = config.getNeighborStrategyClass();
-      NeighborStrategy strategy = (neighborStrategyClass != null && !neighborStrategyClass.isBlank())
-          ? createNeighborStrategyFromClass(neighborStrategyClass)
-          : null;
-      GameRule rule = createRuleFromClass(ruleClassName, params, strategy);
-      MutableGrid grid = createGrid(config, rule);
+      GameRule rule = createRuleFromClass(ruleClassName, params);
+      Grid grid = createGrid(config, rule);
       return new Simulation(grid, rule);
     } catch (IllegalArgumentException e) {
       throw e;
