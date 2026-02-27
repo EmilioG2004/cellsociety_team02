@@ -1,91 +1,48 @@
 package cellsociety.Model.GameRules;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract base class for cellular automaton transition rules. Each simulation type (e.g.,
- * Game of Life, Fire, Percolation) extends this class and defines its own state-transition
- * logic and neighbor semantics.
+ * Abstract base for cellular automaton rules. All neighbor logic lives in the grid;
+ * the rule only takes the current grid and returns the next grid, plus parameters and cell-state factory.
  */
 public abstract class GameRule {
 
-  /** Index of row component in neighbor offset arrays. */
-  protected static final int OFFSET_ROW_INDEX = 0;
-  /** Index of column component in neighbor offset arrays. */
-  protected static final int OFFSET_COL_INDEX = 1;
-
-  /** Defines which offsets from a cell's position count as neighbors (e.g., Moore, Von Neumann). */
-  protected final NeighborStrategy neighborStrategy;
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
   protected Map<String, Double> parameters;
 
-  public GameRule(NeighborStrategy neighborStrategy) {
-    this(neighborStrategy, Map.of());
+  public GameRule(Map<String, Double> parameters) {
+    this.parameters = parameters != null ? parameters : Map.of();
   }
 
-  public GameRule(NeighborStrategy neighborStrategy, Map<String, Double> parameters) {
-    this.neighborStrategy = neighborStrategy;
-    this.parameters = parameters;
-  }
+  /**
+   * Advances the simulation one step. Uses only the grid API (e.g. getCellState, getNeighbors);
+   * neighbor semantics are entirely defined by the grid.
+   */
+  public abstract Grid getNextGrid(Grid currentGrid);
 
-  public abstract CellState[][] getNextStates(CellState[][] currentStates);
-  public NeighborStrategy getNeighborStrategy() {
-    return neighborStrategy;
-  }
+  /**
+   * Default neighbor strategy for this rule type. Used by the factory when building the grid
+   * if config does not specify a strategy. Rules do not use this for transition logic.
+   */
+  public abstract NeighborStrategy getDefaultNeighborStrategy();
+
   public void setParameters(Map<String, Double> parameters) {
-    this.parameters = parameters;
+    this.parameters = parameters != null ? parameters : Map.of();
   }
+
   public void setParameter(String key, Double value) {
     parameters.put(key, value);
   }
+
   public Map<String, Double> getParameters() {
     return parameters;
   }
-  public abstract Map<CellState, String> getStateColors();
 
-  protected static Map<CellState, String> stateColorsFor(CellState... states) {
-    Map<CellState, String> m = new HashMap<>();
-    for (CellState s : states) {
-      m.put(s, s.getColor());
-    }
-    return Map.copyOf(m);
-  }
+  /** Creates a cell state from a config integer code. */
   public abstract CellState fromInt(int value);
-
-  public abstract int fromState(CellState state);
-
-  /** Returns in-bounds neighbor states at (row, col) using this rule's neighbor strategy. */
-  protected List<CellState> getNeighbors(CellState[][] currentStates, int row, int col) {
-    List<CellState> neighbors = new ArrayList<CellState>();
-    for (int[] offset : neighborStrategy.getNeighborOffsets()) {
-      int nr = row + offset[OFFSET_ROW_INDEX];
-      int nc = col + offset[OFFSET_COL_INDEX];
-      if (nr >= 0 && nr < currentStates.length && nc >= 0 && nc < currentStates[0].length) {
-        neighbors.add(currentStates[nr][nc]);
-      }
-    }
-    return neighbors;
-  }
-  /** Returns neighbor positions of (r, c) according to this rule's neighbor strategy. */
-  protected List<int[]> getNeighborPositions(int rows, int cols, int r, int c) {
-    return neighborStrategy.getNeighborPositions(rows, cols, r, c);
-  }
-
-  /** Counts neighbors that equal targetState. */
-  protected static int countNeighborsWithState(List<CellState> neighbors, CellState targetState) {
-    int count = 0;
-    for (CellState cell : neighbors) {
-      if (cell == targetState) {
-        count++;
-      }
-    }
-    return count;
-  }
-  public abstract CellState getNextStateInCycle(CellState current);
 }
