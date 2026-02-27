@@ -5,7 +5,7 @@ import java.util.Stack;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.Grid;
-import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Grid.GridViewData;
 
 /** Runs a single simulation: applies a GameRule to a grid and maintains step-back history. */
 public class Simulation {
@@ -67,7 +67,7 @@ public class Simulation {
     return myStateStack.size() - 1;
   }
 
-  public ReadOnlyGrid getReadOnlyGrid() {
+  public GridViewData getGridViewData() {
     return myGrid;
   }
 
