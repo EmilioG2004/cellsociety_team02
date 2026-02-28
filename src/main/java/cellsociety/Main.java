@@ -48,7 +48,7 @@ public class Main extends Application {
     private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
         SimulationView view = new SimulationView(bundle, showSplash);
         Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
-        SimulationController controller = new SimulationController(view, scene);
+        SimulationController controller = new SimulationController(view, scene, bundle);
 
         stage.setScene(scene);
         view.applyTheme(scene, "Light");

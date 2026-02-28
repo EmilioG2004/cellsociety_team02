@@ -132,7 +132,7 @@ public class MultiSimSlot {
    * <p>Return value: none.</p>
    */
   public void reset() {
-    if (myConfig == null) return;
+    if (myConfig == null) throw new IllegalArgumentException("No configuration set.");
     Simulation sim = SimulationFactory.createSimulation(myConfig);
     setSimulation(sim);
   }

@@ -4,7 +4,6 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationFactory;
-import cellsociety.Model.SimulationDriver;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
@@ -13,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  * <p>Assumptions: all UI controls in {@link SimulationView} are non-null and already
  * constructed; configuration loaders/savers are available.</p>
  *
- * <p>Dependencies: {@link SimulationView}, {@link SimulationDriver},
+ * <p>Dependencies: {@link SimulationView}
  * {@link ConfigLoader}, {@link ConfigSaver}, and {@link Scene} for theme changes.</p>
  *
  * <p>Example usage:</p>
@@ -43,97 +43,23 @@ import org.xml.sax.SAXException;
 public class WiringManager {
 
   private final SimulationView mySimView;
-  private final SimulationDriver myDriver;
-  private final ConfigLoader myConfigLoader;
-  private final ConfigSaver myConfigSaver;
   private final Scene myScene;
-
-  private final java.util.function.Consumer<Simulation> setSimulation;
-  private final java.util.function.Consumer<SimulationConfig> setInitialConfig;
-
-  private final java.util.function.Supplier<SimulationConfig> getInitialConfig;
-  private final Runnable myOpenMulti;
-  private final Supplier<Boolean> isMultiMode;
-  private final Runnable startAllLoaded;
-  private final Runnable pauseAll;
-  private final Runnable stepAllLoaded;
-  private final Runnable stepBackAllLoaded;
-  private final Runnable resetAllLoaded;
-  private final Runnable toggleOutlineAll;
-  private final Runnable speedUpAll;
-  private final Runnable slowDownAll;
-  private final Supplier<Boolean> toggleDirectionAll;
 
   /**
    * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
    *
    * <p>Purpose: injects the dependencies and callbacks needed to attach event handlers.</p>
    *
-   * <p>Assumptions: all callbacks are non-null.</p>
-   *
    * <p>Exceptions: none.</p>
    *
    * <p>Return value: none.</p>
    *
    * @param simView view whose controls will be wired
-   * @param driver simulation driver for single-sim mode
-   * @param loader configuration loader
-   * @param saver configuration saver
    * @param scene scene used for applying themes
-   * @param setSimulationCallback installs a simulation into the main driver
-   * @param setInitialConfigCallback stores the initial config for resets/saves
-   * @param getInitialConfigSupplier provides the initial config snapshot
-   * @param multiSimCallback opens the multi-sim dashboard
-   * @param isMultiModeSupplier indicates whether multi-sim mode is active
-   * @param startAllLoadedCallback starts all loaded multi-sim slots
-   * @param pauseAllCallback pauses all multi-sim slots
-   * @param stepAllLoadedCallback steps all loaded multi-sim slots forward
-   * @param stepBackAllLoadedCallback steps all loaded multi-sim slots backward
-   * @param resetAllLoadedCallback resets all loaded multi-sim slots to initial configs
-   * @param toggleOutlineAllCallback toggles outlines for all loaded slots
-   * @param speedUpAllCallback speeds up all loaded slots
-   * @param slowDownAllCallback slows down all loaded slots
-   * @param toggleDirectionAllCallback toggles stepping direction for all loaded slots
    */
-  public WiringManager(SimulationView simView,
-      SimulationDriver driver,
-      ConfigLoader loader,
-      ConfigSaver saver,
-      Scene scene,
-      Consumer<Simulation> setSimulationCallback,
-      Consumer<SimulationConfig> setInitialConfigCallback,
-      Supplier<SimulationConfig> getInitialConfigSupplier,
-      Runnable multiSimCallback,
-      Supplier<Boolean> isMultiModeSupplier,
-      Runnable startAllLoadedCallback,
-      Runnable pauseAllCallback,
-      Runnable stepAllLoadedCallback,
-      Runnable stepBackAllLoadedCallback,
-      Runnable resetAllLoadedCallback,
-      Runnable toggleOutlineAllCallback,
-      Runnable speedUpAllCallback,
-      Runnable slowDownAllCallback,
-      Supplier<Boolean> toggleDirectionAllCallback) {
+  public WiringManager(SimulationView simView, Scene scene) {
     mySimView = simView;
-    myDriver = driver;
-    myConfigLoader = loader;
-    myConfigSaver = saver;
     myScene = scene;
-
-    setSimulation = setSimulationCallback;
-    setInitialConfig = setInitialConfigCallback;
-    getInitialConfig = getInitialConfigSupplier;
-    myOpenMulti = multiSimCallback;
-    isMultiMode = isMultiModeSupplier;
-    startAllLoaded = startAllLoadedCallback;
-    pauseAll = pauseAllCallback;
-    stepAllLoaded = stepAllLoadedCallback;
-    stepBackAllLoaded = stepBackAllLoadedCallback;
-    resetAllLoaded = resetAllLoadedCallback;
-    toggleOutlineAll = toggleOutlineAllCallback;
-    speedUpAll = speedUpAllCallback;
-    slowDownAll = slowDownAllCallback;
-    toggleDirectionAll = toggleDirectionAllCallback;
   }
 
   /**
@@ -147,114 +73,113 @@ public class WiringManager {
    *
    * <p>Return value: none.</p>
    */
-  public void wireAll() {
+  public void wireAll(List<MultiSimSlot> mySlots) {
     wireApplyChanges();
     wireSettings();
-    wireForward();
-    wireBackward();
-    wireChangeDirection();
-    wireStart();
-    wirePause();
-    wireSave();
-    wireUpload();
-    wireSpeedUp();
-    wireSlowDown();
-    wireReset();
-    wireAbout();
-    wireToggleOutline();
+    wireForward(mySlots);
+    wireBackward(mySlots);
+    wireChangeDirection(mySlots);
+    wireStart(mySlots);
+    wirePause(mySlots);
+    wireSpeedUp(mySlots);
+    wireSlowDown(mySlots);
+    wireReset(mySlots);
+    wireToggleOutline(mySlots);
     wireRotate();
-    wireMultiSim();
   }
 
-  private void wireForward() {
+  private void wireForward(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getForwardButton().setOnAction(e -> {
-      if (isMultiMode.get()) {
-        stepAllLoaded.run();
-        return;
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.step();
+        }
       }
-      if (myDriver.isRunning()) myDriver.pause();
-      myDriver.step();
-      if (myDriver.hasSimulation()) updateGenerationLabel();
     });
   }
 
-  private void wireBackward() {
+  private void wireBackward(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getBackButton().setOnAction(e -> {
-      if (isMultiMode.get()) {
-        stepBackAllLoaded.run();
-        return;
-      }
-      if (myDriver.isRunning()) myDriver.pause();
-      myDriver.stepBack();
-      if (myDriver.hasSimulation()) updateGenerationLabel();
-    });
-  }
-
-  private void wireChangeDirection() {
-    mySimView.getMyButtons().getChangeDirectionButton().setOnAction(e -> {
-      boolean forward;
-      if (isMultiMode.get()) {
-        forward = toggleDirectionAll.get();
-      } else {
-        myDriver.setDirection(!myDriver.isForwardDirection());
-        forward = myDriver.isForwardDirection();
-      }
-      if (forward) {
-        mySimView.getMyButtons().getChangeDirectionButton()
-            .setText(mySimView.getMyBundle().getString("button.direction.forward"));
-      } else {
-        mySimView.getMyButtons().getChangeDirectionButton()
-            .setText(mySimView.getMyBundle().getString("button.direction.backward"));
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.stepBack();
+        }
       }
     });
   }
 
-  private void wireStart() {
+  private void wireChangeDirection(List<MultiSimSlot> mySlots) {
+    var buttons = mySimView.getMyButtons();
+    var dirButton = buttons.getChangeDirectionButton();
+    var bundle = mySimView.getMyBundle();
+
+    dirButton.setOnAction(e -> {
+      Boolean forward = null;
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          forward = slot.isForwardDirection();
+          break;
+        }
+      }
+
+      boolean newDirection = (forward == null) ? true : !forward;
+
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.setDirection(newDirection);
+        }
+      }
+
+      dirButton.setText(bundle.getString(
+          newDirection ? "button.direction.forward" : "button.direction.backward"
+      ));
+    });
+  }
+
+  private void wireStart(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getStartButton().setOnAction(e -> {
-      if (isMultiMode.get()) {
-        startAllLoaded.run();
-        return;
-      }
-      myDriver.start();
-    });
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.start();
+        }
+      }    });
   }
 
-  private void wirePause() {
+  private void wirePause(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getPauseButton().setOnAction(e -> {
-      if (isMultiMode.get()) {
-        pauseAll.run();
-        return;
+      for (MultiSimSlot slot : mySlots) {
+        slot.pause();
       }
-      myDriver.pause();
     });
   }
 
-  private void wireSpeedUp() {
+  private void wireSpeedUp(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
       if (mySimView.getMySpeedMultiplier() >= 4) return;
-      if (isMultiMode.get()) {
-        speedUpAll.run();
-      } else {
-        myDriver.setSpeed(myDriver.getStepsPerSecond() * 2);
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.setSpeed(slot.getStepsPerSecond() * 2.0);
+        }
       }
       mySimView.doubleMySpeed();
       mySimView.updateSpeedLabel();
     });
   }
 
-  private void wireSlowDown() {
+  private void wireSlowDown(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getSlowDownButton().setOnAction(e -> {
       if (mySimView.getMySpeedMultiplier() <= 0.25) return;
-      if (isMultiMode.get()) {
-        slowDownAll.run();
-      } else {
-        myDriver.setSpeed(myDriver.getStepsPerSecond() / 2.0);
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.setSpeed(slot.getStepsPerSecond() / 2.0);
+        }
       }
       mySimView.halveMySpeed();
       mySimView.updateSpeedLabel();
     });
   }
 
+  /**
   private void wireSave() {
     mySimView.getMyButtons().getSaveButton().setOnAction(e -> {
       SimulationConfig initialConfig = getInitialConfig.get();
@@ -284,46 +209,19 @@ public class WiringManager {
       }
     });
   }
+   */
 
-  private void wireUpload() {
-    mySimView.getMyButtons().getUploadButton().setOnAction(e -> handleUpload());
-  }
-
-  private void handleUpload() {
-    File myFile = mySimView.showOpenConfigDialog();
-    if (myFile == null) return;
-
-    try {
-      SimulationConfig config = myConfigLoader.loadConfig(myFile);
-      setInitialConfig.accept(config);
-
-      Simulation sim = SimulationFactory.createSimulation(config);
-      ReadOnlyGrid grid = sim.getReadOnlyGrid();
-
-      mySimView.setGrid(grid.getRows(), grid.getCols());
-      setSimulation.accept(sim);
-
-      updateGenerationLabel();
-    } catch (ParserConfigurationException | SAXException | IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  private void wireReset() {
+  private void wireReset(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getResetButton().setOnAction(e -> {
-      if (isMultiMode.get()) {
-        resetAllLoaded.run();
-        return;
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.reset();
+        }
       }
-      SimulationConfig initialConfig = getInitialConfig.get();
-      if (initialConfig == null) return;
-
-      Simulation sim = SimulationFactory.createSimulation(initialConfig);
-      setSimulation.accept(sim);
-      updateGenerationLabel();
     });
   }
 
+  /**
   private void wireAbout() {
     mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
         mySimView.getMyAboutDialog().closeInfo()
@@ -337,16 +235,15 @@ public class WiringManager {
       mySimView.showAboutSplash(initialConfig);
     });
   }
+   */
 
-  private void wireToggleOutline() {
+  private void wireToggleOutline(List<MultiSimSlot> mySlots) {
     mySimView.getMyButtons().getToggleOutlineButton().setOnAction(e -> {
-      if (isMultiMode.get()) {
-        toggleOutlineAll.run();
-        return;
+      for (MultiSimSlot slot : mySlots) {
+        if (slot.hasSimulation()) {
+          slot.toggleOutline();
+        }
       }
-      if (!myDriver.hasSimulation()) return;
-      Simulation sim = myDriver.getSimulation();
-      mySimView.getMyGridView().toggleOutline(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
     });
   }
 
@@ -372,19 +269,6 @@ public class WiringManager {
     mySimView.getMyButtons().getRotateRightButton().setOnAction(e -> mySimView.getMyGridView().rotateRight());
   }
 
-  private void wireMultiSim() {
-    mySimView.getMyButtons().getMyMultiSimButton().setOnAction(e -> myOpenMulti.run());
-  }
-
-  private void updateGenerationLabel() {
-    Simulation sim = myDriver.getSimulation();
-    if (sim == null) return;
-
-    int generation = sim.getGeneration();
-    mySimView.getMyButtons().getStateStackSizeLabel()
-        .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
-  }
-
   private ResourceBundle loadLanguageBundle(String choice) {
     return switch (choice) {
       case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
@@ -392,6 +276,4 @@ public class WiringManager {
       default -> ResourceBundle.getBundle("cellsociety.Languages.English");
     };
   }
-
-
 }
