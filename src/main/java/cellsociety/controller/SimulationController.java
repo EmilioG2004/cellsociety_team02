@@ -118,6 +118,7 @@ public class SimulationController {
       SimulationPanel panel = new SimulationPanel(myBundle);
       int slotIndex = index;
       panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
+      panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
       SimulationPresenter presenter = new SimulationPresenter(panel);
       MultiSimSlot slot = new MultiSimSlot(index, panel, presenter);
       mySlots.add(slot);
@@ -163,6 +164,15 @@ public class SimulationController {
     } catch (ParserConfigurationException | SAXException | IOException ex) {
       throw new RuntimeException(ex);
     }
+  }
+
+  private void handleAboutForSlot(int slotIndex) {
+    checkIndex(slotIndex);
+    MultiSimSlot slot = mySlots.get(slotIndex);
+    if (!slot.hasSimulation()) {
+      throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+    }
+    mySimView.showAboutSplash(slot.getConfig());
   }
 
   private void rebuildTileChildren() {

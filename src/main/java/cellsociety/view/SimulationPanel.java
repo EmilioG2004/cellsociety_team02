@@ -35,8 +35,8 @@ import javafx.scene.layout.VBox;
  * panel.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
  * }</pre>
  *
- * <p>Other details: this panel exposes controls for loading and rotating the grid.
- * The controller supplies the load behavior via {@link #setOnLoad(Runnable)}.</p>
+ * <p>Other details: this panel exposes controls for loading, viewing metadata, and rotating
+ * the grid. The controller supplies behavior via callbacks.</p>
  *
  * @author Emilio Garcia
  */
@@ -88,7 +88,7 @@ public class SimulationPanel implements SimulationRenderer {
     myLoadButton = new Button(myBundle.getString("button.loadsim"));
     myRotateLeftButton = new Button(myBundle.getString("button.rotateLeft"));
     myRotateRightButton = new Button(myBundle.getString("button.rotateRight"));
-    myAboutButton = new Button(myBundle.getString("about.title"));
+    myAboutButton = new Button(myBundle.getString("button.aboutConfig"));
     myRotateLeftButton.setOnAction(e -> rotateLeft());
     myRotateRightButton.setOnAction(e -> rotateRight());
 
@@ -96,11 +96,15 @@ public class SimulationPanel implements SimulationRenderer {
     myGridContainer.setPadding(new Insets(8));
     myGridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-    HBox header = new HBox(8, myGenerationLabel, myLoadButton, myRotateLeftButton, myRotateRightButton);
+    HBox header = new HBox(8, myGenerationLabel, myLoadButton, myAboutButton);
     header.setAlignment(Pos.CENTER);
     HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
 
-    myRoot.getChildren().addAll(header, myGridContainer);
+    HBox lower = new HBox(8, myRotateLeftButton, myRotateRightButton);
+    lower.setAlignment(Pos.BASELINE_RIGHT);
+
+
+    myRoot.getChildren().addAll(header, myGridContainer, lower);
     VBox.setVgrow(myGridContainer, Priority.ALWAYS);
   }
 
@@ -119,7 +123,7 @@ public class SimulationPanel implements SimulationRenderer {
     Node gridNode = myGridView.getNode();
     myGridContainer.getChildren().setAll(gridNode);
 
-    myGridView.bindToContainer((Region) myGridContainer);
+    myGridView.bindToContainer(myGridContainer);
   }
 
   /**
@@ -185,6 +189,15 @@ public class SimulationPanel implements SimulationRenderer {
   }
 
   /**
+   * Registers the callback for the panel's "About" button.
+   *
+   * @param action callback executed when the about button is pressed
+   */
+  public void setOnAbout(Runnable action) {
+    myAboutButton.setOnAction(e -> action.run());
+  }
+
+  /**
    * Toggles outline visibility for this panel's grid.
    *
    * <p>Purpose: mirror the global outline toggle in multi-sim mode.</p>
@@ -225,6 +238,7 @@ public class SimulationPanel implements SimulationRenderer {
     myGenerationLabel.setText(MessageFormat.format(
         myBundle.getString("label.generation"), myGeneration));
     myLoadButton.setText(myBundle.getString("button.loadsim"));
+    myAboutButton.setText(myBundle.getString("button.aboutConfig"));
     myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
     myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
   }

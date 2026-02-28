@@ -48,7 +48,6 @@ public class ButtonManager {
   private final Button mySaveButton = new Button();
   private final Button myResetButton = new Button();
   private final Button myChangeDirectionButton = new Button();
-  private final Button myAboutButton = new Button();
   private final Button myToggleOutlineButton = new Button();
   private final Button mySettingsButton = new Button();
   private final Button myRotateLeftButton = new Button();
@@ -101,7 +100,6 @@ public class ButtonManager {
     mySlowDownButton.setText(myBundle.getString("button.slowDown"));
     mySaveButton.setText(myBundle.getString("button.saveState"));
     myResetButton.setText(myBundle.getString("button.resetGrid"));
-    myAboutButton.setText(myBundle.getString("button.aboutConfig"));
     myToggleOutlineButton.setText(myBundle.getString("button.toggleOutlines"));
     mySettingsButton.setText(myBundle.getString("button.settings"));
     myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
@@ -143,7 +141,7 @@ public class ButtonManager {
    * @return ordered list of upload-row buttons
    */
   public List<Button> getUploadRowButtons() {
-    return List.of(mySaveButton, myAboutButton, mySettingsButton);
+    return List.of(mySaveButton, mySettingsButton);
   }
 
   /**
@@ -308,16 +306,6 @@ public class ButtonManager {
    */
   public Button getChangeDirectionButton() { return myChangeDirectionButton; }
   /**
-   * Returns the about button.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return button that opens the about dialog
-   */
-  public Button getAboutButton() { return myAboutButton; }
-  /**
    * Returns the outline toggle button.
    *
    * <p>Assumptions: none.</p>
@@ -357,14 +345,4 @@ public class ButtonManager {
    * @return button that rotates grid right
    */
   public Button getRotateRightButton() { return myRotateRightButton; }
-  /**
-   * Returns the multi-simulation dashboard button.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return button that opens multi-sim mode
-   */
-  public Button getMyMultiSimButton() { return myMultiSimButton; }
 }

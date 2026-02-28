@@ -123,6 +123,18 @@ public class MultiSimSlot {
   }
 
   /**
+   * Returns this slot's stored configuration.
+   *
+   * @return configuration snapshot used to build the current simulation
+   */
+  public SimulationConfig getConfig() {
+    if (myConfig == null) {
+      throw new IllegalStateException("No configuration set for slot " + myIndex);
+    }
+    return myConfig;
+  }
+
+  /**
    * Resets this slot to its stored initial configuration.
    *
    * <p>Assumptions: {@link #setConfig(SimulationConfig)} has been called.</p>

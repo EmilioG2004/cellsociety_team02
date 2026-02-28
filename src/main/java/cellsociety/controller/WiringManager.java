@@ -76,6 +76,7 @@ public class WiringManager {
    * <p>Return value: none.</p>
    */
   public void wireAll(List<MultiSimSlot> mySlots) {
+    wireAboutDialogClose();
     wireApplyChanges(mySlots);
     wireSettings();
     wireForward(mySlots);
@@ -88,6 +89,12 @@ public class WiringManager {
     wireReset(mySlots);
     wireToggleOutline(mySlots);
     wireRotate();
+  }
+
+  private void wireAboutDialogClose() {
+    mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
+        mySimView.getMyAboutDialog().closeInfo()
+    );
   }
 
   private void wireForward(List<MultiSimSlot> mySlots) {
