@@ -1,6 +1,8 @@
 package cellsociety.view;
 
 import cellsociety.config.SimulationConfig;
+import cellsociety.controller.MultiSimSlot;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -53,7 +55,7 @@ public class SimulationView {
   private static final String DUKE_CSS =
       SimulationView.class.getResource("/cellsociety/stylesheets/duke.css").toExternalForm();
 
-  private final ResourceBundle myBundle;
+  private ResourceBundle myBundle;
   private final ButtonManager myButtons;
 
   private final StackPane myRoot = new StackPane();
@@ -73,23 +75,7 @@ public class SimulationView {
   private TilePane myTile;
   private ScrollPane myScroll;
   private ChoiceBox<Integer> mySlotChoice;
-
-  /**
-   * Creates a SimulationView without showing the settings splash.
-   *
-   * <p>Purpose: convenience constructor for the typical application startup path.</p>
-   *
-   * <p>Assumptions: {@code bundle} contains all required keys.</p>
-   *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
-   *
-   * <p>Return value: none.</p>
-   *
-   * @param bundle localization bundle for UI strings
-   */
-  public SimulationView(ResourceBundle bundle){
-    this(bundle, false);
-  }
+  private Label mySlotLabel;
 
   /**
    * Creates a SimulationView with optional initial settings splash.
@@ -103,9 +89,8 @@ public class SimulationView {
    * <p>Return value: none.</p>
    *
    * @param bundle localization bundle for UI strings
-   * @param showSplash true to display the settings splash immediately
    */
-  public SimulationView(ResourceBundle bundle, boolean showSplash){
+  public SimulationView(ResourceBundle bundle){
     myBundle = bundle;
     myButtons = new ButtonManager(myBundle);
     myRoot.getStyleClass().add("app-root");
@@ -117,11 +102,7 @@ public class SimulationView {
     myMain.setPadding(new Insets(12));
     myRoot.getChildren().addAll(myMain, mySettings);
     bindSplashToWindow();
-    if (showSplash){
-      openSettings();
-    } else {
-      closeSettings();
-    }
+    openSettings();
   }
 
   private void bindSplashToWindow() {
@@ -209,8 +190,8 @@ public class SimulationView {
 
     mySlotChoice = new ChoiceBox<>();
 
-    Label slotLabel = new Label(myBundle.getString("label.slots"));
-    HBox header = new HBox(8, slotLabel, mySlotChoice);
+    mySlotLabel = new Label(myBundle.getString("label.slots"));
+    HBox header = new HBox(8, mySlotLabel, mySlotChoice);
     header.setPadding(new Insets(4, 6, 8, 6));
 
     myMultiRoot = new VBox(8, header, myScroll);
@@ -434,10 +415,14 @@ public class SimulationView {
    * @param bundle localization bundle for UI strings
    */
   public void applyLanguage(ResourceBundle bundle) {
-    updateSpeedLabel();
+    myBundle = bundle;
     myButtons.applyLanguage(bundle);
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
+    updateSpeedLabel();
+    if (mySlotLabel != null) {
+      mySlotLabel.setText(bundle.getString("label.slots"));
+    }
   }
 
   /**

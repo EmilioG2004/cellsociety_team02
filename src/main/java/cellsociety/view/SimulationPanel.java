@@ -44,7 +44,8 @@ public class SimulationPanel implements SimulationRenderer {
 
   private static final double SPACING = 8;
 
-  private final ResourceBundle myBundle;
+  private ResourceBundle myBundle;
+  private int myGeneration;
 
   private final VBox myRoot;
   private final Label myGenerationLabel;
@@ -76,7 +77,8 @@ public class SimulationPanel implements SimulationRenderer {
     myRoot.setAlignment(Pos.CENTER);
     myRoot.setFillWidth(true);
 
-    myGenerationLabel = new Label();
+    myGeneration = 0;
+    myGenerationLabel = new Label(myBundle.getString("label.generation.unset"));
     myGenerationLabel.setMaxWidth(Double.MAX_VALUE);
     myGenerationLabel.setAlignment(Pos.CENTER);
 
@@ -138,6 +140,7 @@ public class SimulationPanel implements SimulationRenderer {
    */
   @Override
   public void setGeneration(int generation) {
+    myGeneration = generation;
     myGenerationLabel.setText(MessageFormat.format(
         myBundle.getString("label.generation"), generation));
   }
@@ -191,5 +194,12 @@ public class SimulationPanel implements SimulationRenderer {
   public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
     if (myGridView == null) return;
     myGridView.toggleOutline(grid, stateColors);
+  }
+
+  public void applyLanguage(ResourceBundle bundle){
+    myBundle = bundle;
+    myGenerationLabel.setText(MessageFormat.format(
+        myBundle.getString("label.generation"), myGeneration));
+    myLoadButton.setText(myBundle.getString("button.loadsim"));
   }
 }

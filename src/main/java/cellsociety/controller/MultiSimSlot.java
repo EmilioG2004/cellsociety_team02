@@ -274,4 +274,6 @@ public class MultiSimSlot {
   public double getStepsPerSecond() {
     return myPresenter.getDriver().getStepsPerSecond();
   }
+
+  public SimulationPanel getMyPanel() { return myPanel; }
 }

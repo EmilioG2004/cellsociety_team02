@@ -143,7 +143,7 @@ public class ButtonManager {
    * @return ordered list of upload-row buttons
    */
   public List<Button> getUploadRowButtons() {
-    return List.of(myUploadButton, myMultiSimButton, mySaveButton, myAboutButton, mySettingsButton);
+    return List.of(mySaveButton, myAboutButton, mySettingsButton);
   }
 
   /**
@@ -168,8 +168,7 @@ public class ButtonManager {
         myBackButton,
         myChangeDirectionButton,
         myToggleOutlineButton,
-        mySpeedLabel,
-        myStateStackSizeLabel
+        mySpeedLabel
     );
   }
 

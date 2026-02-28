@@ -39,12 +39,12 @@ public class Main extends Application {
     @Override
     public void start (Stage primaryStage) {
         ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.Languages.English");
-        buildGUI(primaryStage, bundle, true);
+        buildGUI(primaryStage, bundle);
     }
 
     //TO-DO REFACTOR: leave view creation, remove scene creation, in controller when creating controller then create scene
-    private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
-        SimulationView view = new SimulationView(bundle, showSplash);
+    private void buildGUI(Stage stage, ResourceBundle bundle){
+        SimulationView view = new SimulationView(bundle);
         Scene scene = new Scene(view.getRoot());
         SimulationController controller = new SimulationController(view, scene, bundle);
 

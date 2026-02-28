@@ -48,7 +48,7 @@ public class SimulationController {
   private static final int DEFAULT_SLOTS = 1;
   private static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
 
-  private final ResourceBundle myBundle;
+  private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
 
   private final List<MultiSimSlot> mySlots;
@@ -77,7 +77,7 @@ public class SimulationController {
     mySlots = new ArrayList<>();
     mySimView = simView;
     myScene = scene;
-    myWires = new WiringManager(mySimView, myScene);
+    myWires = new WiringManager(mySimView, myScene, this::setMyBundle);
 
     myTile = mySimView.getMultiSimTile();
     mySlotChoice = mySimView.getMultiSimSlotChoice();
@@ -106,7 +106,7 @@ public class SimulationController {
    * @param desired requested number of slots
    */
   public void setSlotCount(int desired) {
-    int count = MAX_SLOTS;
+    int count = clamp(desired, 1, MAX_SLOTS);
 
     while (mySlots.size() > count) {
       MultiSimSlot removed = mySlots.remove(mySlots.size() - 1);
@@ -177,4 +177,10 @@ public class SimulationController {
       throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
     }
   }
+
+  private int clamp(int value, int min, int max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  public void setMyBundle(ResourceBundle bundle){ myBundle = bundle; }
 }

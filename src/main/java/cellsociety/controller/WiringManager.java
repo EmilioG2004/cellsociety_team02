@@ -44,6 +44,7 @@ public class WiringManager {
 
   private final SimulationView mySimView;
   private final Scene myScene;
+  private final Consumer<ResourceBundle> myBundleCallback;
 
   /**
    * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
@@ -57,9 +58,10 @@ public class WiringManager {
    * @param simView view whose controls will be wired
    * @param scene scene used for applying themes
    */
-  public WiringManager(SimulationView simView, Scene scene) {
+  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback) {
     mySimView = simView;
     myScene = scene;
+    myBundleCallback = bundleCallback;
   }
 
   /**
@@ -74,7 +76,7 @@ public class WiringManager {
    * <p>Return value: none.</p>
    */
   public void wireAll(List<MultiSimSlot> mySlots) {
-    wireApplyChanges();
+    wireApplyChanges(mySlots);
     wireSettings();
     wireForward(mySlots);
     wireBackward(mySlots);
@@ -247,11 +249,15 @@ public class WiringManager {
     });
   }
 
-  private void wireApplyChanges() {
+  private void wireApplyChanges(List<MultiSimSlot> mySlots) {
     mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
       String choice = mySimView.getMySettings().getMyLanguages().getValue();
       ResourceBundle chosenBundle = loadLanguageBundle(choice);
       mySimView.applyLanguage(chosenBundle);
+      for (MultiSimSlot slot: mySlots){
+        slot.getMyPanel().applyLanguage(chosenBundle);
+      }
+      myBundleCallback.accept(chosenBundle);
 
       String themeChoice = mySimView.getMySettings().getMyThemes().getValue();
       mySimView.applyTheme(myScene, themeChoice);
