@@ -35,8 +35,8 @@ import javafx.scene.layout.VBox;
  * panel.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
  * }</pre>
  *
- * <p>Other details: this panel exposes a "Load" button but does not decide what
- * to load; the controller supplies the handler via {@link #setOnLoad(Runnable)}.</p>
+ * <p>Other details: this panel exposes controls for loading and rotating the grid.
+ * The controller supplies the load behavior via {@link #setOnLoad(Runnable)}.</p>
  *
  * @author Emilio Garcia
  */
@@ -50,6 +50,9 @@ public class SimulationPanel implements SimulationRenderer {
   private final VBox myRoot;
   private final Label myGenerationLabel;
   private final Button myLoadButton;
+  private final Button myRotateLeftButton;
+  private final Button myRotateRightButton;
+  private final Button myAboutButton;
 
   private final StackPane myGridContainer;
 
@@ -83,12 +86,17 @@ public class SimulationPanel implements SimulationRenderer {
     myGenerationLabel.setAlignment(Pos.CENTER);
 
     myLoadButton = new Button(myBundle.getString("button.loadsim"));
+    myRotateLeftButton = new Button(myBundle.getString("button.rotateLeft"));
+    myRotateRightButton = new Button(myBundle.getString("button.rotateRight"));
+    myAboutButton = new Button(myBundle.getString("about.title"));
+    myRotateLeftButton.setOnAction(e -> rotateLeft());
+    myRotateRightButton.setOnAction(e -> rotateRight());
 
     myGridContainer = new StackPane();
     myGridContainer.setPadding(new Insets(8));
     myGridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-    HBox header = new HBox(8, myGenerationLabel, myLoadButton);
+    HBox header = new HBox(8, myGenerationLabel, myLoadButton, myRotateLeftButton, myRotateRightButton);
     header.setAlignment(Pos.CENTER);
     HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
 
@@ -196,10 +204,28 @@ public class SimulationPanel implements SimulationRenderer {
     myGridView.toggleOutline(grid, stateColors);
   }
 
+  /**
+   * Rotates this panel's grid 90 degrees counterclockwise.
+   */
+  public void rotateLeft() {
+    if (myGridView == null) throw new IllegalStateException("No simulation loaded.");
+    myGridView.rotateLeft();
+  }
+
+  /**
+   * Rotates this panel's grid 90 degrees clockwise.
+   */
+  public void rotateRight() {
+    if (myGridView == null) throw new IllegalStateException("No simulation loaded.");
+    myGridView.rotateRight();
+  }
+
   public void applyLanguage(ResourceBundle bundle){
     myBundle = bundle;
     myGenerationLabel.setText(MessageFormat.format(
         myBundle.getString("label.generation"), myGeneration));
     myLoadButton.setText(myBundle.getString("button.loadsim"));
+    myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
+    myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
   }
 }
