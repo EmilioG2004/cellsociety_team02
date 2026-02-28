@@ -32,8 +32,6 @@ public class Main extends Application {
     // internal configuration file
     public static final String INTERNAL_CONFIGURATION = "cellsociety.Version";
 
-    public static final int APP_WIDTH = 1200;
-    public static final int APP_HEIGHT = 750;
 
     /**
      * @see Application#start(Stage)
@@ -47,7 +45,7 @@ public class Main extends Application {
     //TO-DO REFACTOR: leave view creation, remove scene creation, in controller when creating controller then create scene
     private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
         SimulationView view = new SimulationView(bundle, showSplash);
-        Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
+        Scene scene = new Scene(view.getRoot());
         SimulationController controller = new SimulationController(view, scene, bundle);
 
         stage.setScene(scene);

@@ -68,6 +68,12 @@ public class SimulationView {
 
   private GridView myGridView;
 
+  // Multi-sim dashboard UI
+  private VBox myMultiRoot;
+  private TilePane myTile;
+  private ScrollPane myScroll;
+  private ChoiceBox<Integer> mySlotChoice;
+
   /**
    * Creates a SimulationView without showing the settings splash.
    *
@@ -107,6 +113,7 @@ public class SimulationView {
     mySpeedMultiplier = 1.0;
     applyLanguage(myBundle);
     buildTop();
+    buildCenter();
     myMain.setPadding(new Insets(12));
     myRoot.getChildren().addAll(myMain, mySettings);
     bindSplashToWindow();
@@ -175,18 +182,39 @@ public class SimulationView {
   }
 
   private void buildCenter(){
-    if (myGridView == null) return;
     if (centerPane == null) {
       centerPane = new StackPane();
       centerPane.setPadding(new Insets(18,0,18,0));
       myMain.setCenter(centerPane);
     }
-    StackPane card = buildCenterCard();
-    Node gridNode = myGridView.getNode();
-    card.getChildren().setAll(gridNode);
-    centerPane.getChildren().setAll(card);
-    myGridView.bindToContainer(card);
+    if (myMultiRoot == null) {
+      buildMultiSimDashboard();
+    }
+    setCenterContent(myMultiRoot);
+  }
 
+  private void buildMultiSimDashboard() {
+    myTile = new TilePane();
+    myTile.setPadding(new Insets(12));
+    myTile.setHgap(12);
+    myTile.setVgap(12);
+    myTile.setPrefColumns(2);
+    myTile.setPrefTileWidth(420);
+    myTile.setPrefTileHeight(420);
+
+    myScroll = new ScrollPane(myTile);
+    myScroll.setFitToWidth(true);
+    myScroll.setFitToHeight(true);
+    myScroll.getStyleClass().add("card-scroll");
+
+    mySlotChoice = new ChoiceBox<>();
+
+    Label slotLabel = new Label(myBundle.getString("label.slots"));
+    HBox header = new HBox(8, slotLabel, mySlotChoice);
+    header.setPadding(new Insets(4, 6, 8, 6));
+
+    myMultiRoot = new VBox(8, header, myScroll);
+    myMultiRoot.setPadding(new Insets(4));
   }
 
   private StackPane buildCenterCard() {
@@ -356,26 +384,6 @@ public class SimulationView {
   public GridView getMyGridView() { return myGridView; }
 
   /**
-   * Creates and installs a new grid view for the given dimensions.
-   *
-   * <p>Purpose: prepares the center card to render a simulation grid.</p>
-   *
-   * <p>Assumptions: rows and cols are positive.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * <p>Return value: none.</p>
-   *
-   * @param rows number of grid rows
-   * @param cols number of grid columns
-   */
-  public void setGrid(int rows, int cols){
-    this.myGridView = new GridPaneView(rows, cols);
-    buildCenter();
-    buildBottom();
-  }
-
-  /**
    * Doubles the stored speed multiplier.
    *
    * <p>Purpose: keeps UI speed label in sync with controller speed changes.</p>
@@ -510,6 +518,28 @@ public class SimulationView {
     StackPane card = buildCenterCard();
     card.getChildren().setAll(content);
     centerPane.getChildren().setAll(card);
+  }
+
+  /**
+   * Returns the TilePane used by the multi-sim dashboard.
+   *
+   * <p>Assumptions: the dashboard has been built.</p>
+   *
+   * @return multi-sim TilePane
+   */
+  public TilePane getMultiSimTile() {
+    return myTile;
+  }
+
+  /**
+   * Returns the slot count choice box used by the multi-sim dashboard.
+   *
+   * <p>Assumptions: the dashboard has been built.</p>
+   *
+   * @return slot count choice box
+   */
+  public ChoiceBox<Integer> getMultiSimSlotChoice() {
+    return mySlotChoice;
   }
 
 }

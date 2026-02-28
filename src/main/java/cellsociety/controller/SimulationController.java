@@ -1,35 +1,26 @@
 package cellsociety.controller;
 
 import cellsociety.Model.Simulation;
-import cellsociety.Model.SimulationDriver;
 import cellsociety.Model.SimulationFactory;
 import cellsociety.view.SimulationPanel;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
-import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 /**
  * Primary controller that wires {@link SimulationView} to simulation logic.
  *
- * <p>Purpose: connects UI controls to a {@link SimulationDriver}, handles configuration
+ * <p>Purpose: connects UI controls to all SimulationPresenters, handles configuration
  * loading/saving through the {@link cellsociety.config} package, and refreshes the view
  * after simulation steps.</p>
  *
@@ -63,8 +54,6 @@ public class SimulationController {
   private final List<MultiSimSlot> mySlots;
 
   private TilePane myTile;
-  private ScrollPane myScroll;
-  private VBox myRoot;
   private ChoiceBox<Integer> mySlotChoice;
 
   /**
@@ -90,39 +79,17 @@ public class SimulationController {
     myScene = scene;
     myWires = new WiringManager(mySimView, myScene);
 
-    myWires.wireAll(mySlots);
-
-  }
-
-  private void buildVisuals() {
-    myTile = new TilePane();
-    myTile.setPadding(new Insets(12));
-    myTile.setHgap(12);
-    myTile.setVgap(12);
-    myTile.setPrefColumns(2);
-    myTile.setPrefTileWidth(420);
-    myTile.setPrefTileHeight(420);
-
-    myScroll = new ScrollPane(myTile);
-    myScroll.setFitToWidth(true);
-    myScroll.setFitToHeight(true);
-    myScroll.getStyleClass().add("card-scroll");
-
-    mySlotChoice = new ChoiceBox<>();
+    myTile = mySimView.getMultiSimTile();
+    mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
       mySlotChoice.getItems().add(i);
     }
     mySlotChoice.setValue(DEFAULT_SLOTS);
     mySlotChoice.setOnAction(e -> setSlotCount(mySlotChoice.getValue()));
 
-    Label slotLabel = new Label(myBundle.getString("label.slots"));
-    HBox header = new HBox(8, slotLabel, mySlotChoice);
-    header.setPadding(new Insets(4, 6, 8, 6));
-
-    myRoot = new VBox(8, header, myScroll);
-    myRoot.setPadding(new Insets(4));
-
     setSlotCount(DEFAULT_SLOTS);
+
+    myWires.wireAll(mySlots);
   }
 
   /**
@@ -210,5 +177,4 @@ public class SimulationController {
       throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
     }
   }
-
 }
