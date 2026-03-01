@@ -50,6 +50,7 @@ public class SimulationController {
 
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
+  private final ErrorHandler myErrorHandler;
 
   private final List<SimulationSlot> mySlots;
 
@@ -74,8 +75,9 @@ public class SimulationController {
   public SimulationController(SimulationView simView, Scene scene, ResourceBundle bundle) {
     myBundle = bundle;
     myConfigLoader = new ConfigLoader();
-    mySlots = new ArrayList<>();
     mySimView = simView;
+    myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
+    mySlots = new ArrayList<>();
     myScene = scene;
     myWires = new WiringManager(mySimView, myScene, this::setMyBundle);
 
@@ -161,18 +163,22 @@ public class SimulationController {
 
     try {
       loadConfigIntoSlot(slotIndex, xmlFile);
-    } catch (ParserConfigurationException | SAXException | IOException ex) {
-      throw new RuntimeException(ex);
+    } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
+      myErrorHandler.handle(ex);
     }
   }
 
   private void handleAboutForSlot(int slotIndex) {
-    checkIndex(slotIndex);
-    SimulationSlot slot = mySlots.get(slotIndex);
-    if (!slot.hasSimulation()) {
-      throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+    try {
+      checkIndex(slotIndex);
+      SimulationSlot slot = mySlots.get(slotIndex);
+      if (!slot.hasSimulation()) {
+        throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+      }
+      mySimView.showAboutSplash(slot.getConfig());
+    } catch (IllegalStateException | IndexOutOfBoundsException ex) {
+      myErrorHandler.handle(ex);
     }
-    mySimView.showAboutSplash(slot.getConfig());
   }
 
   private void rebuildTileChildren() {
