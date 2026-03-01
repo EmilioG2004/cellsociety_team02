@@ -5,6 +5,7 @@ import cellsociety.Model.ReadOnlyGrid;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -57,6 +58,7 @@ public class SimulationPanel implements SimulationRenderer {
   private final StackPane myGridContainer;
 
   private GridView myGridView;
+  private BiConsumer<Integer, Integer> myOnCellClicked;
 
   /**
    * Creates a panel with localized labels and a blank grid container.
@@ -101,7 +103,7 @@ public class SimulationPanel implements SimulationRenderer {
     HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
 
     HBox lower = new HBox(8, myRotateLeftButton, myRotateRightButton);
-    lower.setAlignment(Pos.BASELINE_RIGHT);
+    lower.setAlignment(Pos.CENTER);
 
 
     myRoot.getChildren().addAll(header, myGridContainer, lower);
@@ -120,6 +122,7 @@ public class SimulationPanel implements SimulationRenderer {
   @Override
   public void setGrid(int rows, int cols) {
     myGridView = new GridPaneView(rows, cols);
+    myGridView.setOnCellClicked(myOnCellClicked);
     Node gridNode = myGridView.getNode();
     myGridContainer.getChildren().setAll(gridNode);
 
@@ -195,6 +198,15 @@ public class SimulationPanel implements SimulationRenderer {
    */
   public void setOnAbout(Runnable action) {
     myAboutButton.setOnAction(e -> action.run());
+  }
+
+  /**
+   * Registers a callback for clicks on this panel's grid cells.
+   *
+   * @param handler callback receiving clicked (row, col)
+   */
+  public void setOnCellClicked(BiConsumer<Integer, Integer> handler) {
+    myOnCellClicked = handler;
   }
 
   /**

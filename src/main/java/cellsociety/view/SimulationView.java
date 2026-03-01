@@ -1,8 +1,6 @@
 package cellsociety.view;
 
 import cellsociety.config.SimulationConfig;
-import cellsociety.controller.MultiSimSlot;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

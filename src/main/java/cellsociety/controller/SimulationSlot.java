@@ -20,14 +20,14 @@ import javafx.scene.Node;
  *
  * <p>Example usage:</p>
  * <pre>{@code
- * MultiSimSlot slot = new MultiSimSlot(index, panel, presenter);
+ * SimulationSlot slot = new SimulationSlot(index, panel, presenter);
  * slot.setSimulation(sim);
  * slot.start();
  * }</pre>
  *
  * @author Emilio Garcia
  */
-public class MultiSimSlot {
+public class SimulationSlot {
 
   private final int myIndex;
   private final SimulationPanel myPanel;
@@ -47,10 +47,11 @@ public class MultiSimSlot {
    * @param panel render-only panel
    * @param presenter presenter/driver for the slot
    */
-  public MultiSimSlot(int index, SimulationPanel panel, SimulationPresenter presenter) {
+  public SimulationSlot(int index, SimulationPanel panel, SimulationPresenter presenter) {
     myIndex = index;
     myPanel = panel;
     myPresenter = presenter;
+    myPanel.setOnCellClicked(myPresenter::toggleCellState);
   }
 
   /**

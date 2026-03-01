@@ -51,7 +51,7 @@ public class SimulationController {
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
 
-  private final List<MultiSimSlot> mySlots;
+  private final List<SimulationSlot> mySlots;
 
   private TilePane myTile;
   private ChoiceBox<Integer> mySlotChoice;
@@ -109,7 +109,7 @@ public class SimulationController {
     int count = clamp(desired, 1, MAX_SLOTS);
 
     while (mySlots.size() > count) {
-      MultiSimSlot removed = mySlots.remove(mySlots.size() - 1);
+      SimulationSlot removed = mySlots.remove(mySlots.size() - 1);
       removed.pause();
     }
 
@@ -120,7 +120,7 @@ public class SimulationController {
       panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
       panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
       SimulationPresenter presenter = new SimulationPresenter(panel);
-      MultiSimSlot slot = new MultiSimSlot(index, panel, presenter);
+      SimulationSlot slot = new SimulationSlot(index, panel, presenter);
       mySlots.add(slot);
     }
     rebuildTileChildren();
@@ -168,7 +168,7 @@ public class SimulationController {
 
   private void handleAboutForSlot(int slotIndex) {
     checkIndex(slotIndex);
-    MultiSimSlot slot = mySlots.get(slotIndex);
+    SimulationSlot slot = mySlots.get(slotIndex);
     if (!slot.hasSimulation()) {
       throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
     }
@@ -177,7 +177,7 @@ public class SimulationController {
 
   private void rebuildTileChildren() {
     myTile.getChildren().clear();
-    for (MultiSimSlot slot : mySlots) {
+    for (SimulationSlot slot : mySlots) {
       myTile.getChildren().add(slot.getNode());
     }
   }

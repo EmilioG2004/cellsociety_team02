@@ -1,24 +1,12 @@
 package cellsociety.controller;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.ReadOnlyGrid;
-import cellsociety.Model.Simulation;
-import cellsociety.Model.SimulationFactory;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
-import cellsociety.config.SimulationConfig;
 import cellsociety.view.SimulationView;
-import java.io.File;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javafx.scene.Scene;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
 
 /**
  * Centralizes wiring of {@link SimulationView} controls to controller logic.
@@ -75,7 +63,7 @@ public class WiringManager {
    *
    * <p>Return value: none.</p>
    */
-  public void wireAll(List<MultiSimSlot> mySlots) {
+  public void wireAll(List<SimulationSlot> mySlots) {
     wireAboutDialogClose();
     wireApplyChanges(mySlots);
     wireSettings();
@@ -97,9 +85,9 @@ public class WiringManager {
     );
   }
 
-  private void wireForward(List<MultiSimSlot> mySlots) {
+  private void wireForward(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getForwardButton().setOnAction(e -> {
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.step();
         }
@@ -107,9 +95,9 @@ public class WiringManager {
     });
   }
 
-  private void wireBackward(List<MultiSimSlot> mySlots) {
+  private void wireBackward(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getBackButton().setOnAction(e -> {
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.stepBack();
         }
@@ -117,14 +105,14 @@ public class WiringManager {
     });
   }
 
-  private void wireChangeDirection(List<MultiSimSlot> mySlots) {
+  private void wireChangeDirection(List<SimulationSlot> mySlots) {
     var buttons = mySimView.getMyButtons();
     var dirButton = buttons.getChangeDirectionButton();
     var bundle = mySimView.getMyBundle();
 
     dirButton.setOnAction(e -> {
       Boolean forward = null;
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           forward = slot.isForwardDirection();
           break;
@@ -133,7 +121,7 @@ public class WiringManager {
 
       boolean newDirection = (forward == null) ? true : !forward;
 
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setDirection(newDirection);
         }
@@ -145,27 +133,27 @@ public class WiringManager {
     });
   }
 
-  private void wireStart(List<MultiSimSlot> mySlots) {
+  private void wireStart(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getStartButton().setOnAction(e -> {
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.start();
         }
       }    });
   }
 
-  private void wirePause(List<MultiSimSlot> mySlots) {
+  private void wirePause(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getPauseButton().setOnAction(e -> {
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         slot.pause();
       }
     });
   }
 
-  private void wireSpeedUp(List<MultiSimSlot> mySlots) {
+  private void wireSpeedUp(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
       if (mySimView.getMySpeedMultiplier() >= 4) return;
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() * 2.0);
         }
@@ -175,10 +163,10 @@ public class WiringManager {
     });
   }
 
-  private void wireSlowDown(List<MultiSimSlot> mySlots) {
+  private void wireSlowDown(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSlowDownButton().setOnAction(e -> {
       if (mySimView.getMySpeedMultiplier() <= 0.25) return;
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() / 2.0);
         }
@@ -220,9 +208,9 @@ public class WiringManager {
   }
    */
 
-  private void wireReset(List<MultiSimSlot> mySlots) {
+  private void wireReset(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getResetButton().setOnAction(e -> {
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.reset();
         }
@@ -246,9 +234,9 @@ public class WiringManager {
   }
    */
 
-  private void wireToggleOutline(List<MultiSimSlot> mySlots) {
+  private void wireToggleOutline(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getToggleOutlineButton().setOnAction(e -> {
-      for (MultiSimSlot slot : mySlots) {
+      for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.toggleOutline();
         }
@@ -256,12 +244,12 @@ public class WiringManager {
     });
   }
 
-  private void wireApplyChanges(List<MultiSimSlot> mySlots) {
+  private void wireApplyChanges(List<SimulationSlot> mySlots) {
     mySimView.getMySettings().getMyApplyChanges().setOnAction(e -> {
       String choice = mySimView.getMySettings().getMyLanguages().getValue();
       ResourceBundle chosenBundle = loadLanguageBundle(choice);
       mySimView.applyLanguage(chosenBundle);
-      for (MultiSimSlot slot: mySlots){
+      for (SimulationSlot slot: mySlots){
         slot.getMyPanel().applyLanguage(chosenBundle);
       }
       myBundleCallback.accept(chosenBundle);
