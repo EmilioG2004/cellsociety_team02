@@ -3,12 +3,12 @@ package cellsociety.Model.GameRules;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SpreadingOfFireState;
 import cellsociety.Model.Grid.Grid;
-import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Map;
 
-/** Spreading of Fire: TREE catches from BURNING (probCatch), BURNING→EMPTY, EMPTY→TREE (probTree). Cardinal neighbors. */
+/** Spreading of Fire: TREE catches from BURNING (probCatch), BURNING→EMPTY, EMPTY→TREE (probTree). Von Neumann neighbors. */
 public class SpreadingOfFireRule extends GameRule {
 
   private static final double DEFAULT_PROB_CATCH = 0.15;
@@ -39,7 +39,7 @@ public class SpreadingOfFireRule extends GameRule {
 
   @Override
   public NeighborStrategy getDefaultNeighborStrategy() {
-    return new CardinalNeighborStrategy();
+    return new VonNeumannNeighborStrategy();
   }
 
   @Override

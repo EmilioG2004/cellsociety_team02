@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Defines which grid positions count as neighbors for a given cell (e.g. Moore 8, Cardinal 4).
+ * Defines which grid positions count as neighbors for a given cell (e.g. Moore 8, Von Neumann 4).
  * Responsible for all neighbor logic: which directions and how bounds/wrapping are applied.
  * Callers (e.g. Grid, GameRule) use {@link #getNeighborPositions(int, int, int, int)} to get
  * neighbor positions, then look up cell states at those positions.

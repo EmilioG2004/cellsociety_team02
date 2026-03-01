@@ -8,7 +8,7 @@ import cellsociety.Model.Creature.Shark;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.Position;
 import cellsociety.Model.Grid.ReadOnlyGrid;
-import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 
@@ -54,7 +54,7 @@ public class WaTorRule extends GameRule {
 
   @Override
   public NeighborStrategy getDefaultNeighborStrategy() {
-    return new WrappingNeighborStrategy(new CardinalNeighborStrategy());
+    return new WrappingNeighborStrategy(new VonNeumannNeighborStrategy());
   }
 
   @Override

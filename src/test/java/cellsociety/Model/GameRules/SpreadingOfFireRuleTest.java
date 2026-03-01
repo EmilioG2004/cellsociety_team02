@@ -199,7 +199,7 @@ class SpreadingOfFireRuleTest {
   }
 
   @Test
-  void getNextStates_treeWithOneCardinalBurning_catchOne_becomesBurning() {
+  void getNextStates_treeWithOneVonNeumannBurning_catchOne_becomesBurning() {
     CellState[][] grid = {
         {EMPTY, BURNING, EMPTY},
         {EMPTY, TREE, EMPTY},
