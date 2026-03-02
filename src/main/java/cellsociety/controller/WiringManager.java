@@ -37,6 +37,7 @@ public class WiringManager {
   private final Scene myScene;
   private final Consumer<ResourceBundle> myBundleCallback;
   private final Runnable mySaveAllCallback;
+  private final Runnable myLoadCallback;
 
   /**
    * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
@@ -50,11 +51,12 @@ public class WiringManager {
    * @param simView view whose controls will be wired
    * @param scene scene used for applying themes
    */
-  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback, Runnable saveAllCallback) {
+  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback, Runnable saveAllCallback, Runnable loadCallback) {
     mySimView = simView;
     myScene = scene;
     myBundleCallback = bundleCallback;
     mySaveAllCallback = saveAllCallback;
+    myLoadCallback = loadCallback;
   }
 
   /**
@@ -74,6 +76,7 @@ public class WiringManager {
     wireApplyChanges(mySlots);
     wireSplashLoad(onSplashLoad);
     wireSettings();
+    wireLoadProgram();
     wireForward(mySlots);
     wireBackward(mySlots);
     wireChangeDirection(mySlots);
@@ -162,27 +165,27 @@ public class WiringManager {
 
   private void wireSpeedUp(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
-      if (mySimView.getMySpeedMultiplier() >= 4) return;
+      double currentSpeed = getReferenceSpeed(mySlots);
+      if (currentSpeed >= 4) return;
       for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() * 2.0);
         }
       }
-      mySimView.doubleMySpeed();
-      mySimView.updateSpeedLabel();
+      refreshSpeedLabel(mySlots);
     });
   }
 
   private void wireSlowDown(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSlowDownButton().setOnAction(e -> {
-      if (mySimView.getMySpeedMultiplier() <= 0.25) return;
+      double currentSpeed = getReferenceSpeed(mySlots);
+      if (currentSpeed <= 0.25) return;
       for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() / 2.0);
         }
       }
-      mySimView.halveMySpeed();
-      mySimView.updateSpeedLabel();
+      refreshSpeedLabel(mySlots);
     });
   }
 
@@ -215,6 +218,7 @@ public class WiringManager {
         slot.getMyPanel().applyLanguage(chosenBundle);
       }
       myBundleCallback.accept(chosenBundle);
+      refreshSpeedLabel(mySlots);
 
       String themeChoice = mySimView.getMySettings().getMyThemes().getValue();
       mySimView.applyTheme(myScene, themeChoice);
@@ -244,4 +248,27 @@ public class WiringManager {
       default -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_ENGLISH);
     };
   }
+
+  private double getReferenceSpeed(List<SimulationSlot> mySlots) {
+    if (!mySlots.isEmpty() && mySlots.get(0).hasSimulation()) {
+      return mySlots.get(0).getStepsPerSecond();
+    }
+    for (SimulationSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        return slot.getStepsPerSecond();
+      }
+    }
+    return 1.0;
+  }
+
+  private void refreshSpeedLabel(List<SimulationSlot> mySlots) {
+    mySimView.setSpeedLabel(getReferenceSpeed(mySlots));
+  }
+
+  private void wireLoadProgram(){
+    mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
+      myLoadCallback.run();
+    });
+  }
+
 }
