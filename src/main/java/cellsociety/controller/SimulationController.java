@@ -2,10 +2,14 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+import static cellsociety.view.constants.SimulationUiConstants.DOUBLE_VALUE;
 
 import cellsociety.config.ConfigSaver;
+import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
+import cellsociety.view.AboutDialog;
+import cellsociety.view.SettingsSplash;
 import cellsociety.view.SimulationPanel;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationFactory;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
@@ -58,6 +63,7 @@ public class SimulationController {
   private final ConfigLoader myConfigLoader;
   private final ConfigSaver myConfigSaver;
   private final SimulationSaver mySimSaver;
+  private final SimulationLoader mySimLoader;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
 
@@ -82,6 +88,7 @@ public class SimulationController {
     myConfigLoader = new ConfigLoader();
     myConfigSaver = new ConfigSaver();
     mySimSaver = new SimulationSaver();
+    mySimLoader = new SimulationLoader();
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
@@ -149,6 +156,40 @@ public class SimulationController {
     rebuildTileChildren();
   }
 
+  public void loadState(File xmlFile)
+      throws ParserConfigurationException, IOException, SAXException {
+    SimulationState desiredState = mySimLoader.loadState(xmlFile);
+    SimulationPreferences desiredPreferences = mySimLoader.loadPreferences(xmlFile);
+    loadSimulations(desiredState);
+    loadPreferences(desiredPreferences);
+
+  }
+
+  private void loadSimulations(SimulationState desiredState) {
+    int activeSims = desiredState.getActiveSimulations().size();
+    setSlotCount(activeSims);
+    mySimView.getMultiSimSlotChoice().setValue(activeSims);
+    for (int i = 0; i < mySlots.size(); i++){
+      SimulationSlot currentSlot = mySlots.get(i);
+      SimulationConfig currentConfig = desiredState.getActiveSimulations().get(i);
+      Simulation currentSim = SimulationFactory.createSimulation(currentConfig);
+      currentSlot.setSimulation(currentSim);
+      currentSlot.setConfig(currentConfig);
+    }
+  }
+
+  private void loadPreferences(SimulationPreferences desiredPreferences){
+    int theme = desiredPreferences.getTheme();
+    String language = desiredPreferences.getLanguage();
+    double speed = desiredPreferences.getSimulationSpeed();
+    Map<Integer, String> colors = desiredPreferences.getColorMap();
+    mySimView.applyTheme(myScene, String.valueOf(theme));
+    mySimView.applyLanguage(ResourceBundle.getBundle(language));
+    for (SimulationSlot currentSlot : mySlots){
+      currentSlot.setSpeed(speed);
+    }
+  }
+
   /**
    * Loads an XML config file into the given slot index.
    *
@@ -205,7 +246,7 @@ public class SimulationController {
     );
 
     File saveDestination = mySimView.showSaveConfigDialog();
-    if (saveDestination == null) return;
+    if (saveDestination == null) throw new IllegalArgumentException("No Save Destination Selected.");
 
     myConfigSaver.saveConfig(configSnapshot, saveDestination);
   }
@@ -257,7 +298,7 @@ public class SimulationController {
 
   private SimulationPreferences getSimulationPreferences() {
     int theme = mapThemeToCode(mySimView.getMySettings().getMyThemes().getValue());
-    double speed = mySimView.getMySpeedMultiplier();
+    double speed = getReferenceSpeed();
     String language = mySimView.getMySettings().getMyLanguages().getValue();
     if (language == null || language.isBlank()) {
       language = ResourcePaths.LANGUAGE_ENGLISH;
@@ -266,6 +307,18 @@ public class SimulationController {
     SimulationPreferences preferences = new SimulationPreferences(theme, language, speed, new HashMap<Integer,String>());
 
     return preferences;
+  }
+
+  private double getReferenceSpeed() {
+    if (!mySlots.isEmpty() && mySlots.get(0).hasSimulation()) {
+      return mySlots.get(0).getStepsPerSecond();
+    }
+    for (SimulationSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        return slot.getStepsPerSecond();
+      }
+    }
+    return 1.0;
   }
 
   private int mapThemeToCode(String themeChoice) {

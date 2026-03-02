@@ -62,9 +62,6 @@ public class SimulationView {
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
 
-  //TODO: pull from backend
-  private double mySpeedMultiplier;
-
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog();
   private final SettingsSplash mySettings = new SettingsSplash();
@@ -96,8 +93,8 @@ public class SimulationView {
     myButtons = new ButtonManager(myBundle);
     myRoot.getStyleClass().add("app-root");
     myMain.getStyleClass().add("main-pane");
-    mySpeedMultiplier = 1.0;
     applyLanguage(myBundle);
+    setSpeedLabel(1.0);
     buildTop();
     buildCenter();
     myMain.setPadding(new Insets(MAIN_PADDING));
@@ -373,42 +370,7 @@ public class SimulationView {
    */
   public GridView getMyGridView() { return myGridView; }
 
-  /**
-   * Doubles the stored speed multiplier.
-   *
-   * <p>Purpose: keeps UI speed label in sync with controller speed changes.</p>
-   *
-   * <p>Assumptions: current multiplier is positive.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * <p>Return value: none.</p>
-   */
-  public void doubleMySpeed() { this.mySpeedMultiplier *= 2; }
-
-  /**
-   * Halves the stored speed multiplier.
-   *
-   * <p>Purpose: keeps UI speed label in sync with controller speed changes.</p>
-   *
-   * <p>Assumptions: current multiplier is positive.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * <p>Return value: none.</p>
-   */
-  public void halveMySpeed() { this.mySpeedMultiplier /= 2; }
-
-  /**
-   * Refreshes the speed label using the current multiplier.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * <p>Return value: none.</p>
-   */
-  public void updateSpeedLabel() { myButtons.setSpeedLabel(mySpeedMultiplier); }
+  public void setSpeedLabel(double speedMultiplier) { myButtons.setSpeedLabel(speedMultiplier); }
 
   /**
    * Applies a new language bundle to all view components.
@@ -428,7 +390,6 @@ public class SimulationView {
     myButtons.applyLanguage(bundle);
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
-    updateSpeedLabel();
     if (mySlotLabel != null) {
       mySlotLabel.setText(bundle.getString(LABEL_SLOTS));
     }
@@ -478,17 +439,6 @@ public class SimulationView {
    * @return button manager
    */
   public ButtonManager getMyButtons() { return myButtons; }
-
-  /**
-   * Returns the current speed multiplier tracked by the view.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return speed multiplier used for display
-   */
-  public double getMySpeedMultiplier() { return mySpeedMultiplier; }
 
   /**
    * Replaces the center content with a provided node wrapped in a card.

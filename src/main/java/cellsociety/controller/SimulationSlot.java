@@ -272,6 +272,8 @@ public class SimulationSlot {
     myPresenter.getDriver().setSpeed(stepsPerSecond);
   }
 
+  public double getSpeed() { return myPresenter.getDriver().getStepsPerSecond(); }
+
   /**
    * Returns the current stepping speed for this slot.
    *

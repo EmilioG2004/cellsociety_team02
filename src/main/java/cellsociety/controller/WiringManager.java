@@ -162,27 +162,27 @@ public class WiringManager {
 
   private void wireSpeedUp(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
-      if (mySimView.getMySpeedMultiplier() >= 4) return;
+      double currentSpeed = getReferenceSpeed(mySlots);
+      if (currentSpeed >= 4) return;
       for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() * 2.0);
         }
       }
-      mySimView.doubleMySpeed();
-      mySimView.updateSpeedLabel();
+      refreshSpeedLabel(mySlots);
     });
   }
 
   private void wireSlowDown(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSlowDownButton().setOnAction(e -> {
-      if (mySimView.getMySpeedMultiplier() <= 0.25) return;
+      double currentSpeed = getReferenceSpeed(mySlots);
+      if (currentSpeed <= 0.25) return;
       for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() / 2.0);
         }
       }
-      mySimView.halveMySpeed();
-      mySimView.updateSpeedLabel();
+      refreshSpeedLabel(mySlots);
     });
   }
 
@@ -215,6 +215,7 @@ public class WiringManager {
         slot.getMyPanel().applyLanguage(chosenBundle);
       }
       myBundleCallback.accept(chosenBundle);
+      refreshSpeedLabel(mySlots);
 
       String themeChoice = mySimView.getMySettings().getMyThemes().getValue();
       mySimView.applyTheme(myScene, themeChoice);
@@ -243,5 +244,21 @@ public class WiringManager {
       case ResourcePaths.LANGUAGE_PORTUGUESE -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_PORTUGUESE);
       default -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_ENGLISH);
     };
+  }
+
+  private double getReferenceSpeed(List<SimulationSlot> mySlots) {
+    if (!mySlots.isEmpty() && mySlots.get(0).hasSimulation()) {
+      return mySlots.get(0).getStepsPerSecond();
+    }
+    for (SimulationSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        return slot.getStepsPerSecond();
+      }
+    }
+    return 1.0;
+  }
+
+  private void refreshSpeedLabel(List<SimulationSlot> mySlots) {
+    mySimView.setSpeedLabel(getReferenceSpeed(mySlots));
   }
 }
