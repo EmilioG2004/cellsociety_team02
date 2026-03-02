@@ -2,10 +2,13 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+
+import cellsociety.config.ConfigSaver;
 import cellsociety.view.SimulationPanel;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationFactory;
 import cellsociety.Model.Simulation.SimulationDriver;
+import cellsociety.Model.Grid.GridViewData;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.SimulationConfig;
@@ -31,7 +34,7 @@ import org.xml.sax.SAXException;
  * files are valid and compatible with {@link cellsociety.config.ConfigLoader}.</p>
  *
  * <p>Dependencies: {@link SimulationView}, {@link SimulationDriver}, configuration loaders/savers,
- * and JavaFX {@link Platform} for UI thread updates.</p>
+ * and JavaFX for UI thread updates.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
@@ -50,6 +53,7 @@ public class SimulationController {
 
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
+  private final ConfigSaver myConfigSaver;
   private final ErrorHandler myErrorHandler;
 
   private final List<SimulationSlot> mySlots;
@@ -75,6 +79,7 @@ public class SimulationController {
   public SimulationController(SimulationView simView, Scene scene, ResourceBundle bundle) {
     myBundle = bundle;
     myConfigLoader = new ConfigLoader();
+    myConfigSaver = new ConfigSaver();
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
@@ -121,6 +126,7 @@ public class SimulationController {
       int slotIndex = index;
       panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
       panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
+      panel.setOnSave(() -> handleSaveForSlot(slotIndex));
       SimulationPresenter presenter = new SimulationPresenter(panel);
       SimulationSlot slot = new SimulationSlot(index, panel, presenter);
       mySlots.add(slot);
@@ -148,7 +154,7 @@ public class SimulationController {
       throws ParserConfigurationException, IOException, SAXException, IllegalArgumentException {
 
     checkIndex(slotIndex);
-    if (xmlFile == null) return;
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
 
     SimulationConfig config = myConfigLoader.loadConfig(xmlFile);
     Simulation sim = SimulationFactory.createSimulation(config);
@@ -164,6 +170,45 @@ public class SimulationController {
     try {
       loadConfigIntoSlot(slotIndex, xmlFile);
     } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
+      myErrorHandler.handle(ex);
+    }
+  }
+
+  private void saveConfigInSlot(int slotIndex) {
+    checkIndex(slotIndex);
+    SimulationSlot slot = mySlots.get(slotIndex);
+
+    if (!slot.hasSimulation()) {
+      throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+    }
+
+    SimulationConfig initialConfig = slot.getConfig();
+    GridViewData grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+    int[][] intSnapshot = GridViewData.produceIntArray(grid);
+
+    SimulationConfig configSnapshot = new SimulationConfig(
+        initialConfig.getSimulationType(),
+        initialConfig.getRuleClass(),
+        initialConfig.getNeighborStrategyClass(),
+        initialConfig.getTitle(),
+        initialConfig.getAuthor(),
+        initialConfig.getDescription(),
+        grid.getRows(),
+        grid.getCols(),
+        intSnapshot,
+        initialConfig.getParameters()
+    );
+
+    File saveDestination = mySimView.showSaveConfigDialog();
+    if (saveDestination == null) return;
+
+    myConfigSaver.saveConfig(configSnapshot, saveDestination);
+  }
+
+  private void handleSaveForSlot(int slotIndex) {
+    try {
+      saveConfigInSlot(slotIndex);
+    } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
     }
   }
@@ -200,4 +245,3 @@ public class SimulationController {
 
   public void setMyBundle(ResourceBundle bundle){ myBundle = bundle; }
 }
-
