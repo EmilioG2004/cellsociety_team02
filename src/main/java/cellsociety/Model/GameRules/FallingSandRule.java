@@ -2,7 +2,9 @@ package cellsociety.Model.GameRules;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.FallingSandState;
-import cellsociety.Model.Utils.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+
 import java.util.Map;
 import java.util.Random;
 
@@ -24,6 +26,9 @@ public class FallingSandRule extends GameRule {
     super(new MooreNeighborStrategy(), parameters);
   }
 
+  public FallingSandRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(strategy, parameters);
+  }
   @Override
   public CellState[][] getNextStates(CellState[][] currentStates) {
     int rows = currentStates.length;

@@ -1,6 +1,7 @@
-package cellsociety.Model;
+package cellsociety.Model.Simulation;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.Grid.Grid;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -48,7 +49,7 @@ public class SimulationDriver {
    * Sets the simulation's grid to the given state and updates its undo stack. Use this instead of
    * setting cell state on the grid directly so stepBack() stays correct. No-op if no simulation set.
    */
-  public void setState(CellState[][] state) {
+  public void setState(Grid state) {
     if (simulation != null) {
       simulation.setState(state);
     }

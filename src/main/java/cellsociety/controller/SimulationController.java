@@ -2,10 +2,10 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
-
-import cellsociety.Model.Simulation;
-import cellsociety.Model.SimulationFactory;
 import cellsociety.view.SimulationPanel;
+import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationFactory;
+import cellsociety.Model.Simulation.SimulationDriver;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.SimulationConfig;
@@ -200,3 +200,4 @@ public class SimulationController {
 
   public void setMyBundle(ResourceBundle bundle){ myBundle = bundle; }
 }
+

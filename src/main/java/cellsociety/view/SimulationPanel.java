@@ -4,7 +4,8 @@ import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.ReadOnlyGrid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.ResourceBundle;

@@ -1,7 +1,6 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.CellState.GameOfLifeState;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -9,16 +8,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
+import cellsociety.Model.Grid.ArrayGrid;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GridTest {
+class ArrayGridTest {
 
-  private Grid grid;
+  private ArrayGrid grid;
+  private ConwayGameOfLifeRule cellFactory;
 
   @BeforeEach
   void setUp() {
-    grid = new Grid(3, 3);
+    grid = new ArrayGrid(3, 3);
+    cellFactory = new ConwayGameOfLifeRule();
   }
 
   // Z - Zero: empty/minimal state
@@ -35,7 +38,7 @@ class GridTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(allDead);
+    grid.setCellsState(allDead, cellFactory);
     CellState[][] result = grid.getCellStates();
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
@@ -47,10 +50,10 @@ class GridTest {
   // O - One: single element
   @Test
   void singleCellGrid_storesAndRetrievesState() {
-    Grid singleGrid = new Grid(1, 1);
-    singleGrid.setCellsState(new CellState[][]{{ALIVE}});
+    ArrayGrid singleGrid = new ArrayGrid(1, 1);
+    singleGrid.setCellsState(new CellState[][]{{ALIVE}}, cellFactory);
     assertEquals(ALIVE, singleGrid.getCellStates()[0][0]);
-    singleGrid.setCellsState(new CellState[][]{{DEAD}});
+    singleGrid.setCellsState(new CellState[][]{{DEAD}}, cellFactory);
     assertEquals(DEAD, singleGrid.getCellStates()[0][0]);
   }
 
@@ -62,7 +65,7 @@ class GridTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(initial);
+    grid.setCellsState(initial, cellFactory);
     CellState[][] result = grid.getCellStates();
     assertEquals(DEAD, result[0][0]);
     assertEquals(ALIVE, result[0][1]);
@@ -82,14 +85,14 @@ class GridTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(initial);
+    grid.setCellsState(initial, cellFactory);
 
     CellState[][] updated = {
         {ALIVE, ALIVE, ALIVE},
         {ALIVE, ALIVE, ALIVE},
         {ALIVE, ALIVE, ALIVE}
     };
-    grid.setCellsState(updated);
+    grid.setCellsState(updated, cellFactory);
 
     CellState[][] result = grid.getCellStates();
     for (int r = 0; r < 3; r++) {
@@ -106,7 +109,7 @@ class GridTest {
         {DEAD, ALIVE, DEAD},
         {ALIVE, DEAD, ALIVE}
     };
-    grid.setCellsState(checkerboard);
+    grid.setCellsState(checkerboard, cellFactory);
     CellState[][] result = grid.getCellStates();
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
@@ -119,7 +122,7 @@ class GridTest {
   @Test
   void setCellsState_wrongColumnCount_throws() {
     CellState[][] wrongCols = {{DEAD, ALIVE}, {ALIVE, DEAD}};
-    assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(wrongCols));
+    assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(wrongCols, cellFactory));
   }
 
   @Test
@@ -128,7 +131,7 @@ class GridTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(wrongRows));
+    assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(wrongRows, cellFactory));
   }
 
   @Test
@@ -139,20 +142,20 @@ class GridTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(tooMany));
+    assertThrows(IllegalArgumentException.class, () -> grid.setCellsState(tooMany, cellFactory));
   }
 
   @Test
   void largeGrid_storesAndRetrievesCorrectly() {
     int size = 50;
-    Grid largeGrid = new Grid(size, size);
+    ArrayGrid largeGrid = new ArrayGrid(size, size);
     CellState[][] states = new CellState[size][size];
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
         states[r][c] = (r + c) % 2 == 0 ? ALIVE : DEAD;
       }
     }
-    largeGrid.setCellsState(states);
+    largeGrid.setCellsState(states, cellFactory);
     CellState[][] result = largeGrid.getCellStates();
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
@@ -169,7 +172,7 @@ class GridTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(initial);
+    grid.setCellsState(initial, cellFactory);
     CellState[][] copy = grid.getCellStates();
     copy[0][0] = ALIVE;
     assertEquals(DEAD, grid.getCellStates()[0][0],
@@ -183,7 +186,7 @@ class GridTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    grid.setCellsState(initial);
+    grid.setCellsState(initial, cellFactory);
     CellState[][] result = grid.getCellStates();
     assertEquals(3, result.length);
     assertEquals(3, result[0].length);
@@ -192,29 +195,29 @@ class GridTest {
   // E - Exceptional: empty grid, uninitialized access
   @Test
   void zeroSizeGrid_hasZeroDimensionsAndEmptyGetCellStates() {
-    Grid emptyGrid = new Grid(0, 0);
+    ArrayGrid emptyGrid = new ArrayGrid(0, 0);
     assertEquals(0, emptyGrid.getRows());
     assertEquals(0, emptyGrid.getCols());
-    emptyGrid.setCellsState(new CellState[0][0]);
+    emptyGrid.setCellsState(new CellState[0][0], cellFactory);
     CellState[][] result = emptyGrid.getCellStates();
     assertEquals(0, result.length);
   }
 
   @Test
   void getCellState_beforeSetCellsState_throws() {
-    Grid uninit = new Grid(2, 2);
+    ArrayGrid uninit = new ArrayGrid(2, 2);
     assertThrows(IllegalStateException.class, () -> uninit.getCellState(0, 0));
   }
 
   @Test
   void getCellStates_beforeSetCellsState_throws() {
-    Grid uninit = new Grid(2, 2);
+    ArrayGrid uninit = new ArrayGrid(2, 2);
     assertThrows(IllegalStateException.class, () -> uninit.getCellStates());
   }
 
   @Test
   void getCellState_outOfBounds_throws() {
-    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}});
+    grid.setCellsState(new CellState[][]{{DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}, {DEAD, DEAD, DEAD}}, cellFactory);
     assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(-1, 0));
     assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(0, -1));
     assertThrows(IndexOutOfBoundsException.class, () -> grid.getCellState(3, 0));

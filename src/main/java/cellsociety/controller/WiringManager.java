@@ -2,7 +2,6 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_BACKWARD;
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_FORWARD;
-
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.view.SimulationView;
@@ -70,6 +69,7 @@ public class WiringManager {
   public void wireAll(List<SimulationSlot> mySlots) {
     wireAboutDialogClose();
     wireApplyChanges(mySlots);
+    wireSplashLoad();
     wireSettings();
     wireForward(mySlots);
     wireBackward(mySlots);
@@ -195,6 +195,7 @@ public class WiringManager {
       SimulationConfig configSnapshot = new SimulationConfig(
           initialConfig.getSimulationType(),
           initialConfig.getRuleClass(),
+          initialConfig.getNeighborStrategyClass(),
           initialConfig.getTitle(),
           initialConfig.getAuthor(),
           initialConfig.getDescription(),
@@ -261,6 +262,12 @@ public class WiringManager {
       String themeChoice = mySimView.getMySettings().getMyThemes().getValue();
       mySimView.applyTheme(myScene, themeChoice);
 
+      mySimView.closeSettings();
+    });
+  }
+
+  private void wireSplashLoad() {
+    mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
       mySimView.closeSettings();
     });
   }

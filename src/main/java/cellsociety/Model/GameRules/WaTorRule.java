@@ -1,7 +1,16 @@
 package cellsociety.Model.GameRules;
+
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.CellState.WaTorState;
-import cellsociety.Model.Utils.CardinalNeighborStrategy;
+import cellsociety.Model.CellState.WaTorCellState;
+import cellsociety.Model.CellState.WaTorTurnResult;
+import cellsociety.Model.Creature.Fish;
+import cellsociety.Model.Creature.Shark;
+import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.Position;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,211 +19,155 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 
-/** Wa-Tor World: fish and sharks move on cardinal neighbors; fish reproduce after N chronons, sharks eat fish for energy and reproduce after M chronons. */
+/**
+ * Wa-Tor World: fish and sharks move on cardinal neighbors. Fish reproduce after
+ * Fish.BREED_THRESHOLD steps. Sharks eat fish for energy, reproduce after Shark.BREED_THRESHOLD
+ * steps, and die when energy reaches zero.
+ *
+ * <p>Turn logic lives in {@link Fish#act} and {@link Shark#tryEat}/{@link Shark#move}; this rule
+ * orchestrates (grid, neighbors, shuffle) and applies their {@link WaTorTurnResult}s.
+ */
 public class WaTorRule extends GameRule {
+
   private static final String SHARK_START_ENERGY = "sharkStartEnergy";
   private static final String SHARK_ENERGY_FROM_FISH = "sharkEnergyFromFish";
-  private static final int DEFAULT_FISH_BIRTH_GENS = 2;
-  private static final int DEFAULT_SHARK_BIRTH_GENS = 6;
-  /** Sharks lose 1 energy per chronon; this gives at most 5 steps without food so they die off when no fish. */
-  private static final int DEFAULT_SHARK_START_ENERGY = 5;
-  /** Energy gained per fish eaten; 1 offsets the 1 lost per turn so sharks must keep eating to survive. */
-  private static final int DEFAULT_ENERGY_FROM_EATING_FISH = 1;
+  private static final String SHARK_MAX_ENERGY = "sharkMaxEnergy";
 
-  /** Default parameters for logical predator-prey behavior: sharks die when fish are scarce. */
+  private static final String ERROR_INVALID_STATE = "Invalid WaTor state: ";
+
   private static final Map<String, Double> DEFAULT_PARAMETERS = Map.of(
-      SHARK_START_ENERGY, (double) DEFAULT_SHARK_START_ENERGY,
-      SHARK_ENERGY_FROM_FISH, (double) DEFAULT_ENERGY_FROM_EATING_FISH);
-  private int[][] fishGenCount;
-  private int[][] sharkGenCount;
-  private int[][] sharkEnergy;
-  private Random rand;
+      SHARK_START_ENERGY, (double) Shark.DEFAULT_START_ENERGY,
+      SHARK_ENERGY_FROM_FISH, (double) Shark.DEFAULT_ENERGY_FROM_FISH,
+      SHARK_MAX_ENERGY, (double) Shark.DEFAULT_MAX_ENERGY);
+
+  private final Random rand = new Random();
+
+  public WaTorRule() {
+    this(DEFAULT_PARAMETERS);
+  }
+
+  public WaTorRule(Map<String, Double> parameters) {
+    super(parameters != null ? parameters : DEFAULT_PARAMETERS);
+  }
+
+  @Override
+  public NeighborStrategy getDefaultNeighborStrategy() {
+    return new WrappingNeighborStrategy(new CardinalNeighborStrategy());
+  }
+
+  @Override
+  public Grid getNextGrid(Grid currentGrid) {
+    Grid next = currentGrid.deepCopy();
+    computeNext(currentGrid, next, currentGrid.getRows(), currentGrid.getCols());
+    return next;
+  }
+
+  private void computeNext(ReadOnlyGrid current, Grid next, int rows, int cols) {
+    Set<String> claimed = new HashSet<>();
+    Set<String> eaten = new HashSet<>();
+
+    List<int[]> fishPositions = collectPositions(current, rows, cols, WaTorCellState::isFish);
+    List<int[]> sharkPositions = collectPositions(current, rows, cols, WaTorCellState::isShark);
+
+    Collections.shuffle(fishPositions, rand);
+    Collections.shuffle(sharkPositions, rand);
+
+    int startEnergy = getSharkStartEnergy();
+    int energyFromFish = getEnergyFromFish();
+    int maxEnergy = getSharkMaxEnergy();
+
+    for (int[] pos : sharkPositions) {
+      List<int[]> fishSpots = neighborPositionsFiltered(current, pos[0], pos[1], eaten, WaTorCellState::isFish);
+      WaTorCellState cell = cast(current.getCellState(pos[0], pos[1]));
+      Shark shark = (Shark) cell.getCreature();
+
+      WaTorTurnResult result = shark.tryEat(fishSpots, rand, startEnergy, energyFromFish, maxEnergy);
+      boolean ate = (result != null);
+      if (result == null) {
+        List<int[]> openSpots = neighborPositionsFiltered(current, pos[0], pos[1], claimed, WaTorCellState::isWater);
+        result = shark.move(openSpots, rand, startEnergy);
+      }
+      applyResult(pos[0], pos[1], result, next, claimed, eaten, ate);
+    }
+
+    for (int[] pos : fishPositions) {
+      if (eaten.contains(key(pos[0], pos[1]))) continue;
+      List<int[]> openSpots = neighborPositionsFiltered(current, pos[0], pos[1], claimed, WaTorCellState::isWater);
+      WaTorCellState cell = cast(current.getCellState(pos[0], pos[1]));
+      Fish fish = (Fish) cell.getCreature();
+      WaTorTurnResult result = fish.act(openSpots, rand);
+      applyResult(pos[0], pos[1], result, next, claimed, eaten, false);
+    }
+  }
+
+  private void applyResult(int r, int c, WaTorTurnResult result,
+      Grid next, Set<String> claimed, Set<String> eaten, boolean destWasEaten) {
+    next.setCellState(r, c, result.atCurrent());
+    claimed.add(key(r, c));
+    if (result.hasDest()) {
+      next.setCellState(result.destR(), result.destC(), result.atDest());
+      claimed.add(key(result.destR(), result.destC()));
+      if (destWasEaten) eaten.add(key(result.destR(), result.destC()));
+    }
+  }
+
+  private static List<int[]> collectPositions(ReadOnlyGrid grid, int rows, int cols,
+      Predicate<WaTorCellState> predicate) {
+    List<int[]> positions = new ArrayList<>();
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        if (predicate.test(cast(grid.getCellState(r, c)))) positions.add(new int[]{r, c});
+      }
+    }
+    return positions;
+  }
+
+  /** Neighbor positions (as int[]) where state matches predicate and position is not in excluded set. */
+  private static List<int[]> neighborPositionsFiltered(ReadOnlyGrid current, int r, int c,
+      Set<String> excluded, Predicate<WaTorCellState> stateMatches) {
+    List<int[]> result = new ArrayList<>();
+    for (Map.Entry<Position, CellState> e : current.getNeighborStates(r, c).entrySet()) {
+      Position pos = e.getKey();
+      if (stateMatches.test(cast(e.getValue())) && !excluded.contains(key(pos.row(), pos.col()))) {
+        result.add(new int[]{pos.row(), pos.col()});
+      }
+    }
+    return result;
+  }
+
+  private static WaTorCellState cast(CellState state) {
+    return (state instanceof WaTorCellState wcs) ? wcs : WaTorCellState.water();
+  }
 
   private static String key(int r, int c) {
     return r + "," + c;
   }
 
-  /** Wa-Tor rule with default parameters (sharks die off when no fish). */
-  public WaTorRule() {
-    this(DEFAULT_PARAMETERS);
+  private int getIntParam(String key, int defaultValue) {
+    return parameters.containsKey(key) ? parameters.get(key).intValue() : defaultValue;
   }
 
-  /** Wa-Tor rule with the given parameters (e.g. sharkStartEnergy, sharkEnergyFromFish). */
-  public WaTorRule(Map<String, Double> parameters) {
-    super(new CardinalNeighborStrategy(), parameters);
-    rand = new Random();
+  private int getSharkStartEnergy() {
+    return Math.min(getIntParam(SHARK_START_ENERGY, Shark.DEFAULT_START_ENERGY), getSharkMaxEnergy());
   }
 
-  /** Initializes breed counts and shark energy for the grid; no-op if already initialized. */
-  public void initEnduringValues(CellState[][] currentStates)
-  {
-    int rows = currentStates.length;
-    int cols = currentStates[0].length;
-    if(fishGenCount == null)
-    {
-      int sharkStartEnergy;
-      fishGenCount = new int[rows][cols];
-      sharkGenCount = new int[rows][cols];
-      sharkEnergy = new int[rows][cols];
-      if (parameters != null && parameters.containsKey(SHARK_START_ENERGY))
-      {
-        double dsharkStartEnergy = parameters.get(SHARK_START_ENERGY);
-        sharkStartEnergy = (int) dsharkStartEnergy;
-      }
-      else {
-        sharkStartEnergy = DEFAULT_SHARK_START_ENERGY;
-      }
-      for (int r = 0; r < currentStates.length; r++) {
-        for (int c = 0; c < currentStates[0].length; c++) {
-          fishGenCount[r][c] = 0;
-          sharkGenCount[r][c] = 0;
-          if(currentStates[r][c] == WaTorState.SHARK)
-          {
-            sharkEnergy[r][c] = sharkStartEnergy;
-          }
-        }
-      }
-    }
+  private int getEnergyFromFish() {
+    return getIntParam(SHARK_ENERGY_FROM_FISH, Shark.DEFAULT_ENERGY_FROM_FISH);
   }
 
-  /** One generation: fish then sharks move (or eat); reproduction and energy applied. */
-  @Override
-  public CellState[][] getNextStates(CellState[][] currentStates) {
-    initEnduringValues(currentStates);
-    int rows = currentStates.length;
-    int cols = currentStates[0].length;
-    CellState[][] nextStates = new CellState[rows][cols];
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        nextStates[r][c] = currentStates[r][c];
-      }
-    }
-    Set<String> claimed = new HashSet<>();
-    Set<String> eaten = new HashSet<>();
-
-    List<int[]> fishPositions = new ArrayList<>();
-    List<int[]> sharkPositions = new ArrayList<>();
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        if (currentStates[r][c] == WaTorState.FISH) fishPositions.add(new int[] { r, c });
-        else if (currentStates[r][c] == WaTorState.SHARK) sharkPositions.add(new int[] { r, c });
-      }
-    }
-    Collections.shuffle(fishPositions);
-    Collections.shuffle(sharkPositions);
-
-    for (int[] pos : fishPositions) {
-      int r = pos[0], c = pos[1];
-      if (eaten.contains(key(r, c))) continue;
-      List<int[]> neighborPositions = getNeighborPositions(rows, cols, r, c);
-      moveIntoOpenSpot(r, c, currentStates, nextStates, false, claimed, neighborPositions);
-    }
-    for (int[] pos : sharkPositions) {
-      int r = pos[0], c = pos[1];
-      List<int[]> neighborPositions = getNeighborPositions(rows, cols, r, c);
-      if (!trySharkEat(r, c, currentStates, nextStates, claimed, eaten, neighborPositions)) {
-        moveIntoOpenSpot(r, c, currentStates, nextStates, true, claimed, neighborPositions);
-      }
-    }
-    return nextStates;
+  private int getSharkMaxEnergy() {
+    return getIntParam(SHARK_MAX_ENERGY, Shark.DEFAULT_MAX_ENERGY);
   }
 
-  /** Returns true if shark ate a fish (or died); false if no prey, so caller should call moveIntoOpenSpot. */
-  private boolean trySharkEat(int r, int c, CellState[][] currentStates, CellState[][] nextStates,
-      Set<String> claimed, Set<String> eaten, List<int[]> neighborPositions) {
-    int energy = sharkEnergy[r][c] - 1;
-    if (energy <= 0) {
-      nextStates[r][c] = WaTorState.WATER;
-      return true;
-    }
-    int energyFromFish = parameters != null && parameters.containsKey(SHARK_ENERGY_FROM_FISH)
-        ? parameters.get(SHARK_ENERGY_FROM_FISH).intValue() : DEFAULT_ENERGY_FROM_EATING_FISH;
-    List<int[]> fishSpots = getUnclaimedSpots(
-        getNeighborPositionsForState(neighborPositions, WaTorState.FISH, currentStates), eaten);
-    if (!fishSpots.isEmpty()) {
-      int[] prey = fishSpots.get(rand.nextInt(fishSpots.size()));
-      int pr = prey[0], pc = prey[1];
-      eaten.add(key(pr, pc));
-      claimed.add(key(pr, pc));
-      int birthGens = DEFAULT_SHARK_BIRTH_GENS;
-      int gens = sharkGenCount[r][c];
-      nextStates[pr][pc] = WaTorState.SHARK;
-      sharkEnergy[pr][pc] = energy + energyFromFish;
-      sharkGenCount[pr][pc] = (gens >= birthGens) ? 0 : gens + 1;
-      if (gens >= birthGens) {
-        nextStates[r][c] = WaTorState.SHARK;
-        sharkGenCount[r][c] = 0;
-        sharkEnergy[r][c] = DEFAULT_SHARK_START_ENERGY;
-      } else {
-        nextStates[r][c] = WaTorState.WATER;
-      }
-      return true;
-    }
-    return false;
-  }
-
-  private void moveIntoOpenSpot(int r, int c, CellState[][] currentStates, CellState[][] nextStates,
-      boolean isShark, Set<String> claimed, List<int[]> neighborPositions) {
-    int birthGens = isShark ? DEFAULT_SHARK_BIRTH_GENS : DEFAULT_FISH_BIRTH_GENS;
-    int gens = isShark ? sharkGenCount[r][c] : fishGenCount[r][c];
-    int[][] genCountArray = isShark ? sharkGenCount : fishGenCount;
-    CellState targetState = isShark ? WaTorState.SHARK : WaTorState.FISH;
-    List<int[]> openSpots = getUnclaimedSpots(
-        getNeighborPositionsForState(neighborPositions, WaTorState.WATER, currentStates), claimed);
-    int sharkEnergyAfterStep = isShark ? sharkEnergy[r][c] - 1 : 0;
-    if (openSpots.isEmpty()) {
-      nextStates[r][c] = targetState;
-      claimed.add(key(r, c));
-      genCountArray[r][c] = gens + 1;
-      if (isShark) sharkEnergy[r][c] = sharkEnergyAfterStep;
-      return;
-    }
-    int[] newPosition = openSpots.get(rand.nextInt(openSpots.size()));
-    int nr = newPosition[0], nc = newPosition[1];
-    nextStates[nr][nc] = targetState;
-    claimed.add(key(nr, nc));
-    if (gens >= birthGens) {
-      nextStates[r][c] = targetState;
-      genCountArray[r][c] = 0;
-      if (isShark) {
-        sharkEnergy[r][c] = DEFAULT_SHARK_START_ENERGY;
-        sharkEnergy[nr][nc] = sharkEnergyAfterStep;
-      }
-      genCountArray[nr][nc] = 0;
-    } else {
-      nextStates[r][c] = WaTorState.WATER;
-      genCountArray[nr][nc] = gens + 1;
-      if (isShark) sharkEnergy[nr][nc] = sharkEnergyAfterStep;
-    }
-  }
-
-  private List<int[]> getUnclaimedSpots(List<int[]> spots, Set<String> claimed) {
-    List<int[]> out = new ArrayList<>();
-    for (int[] spot : spots) {
-      if (!claimed.contains(key(spot[0], spot[1]))) out.add(spot);
-    }
-    return out;
-  }
-
-  @Override
-  public Map<CellState, String> getStateColors() {
-    return stateColorsFor(WaTorState.WATER, WaTorState.FISH, WaTorState.SHARK);
-  }
-
-  /** Maps 0=WATER, 1=FISH, 2=SHARK. */
   @Override
   public CellState fromInt(int value) {
-    return WaTorState.fromInt(value);
-  }
-
-  @Override
-  public CellState getNextStateInCycle(CellState current) {
-    return WaTorState.getNextStateInCycle(current);
-  }
-
-  @Override
-  public int fromState(CellState state) {
-    return WaTorState.fromState(state);
+    return switch (value) {
+      case WaTorCellState.WATER_INT -> WaTorCellState.water();
+      case WaTorCellState.FISH_INT  -> new WaTorCellState(new Fish());
+      case WaTorCellState.SHARK_INT -> new WaTorCellState(new Shark(getSharkStartEnergy()));
+      default -> throw new IllegalArgumentException(ERROR_INVALID_STATE + value);
+    };
   }
 }

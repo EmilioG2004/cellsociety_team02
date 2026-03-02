@@ -2,38 +2,44 @@ package cellsociety.Model.CellState;
 
 /** Game of Life cell states: DEAD, ALIVE. */
 public enum GameOfLifeState implements CellState {
-  DEAD("WHITE"),
-  ALIVE("GREEN");
+  DEAD(0),
+  ALIVE(1);
 
-  private static final int STATE_VALUE_DEAD = 0;
-  private static final int STATE_VALUE_ALIVE = 1;
+  /** Int encoding for config and fromInt. */
+  public static final int DEAD_INT = 0;
+  public static final int ALIVE_INT = 1;
+
   private static final String ERROR_MESSAGE_INVALID_STATE = "Invalid GameOfLife state: ";
 
-  private final String color;
+  private final int stateValue;
 
-  GameOfLifeState(String color) {
-    this.color = color;
+  GameOfLifeState(int stateValue) {
+    this.stateValue = stateValue;
   }
 
   @Override
-  public String getColor() {
-    return color;
+  public int toInt() {
+    return stateValue;
+  }
+
+  @Override
+  public CellState getNextInCycle() {
+    return getNextStateInCycle(this);
   }
 
   public static GameOfLifeState fromInt(int value) {
     return switch (value) {
-      case STATE_VALUE_DEAD -> DEAD;
-      case STATE_VALUE_ALIVE -> ALIVE;
+      case DEAD_INT -> DEAD;
+      case ALIVE_INT -> ALIVE;
       default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + value);
     };
   }
 
-  public static int fromState(CellState state){
-    return switch (state){
-      case DEAD -> STATE_VALUE_DEAD;
-      case ALIVE -> STATE_VALUE_ALIVE;
-      default -> throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
-    };
+  public static int fromState(CellState state) {
+    if (state instanceof GameOfLifeState gs) {
+      return gs.stateValue;
+    }
+    throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_STATE + state);
   }
 
   public static GameOfLifeState getNextStateInCycle(CellState current) {
