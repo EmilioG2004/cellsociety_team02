@@ -69,7 +69,6 @@ public class WiringManager {
   public void wireAll(List<SimulationSlot> mySlots) {
     wireAboutDialogClose();
     wireApplyChanges(mySlots);
-    wireSplashLoad();
     wireSettings();
     wireForward(mySlots);
     wireBackward(mySlots);
@@ -80,7 +79,6 @@ public class WiringManager {
     wireSlowDown(mySlots);
     wireReset(mySlots);
     wireToggleOutline(mySlots);
-    wireRotate();
   }
 
   private void wireAboutDialogClose() {
@@ -180,39 +178,6 @@ public class WiringManager {
     });
   }
 
-  /**
-  private void wireSave() {
-    mySimView.getMyButtons().getSaveButton().setOnAction(e -> {
-      SimulationConfig initialConfig = getInitialConfig.get();
-      if (initialConfig == null) return;
-      if (!myDriver.hasSimulation()) return;
-      if (myDriver.isRunning()) myDriver.pause();
-
-      ReadOnlyGrid grid = myDriver.getSimulation().getReadOnlyGrid();
-      CellState[][] stateSnapshot = ReadOnlyGrid.copyToArray(grid);
-      int[][] intSnapshot = ReadOnlyGrid.produceIntArray(stateSnapshot, myDriver.getSimulation().getRule());
-
-      SimulationConfig configSnapshot = new SimulationConfig(
-          initialConfig.getSimulationType(),
-          initialConfig.getRuleClass(),
-          initialConfig.getNeighborStrategyClass(),
-          initialConfig.getTitle(),
-          initialConfig.getAuthor(),
-          initialConfig.getDescription(),
-          grid.getRows(),
-          grid.getCols(),
-          intSnapshot,
-          new HashMap<>(initialConfig.getParameters())
-      );
-
-      File saveDestination = mySimView.showSaveConfigDialog();
-      if (saveDestination != null) {
-        myConfigSaver.saveConfig(configSnapshot, saveDestination);
-      }
-    });
-  }
-   */
-
   private void wireReset(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getResetButton().setOnAction(e -> {
       for (SimulationSlot slot : mySlots) {
@@ -222,22 +187,6 @@ public class WiringManager {
       }
     });
   }
-
-  /**
-  private void wireAbout() {
-    mySimView.getMyAboutDialog().getMyCloseButton().setOnAction(c ->
-        mySimView.getMyAboutDialog().closeInfo()
-    );
-
-    mySimView.getMyButtons().getAboutButton().setOnAction(e -> {
-      SimulationConfig initialConfig = getInitialConfig.get();
-      if (initialConfig == null) {
-        throw new IllegalStateException("No configuration loaded");
-      }
-      mySimView.showAboutSplash(initialConfig);
-    });
-  }
-   */
 
   private void wireToggleOutline(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getToggleOutlineButton().setOnAction(e -> {
@@ -266,20 +215,10 @@ public class WiringManager {
     });
   }
 
-  private void wireSplashLoad() {
-    mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
-      mySimView.closeSettings();
-    });
-  }
-
   private void wireSettings() {
     mySimView.getMyButtons().getSettingsButton().setOnAction(e -> mySimView.openSettings());
   }
 
-  private void wireRotate() {
-    mySimView.getMyButtons().getRotateLeftButton().setOnAction(e -> mySimView.getMyGridView().rotateLeft());
-    mySimView.getMyButtons().getRotateRightButton().setOnAction(e -> mySimView.getMyGridView().rotateRight());
-  }
 
   private ResourceBundle loadLanguageBundle(String choice) {
     return switch (choice) {
