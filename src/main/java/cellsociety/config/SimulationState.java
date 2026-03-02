@@ -3,51 +3,30 @@ package cellsociety.config;
 import java.util.List;
 
 /**
- * Immutable snapshot of the overall application state:
- * - Active simulations
- * - UI theme
- * - Simulation speed
- * - Current language
+ * Immutable snapshot of the overall application state, with active simulations and preferences
  */
 public final class SimulationState {
 
   private final List<SimulationConfig> activeSimulations;
-  private final int theme;
-  private final double simulationSpeed;
-  private final String language;
+  private final SimulationPreferences preferences;
 
   public SimulationState(
       List<SimulationConfig> activeSimulations,
-      int theme,
-      double simulationSpeed,
-      String language
+      SimulationPreferences preferences
   ) {
     if (activeSimulations == null) {
       throw new IllegalArgumentException("activeSimulations cannot be null");
     }
-    if (simulationSpeed <= 0) {
-      throw new IllegalArgumentException("simulationSpeed must be positive");
+    if (preferences == null) {
+      throw new IllegalArgumentException("preferences cannot be null");
     }
 
     this.activeSimulations = List.copyOf(activeSimulations);
-    this.theme = theme;
-    this.simulationSpeed = simulationSpeed;
-    this.language = language;
+    this.preferences = preferences;
   }
 
   public List<SimulationConfig> getActiveSimulations() {
     return activeSimulations;
   }
-
-  public int getTheme() {
-    return theme;
-  }
-
-  public double getSimulationSpeed() {
-    return simulationSpeed;
-  }
-
-  public String getLanguage() {
-    return language;
-  }
+  public SimulationPreferences getPreferences() { return preferences; }
 }

@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
 import static cellsociety.config.ConfigXmlConstants.*;
 
 /**
@@ -18,16 +20,6 @@ public class ConfigLoader {
 
   private final ConfigGridParser gridParser = new ConfigGridParser();
 
-  /**
-   * Parses an XML config file into a {@link SimulationConfig}.
-   *
-   * @param xmlFile path to a valid simulation XML file
-   * @return the parsed configuration (never null)
-   * @throws ParserConfigurationException if the XML parser cannot be configured
-   * @throws IOException                  if the file cannot be read
-   * @throws SAXException                 if the XML is not well-formed
-   * @throws IllegalArgumentException     if required elements or attributes are missing or invalid
-   */
   public SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
@@ -36,10 +28,37 @@ public class ConfigLoader {
         .newDocumentBuilder()
         .parse(xmlFile);
 
-    SimulationTypeAndClass simulationTypeAndClass= getSimulationType(xmlDocument);
+    return loadConfig(xmlDocument);
+  }
+
+  public SimulationConfig loadConfig(Element simulationElement)
+      throws ParserConfigurationException {
+
+    if (simulationElement == null) {
+      throw new IllegalArgumentException("simulationElement cannot be null");
+    }
+    if (!CONFIG_SIMULATION.equals(simulationElement.getTagName())) {
+      throw new IllegalArgumentException(
+          "Expected <" + CONFIG_SIMULATION + "> element but got <" + simulationElement.getTagName() + ">");
+    }
+
+    Document doc = DocumentBuilderFactory
+        .newInstance()
+        .newDocumentBuilder()
+        .newDocument();
+
+    Element imported = (Element) doc.importNode(simulationElement, true);
+    doc.appendChild(imported);
+
+    return loadConfig(doc);
+  }
+
+  private SimulationConfig loadConfig(Document xmlDocument) {
+    SimulationTypeAndClass simulationTypeAndClass = getSimulationType(xmlDocument);
     String simulationType = simulationTypeAndClass.simulationType;
     String ruleClass = simulationTypeAndClass.ruleClass;
     String neighborStrategyClass = simulationTypeAndClass.neighborStrategyClass;
+
     Element metadata = getMetadata(xmlDocument);
     String title = getChildText(metadata, CONFIG_TITLE);
     String author = getChildText(metadata, CONFIG_AUTHOR);
@@ -91,8 +110,13 @@ public class ConfigLoader {
       throw new IllegalArgumentException(
           "Simulation element must have both 'type' and 'class' attributes (e.g. type=\"GameOfLife\" class=\"cellsociety.Model.GameRules.ConwayGameOfLifeRule\")");
     }
+
     String neighborStrategyAttr = simulation.getAttribute(CONFIG_NEIGHBOR_STRATEGY_ATTR).trim();
-    return new SimulationTypeAndClass(typeAttr, classAttr, neighborStrategyAttr.isEmpty() ? null : neighborStrategyAttr);
+    return new SimulationTypeAndClass(
+        typeAttr,
+        classAttr,
+        neighborStrategyAttr.isEmpty() ? null : neighborStrategyAttr
+    );
   }
 
   private Element getMetadata(Document xmlDocument) {
@@ -104,9 +128,9 @@ public class ConfigLoader {
     if (child == null) return "";
     return child.getTextContent().trim();
   }
+
   /** Result of parsing the {@code <simulation>} element: display type, fully qualified rule class name, and optional neighbor strategy class name. */
   public record SimulationTypeAndClass(String simulationType, String ruleClass, String neighborStrategyClass) {}
-  
 
   private HashMap<String, Double> getParameters(Document xmlDocument) {
     HashMap<String, Double> params = new HashMap<>();

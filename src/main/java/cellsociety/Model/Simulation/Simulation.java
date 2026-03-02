@@ -6,8 +6,13 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ReadOnlyGrid;
 
-/** Runs a single simulation: applies a GameRule to a grid and maintains step-back history. */
+/**
+ * Runs a single simulation: applies a GameRule to a grid and maintains step-back history.
+ *
+ * @author Michael Lei
+ */
 public class Simulation {
 
   /** Minimum number of states on the stack (current only) before stepBack is allowed. */
@@ -68,6 +73,10 @@ public class Simulation {
   }
 
   public GridViewData getGridViewData() {
+    return myGrid;
+  }
+
+  public ReadOnlyGrid getReadOnlyGrid() {
     return myGrid;
   }
 

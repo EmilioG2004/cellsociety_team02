@@ -68,10 +68,11 @@ public class WiringManager {
    *
    * <p>Return value: none.</p>
    */
-  public void wireAll(List<SimulationSlot> mySlots) {
+  public void wireAll(List<SimulationSlot> mySlots, Runnable onSplashLoad) {
     wireAboutDialogClose();
     wireSaveAll();
     wireApplyChanges(mySlots);
+    wireSplashLoad(onSplashLoad);
     wireSettings();
     wireForward(mySlots);
     wireBackward(mySlots);
@@ -218,6 +219,15 @@ public class WiringManager {
       String themeChoice = mySimView.getMySettings().getMyThemes().getValue();
       mySimView.applyTheme(myScene, themeChoice);
 
+      mySimView.closeSettings();
+    });
+  }
+
+  private void wireSplashLoad(Runnable onSplashLoad) {
+    mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
+      if (onSplashLoad != null) {
+        onSplashLoad.run();
+      }
       mySimView.closeSettings();
     });
   }

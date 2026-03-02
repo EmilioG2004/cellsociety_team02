@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cellsociety.Model.Creature.Fish;
+import cellsociety.Model.CellState.WaTor.Fish;
+import cellsociety.Model.CellState.WaTor.WaTorCellState;
+import cellsociety.Model.CellState.WaTor.WaTorTurnResult;
 import org.junit.jupiter.api.Test;
 
 /**

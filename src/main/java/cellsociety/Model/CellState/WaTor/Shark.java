@@ -1,11 +1,13 @@
-package cellsociety.Model.Creature;
+package cellsociety.Model.CellState.WaTor;
 
-import cellsociety.Model.CellState.WaTorCellState;
-import cellsociety.Model.CellState.WaTorTurnResult;
 import java.util.List;
 import java.util.Random;
 
-/** A shark in the Wa-Tor simulation. Must eat fish to maintain energy; reproduces after BREED_THRESHOLD steps. */
+/**
+ * A shark in the Wa-Tor simulation. Must eat fish to maintain energy; reproduces after BREED_THRESHOLD steps.
+ *
+ * @author Michael Lei
+ */
 public class Shark extends Creature {
 
   public static final int BREED_THRESHOLD = 6;

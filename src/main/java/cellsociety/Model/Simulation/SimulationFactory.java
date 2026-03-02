@@ -1,6 +1,7 @@
 package cellsociety.Model.Simulation;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.GameRules.CellFactory;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.Grid;
@@ -10,7 +11,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-/** Builds a Simulation from a SimulationConfig (rule class, dimensions, initial states, parameters). */
+/**
+ * Builds a Simulation from a SimulationConfig (rule class, dimensions, initial states, parameters).
+ *
+ * @author Michael Lei
+ */
 public class SimulationFactory {
 
   private static final String ERROR_MESSAGE_INVALID_CONFIG = "Invalid simulation configuration: ";
@@ -89,20 +94,20 @@ public class SimulationFactory {
   }
 
   /**
-   * Builds a grid from config dimensions and initial states, using the rule to convert int states to cell states.
-   * Neighbor strategy comes from config if specified, otherwise from the rule's default.
+   * Builds a grid from config dimensions and initial states, using the cell factory to convert int states to cell states.
+   * Neighbor strategy comes from config if specified, otherwise the given default strategy.
    */
-  public static Grid createGrid(SimulationConfig config, GameRule rule) {
+  public static Grid createGrid(SimulationConfig config, CellFactory cellFactory, NeighborStrategy defaultStrategy) {
     int rows = config.getRows();
     int cols = config.getCols();
     NeighborStrategy strategy = (config.getNeighborStrategyClass() != null && !config.getNeighborStrategyClass().isBlank())
         ? createNeighborStrategyFromClass(config.getNeighborStrategyClass())
-        : rule.getDefaultNeighborStrategy();
+        : defaultStrategy;
     int[][] intStates = config.getInitialStates();
     CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        states[r][c] = rule.fromInt(intStates[r][c]);
+        states[r][c] = cellFactory.fromInt(intStates[r][c]);
       }
     }
     return new ArrayGrid(states, strategy);
@@ -124,7 +129,7 @@ public class SimulationFactory {
       Map<String, Double> params =
           config.getParameters() != null ? config.getParameters() : Map.of();
       GameRule rule = createRuleFromClass(ruleClassName, params);
-      Grid grid = createGrid(config, rule);
+      Grid grid = createGrid(config, rule, rule.getDefaultNeighborStrategy());
       return new Simulation(grid, rule);
     } catch (IllegalArgumentException e) {
       throw e;

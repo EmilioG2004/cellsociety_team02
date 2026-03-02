@@ -1,13 +1,13 @@
-package cellsociety.Model.CellState;
+package cellsociety.Model.CellState.WaTor;
 
-import cellsociety.Model.Creature.Creature;
-import cellsociety.Model.Creature.Fish;
-import cellsociety.Model.Creature.Shark;
+import cellsociety.Model.CellState.CellState;
 
 /**
  * CellState for the Wa-Tor simulation. Wraps a {@link Creature} (null means water/empty).
  * Equality is based on creature type only (not breed counter or energy), so map lookups
  * and legend display work correctly across different simulation steps.
+ *
+ * @author Michael Lei
  */
 public class WaTorCellState implements CellState {
 

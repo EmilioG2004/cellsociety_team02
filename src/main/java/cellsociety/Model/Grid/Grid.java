@@ -6,6 +6,8 @@ import cellsociety.Model.CellState.CellState;
  * Full grid interface: read-only view plus mutation and copy operations.
  * Concrete implementations (e.g. ArrayGrid) are created by SimulationFactory and passed
  * to Simulation as this interface, so Simulation stays decoupled from the concrete type.
+ *
+ * @author Michael Lei
  */
 public interface Grid extends ReadOnlyGrid {
 

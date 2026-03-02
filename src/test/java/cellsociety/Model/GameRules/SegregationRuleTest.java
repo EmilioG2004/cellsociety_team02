@@ -6,6 +6,8 @@ import static cellsociety.Model.CellState.SegregationState.GROUP_B;
 import static org.junit.jupiter.api.Assertions.*;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.Grid.ArrayGrid;
+import cellsociety.Model.Grid.Grid;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,75 +27,79 @@ class SegregationRuleTest {
     ruleEmptyParams = new SegregationRule(Map.<String, Double>of());
   }
 
+  private CellState[][] next(GameRule r, CellState[][] input) {
+    Grid g = new ArrayGrid(input, r.getDefaultNeighborStrategy());
+    Grid result = r.getNextGrid(g);
+    CellState[][] out = new CellState[input.length][input[0].length];
+    for (int row = 0; row < input.length; row++) {
+      for (int col = 0; col < input[0].length; col++) {
+        out[row][col] = result.getCellState(row, col);
+      }
+    }
+    return out;
+  }
+
   @Test
-  void getNextStates_allEmpty_staysAllEmpty() {
+  void getNextGrid_allEmpty_staysAllEmpty() {
     CellState[][] allEmpty = {
         {EMPTY, EMPTY, EMPTY},
         {EMPTY, EMPTY, EMPTY},
         {EMPTY, EMPTY, EMPTY}
     };
-    CellState[][] next = ruleDefault.getNextStates(allEmpty);
+    CellState[][] n = next(ruleDefault, allEmpty);
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
-        assertEquals(EMPTY, next[r][c]);
+        assertEquals(EMPTY, n[r][c]);
       }
     }
   }
 
   @Test
-  void getNextStates_1x1Empty_staysEmpty() {
+  void getNextGrid_1x1Empty_staysEmpty() {
     CellState[][] single = {{EMPTY}};
-    CellState[][] next = ruleDefault.getNextStates(single);
-    assertEquals(EMPTY, next[0][0]);
+    assertEquals(EMPTY, next(ruleDefault, single)[0][0]);
   }
 
   @Test
-  void getNextStates_1x1GroupA_noNeighbors_isSatisfied_stays() {
+  void getNextGrid_1x1GroupA_noNeighbors_isSatisfied_stays() {
     CellState[][] grid = {{GROUP_A}};
-    CellState[][] next = ruleThresholdOne.getNextStates(grid);
-    assertEquals(GROUP_A, next[0][0]);
+    assertEquals(GROUP_A, next(ruleThresholdOne, grid)[0][0]);
   }
 
   @Test
-  void getNextStates_thresholdZero_noOneMoves_gridUnchanged() {
+  void getNextGrid_thresholdZero_noOneMoves_gridUnchanged() {
     CellState[][] grid = {
         {GROUP_A, GROUP_B, EMPTY},
         {GROUP_A, GROUP_B, EMPTY},
         {EMPTY,   EMPTY,   EMPTY}
     };
     CellState[][] copy = deepCopy(grid);
-
-    CellState[][] next = ruleThresholdZero.getNextStates(grid);
-
-    assertGridsEqual(copy, next);
+    CellState[][] n = next(ruleThresholdZero, grid);
+    assertGridsEqual(copy, n);
   }
 
   @Test
-  void getNextStates_singleUnhappyAgent_movesToOnlyEmptySpot_moore() {
+  void getNextGrid_singleUnhappyAgent_movesToOnlyEmptySpot_moore() {
     CellState[][] grid = {
         {GROUP_A, GROUP_A, GROUP_A},
         {GROUP_A, GROUP_A, GROUP_A},
         {GROUP_A, GROUP_B, EMPTY}
     };
-    CellState[][] next = ruleThresholdOne.getNextStates(grid);
-
-    assertEquals(EMPTY, next[1][1]);
-    assertEquals(GROUP_A, next[2][2]);
-
-    assertSameCounts(grid, next);
+    CellState[][] n = next(ruleThresholdOne, grid);
+    assertEquals(EMPTY, n[1][1]);
+    assertEquals(GROUP_A, n[2][2]);
+    assertSameCounts(grid, n);
   }
 
   @Test
-  void getNextStates_doesNotMutateInput() {
+  void getNextGrid_doesNotMutateInput() {
     CellState[][] input = {
         {GROUP_A, GROUP_B, EMPTY},
         {GROUP_A, GROUP_A, GROUP_B},
         {EMPTY,   GROUP_B, GROUP_A}
     };
     CellState[][] copy = deepCopy(input);
-
-    ruleDefault.getNextStates(input);
-
+    next(ruleDefault, input);
     assertGridsEqual(copy, input);
   }
 
@@ -113,7 +119,6 @@ class SegregationRuleTest {
   void constructor_emptyParameters_accepts() {
     assertNotNull(ruleEmptyParams);
   }
-
 
   private static CellState[][] deepCopy(CellState[][] grid) {
     CellState[][] copy = new CellState[grid.length][grid[0].length];
