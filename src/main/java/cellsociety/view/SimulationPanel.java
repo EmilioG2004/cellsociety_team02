@@ -3,13 +3,10 @@ package cellsociety.view;
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Grid.ReadOnlyGrid;
-
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
+import cellsociety.Model.Grid.GridViewData;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -28,7 +25,7 @@ import javafx.scene.layout.VBox;
  * {@link SimulationView} UI.</p>
  *
  * <p>Assumptions: the caller initializes the grid via {@link #setGrid(int, int)}
- * before calling {@link #render(ReadOnlyGrid, Map)}.</p>
+ * before calling {@link #render(GridViewData)}.</p>
  *
  * <p>Dependencies: {@link GridView} implementations, JavaFX layout nodes, and
  * localized strings from {@link ResourceBundle}.</p>
@@ -37,7 +34,7 @@ import javafx.scene.layout.VBox;
  * <pre>{@code
  * SimulationPanel panel = new SimulationPanel(bundle);
  * panel.setGrid(rows, cols);
- * panel.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * panel.render(sim.getGridViewData());
  * }</pre>
  *
  * <p>Other details: this panel exposes controls for loading, viewing metadata, and rotating
@@ -56,6 +53,7 @@ public class SimulationPanel implements SimulationRenderer {
   private final Button myRotateLeftButton;
   private final Button myRotateRightButton;
   private final Button myAboutButton;
+  private final Button mySaveButton;
 
   private final StackPane myGridContainer;
 
@@ -78,38 +76,63 @@ public class SimulationPanel implements SimulationRenderer {
    */
   public SimulationPanel(ResourceBundle bundle) {
     myBundle = bundle;
-
-    myRoot = new VBox(SPACING_SMALL);
-    myRoot.setPadding(new Insets(SPACING_SMALL));
-    myRoot.setAlignment(Pos.CENTER);
-    myRoot.setFillWidth(true);
-
     myGeneration = 0;
-    myGenerationLabel = new Label(myBundle.getString(LABEL_GENERATION_UNSET));
-    myGenerationLabel.setMaxWidth(Double.MAX_VALUE);
-    myGenerationLabel.setAlignment(Pos.CENTER);
+    myRoot = buildRootContainer();
+    myGenerationLabel = buildGenerationLabel();
+    myLoadButton = buildButton(BUTTON_LOAD_SIM);
+    myRotateLeftButton = buildButton(BUTTON_ROTATE_LEFT);
+    myRotateRightButton = buildButton(BUTTON_ROTATE_RIGHT);
+    myAboutButton = buildButton(BUTTON_ABOUT_CONFIG);
+    mySaveButton = buildButton(BUTTON_SAVE_STATE);
+    myGridContainer = buildGridContainer();
 
-    myLoadButton = new Button(myBundle.getString(BUTTON_LOAD_SIM));
-    myRotateLeftButton = new Button(myBundle.getString(BUTTON_ROTATE_LEFT));
-    myRotateRightButton = new Button(myBundle.getString(BUTTON_ROTATE_RIGHT));
-    myAboutButton = new Button(myBundle.getString(BUTTON_ABOUT_CONFIG));
+    configureHandlers();
+    myRoot.getChildren().addAll(buildHeader(), myGridContainer, buildRotationRow());
+    VBox.setVgrow(myGridContainer, Priority.ALWAYS);
+  }
+
+  private VBox buildRootContainer() {
+    VBox root = new VBox(SPACING_SMALL);
+    root.setPadding(new Insets(SPACING_SMALL));
+    root.setAlignment(Pos.CENTER);
+    root.setFillWidth(true);
+    return root;
+  }
+
+  private Label buildGenerationLabel() {
+    Label generation = new Label(myBundle.getString(LABEL_GENERATION_UNSET));
+    generation.setMaxWidth(Double.MAX_VALUE);
+    generation.setAlignment(Pos.CENTER);
+    return generation;
+  }
+
+  private Button buildButton(String key) {
+    return new Button(myBundle.getString(key));
+  }
+
+  private StackPane buildGridContainer() {
+    StackPane gridContainer = new StackPane();
+    gridContainer.setPadding(new Insets(SPACING_SMALL));
+    gridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+    return gridContainer;
+  }
+
+  private void configureHandlers() {
     myRotateLeftButton.setOnAction(e -> rotateLeft());
     myRotateRightButton.setOnAction(e -> rotateRight());
+  }
 
-    myGridContainer = new StackPane();
-    myGridContainer.setPadding(new Insets(SPACING_SMALL));
-    myGridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-    HBox header = new HBox(SPACING_SMALL, myGenerationLabel, myLoadButton, myAboutButton);
+  private HBox buildHeader() {
+    HBox header = new HBox(SPACING_SMALL, myGenerationLabel, myLoadButton, mySaveButton, myAboutButton);
     header.setAlignment(Pos.CENTER);
     HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
+    return header;
+  }
 
+  private HBox buildRotationRow() {
     HBox lower = new HBox(SPACING_SMALL, myRotateLeftButton, myRotateRightButton);
     lower.setAlignment(Pos.CENTER);
-
-
-    myRoot.getChildren().addAll(header, myGridContainer, lower);
-    VBox.setVgrow(myGridContainer, Priority.ALWAYS);
+    return lower;
   }
 
   /**
@@ -141,9 +164,9 @@ public class SimulationPanel implements SimulationRenderer {
    * <p>Return value: none.</p>
    */
   @Override
-  public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+  public void render(GridViewData grid) {
     if (myGridView == null) return;
-    myGridView.render(grid, stateColors);
+    myGridView.render(grid);
   }
 
   /**
@@ -202,6 +225,8 @@ public class SimulationPanel implements SimulationRenderer {
     myAboutButton.setOnAction(e -> action.run());
   }
 
+  public void setOnSave(Runnable action) { mySaveButton.setOnAction(e -> action.run()); }
+
   /**
    * Registers a callback for clicks on this panel's grid cells.
    *
@@ -216,19 +241,17 @@ public class SimulationPanel implements SimulationRenderer {
    *
    * <p>Purpose: mirror the global outline toggle in multi-sim mode.</p>
    *
-   * <p>Assumptions: {@code grid} dimensions match the current grid; {@code stateColors}
-   * contains entries for all cell states.</p>
+   * <p>Assumptions: {@code grid} dimensions match the current grid.</p>
    *
    * <p>Exceptions: none.</p>
    *
    * <p>Return value: none.</p>
    *
    * @param grid read-only grid used to update outlines
-   * @param stateColors mapping from cell states to color strings
    */
-  public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+  public void toggleOutline(GridViewData grid) {
     if (myGridView == null) return;
-    myGridView.toggleOutline(grid, stateColors);
+    myGridView.toggleOutline(grid);
   }
 
   /**
@@ -252,6 +275,7 @@ public class SimulationPanel implements SimulationRenderer {
     myGenerationLabel.setText(MessageFormat.format(
         myBundle.getString(LABEL_GENERATION), myGeneration));
     myLoadButton.setText(myBundle.getString(BUTTON_LOAD_SIM));
+    mySaveButton.setText(myBundle.getString(BUTTON_SAVE_STATE));
     myAboutButton.setText(myBundle.getString(BUTTON_ABOUT_CONFIG));
     myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
     myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));

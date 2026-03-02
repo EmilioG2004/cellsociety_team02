@@ -5,7 +5,6 @@ import cellsociety.Model.CellState.SegregationState;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,14 +17,25 @@ public class SegregationRule extends GameRule {
   private static final String PARAM_SATISFACTION_THRESHOLD = "satisfactionThreshold";
   private static final double THRESHOLD_MIN = 0.0;
   private static final double THRESHOLD_MAX = 1.0;
+  private static final int NO_OCCUPIED_NEIGHBORS = 0;
+
+  public SegregationRule() {
+    super(Map.of());
+  }
 
   public SegregationRule(Map<String, Double> parameters) {
     super(parameters);
-    validateParameters(this.parameters);
+    validateParameters(parameters);
   }
 
-  public SegregationRule() {
-    this(Map.of());
+  public SegregationRule(NeighborStrategy strategy, Map<String, Double> parameters) {
+    super(parameters);
+    validateParameters(parameters);
+  }
+
+  @Override
+  public NeighborStrategy getDefaultNeighborStrategy() {
+    return new MooreNeighborStrategy();
   }
 
   private static void validateParameters(Map<String, Double> parameters) {
@@ -42,51 +52,41 @@ public class SegregationRule extends GameRule {
   public Grid getNextGrid(Grid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
-
-    double threshold = parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
-        ? parameters.get(PARAM_SATISFACTION_THRESHOLD)
-        : DEFAULT_THRESHOLD;
-
     Grid nextGrid = currentGrid.deepCopy();
 
-    List<int[]> emptyCells = new ArrayList<>();
+    double threshold = !parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
+        ? DEFAULT_THRESHOLD
+        : parameters.get(PARAM_SATISFACTION_THRESHOLD);
+
+    List<Position> emptyCells = new ArrayList<>();
     List<Mover> movers = new ArrayList<>();
 
-    // identify empties and unhappy movers
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        CellState s = currentGrid.getCellState(r, c);
+        CellState state = currentGrid.getCellState(r, c);
 
-        if (s == SegregationState.EMPTY) {
-          emptyCells.add(new int[]{r, c});
-        } else {
-          if (!isSatisfied(currentGrid, r, c, s, threshold)) {
-            movers.add(new Mover(r, c, s));
-          }
+        if (state == SegregationState.EMPTY) {
+          emptyCells.add(new Position(r, c));
+          continue;
+        }
+        if (!isSatisfied(currentGrid, r, c, state, threshold)) {
+          movers.add(new Mover(r, c, state));
         }
       }
     }
 
-    // clear movers original positions
     for (Mover m : movers) {
       nextGrid.setCellState(m.r, m.c, SegregationState.EMPTY);
-      emptyCells.add(new int[]{m.r, m.c});
+      emptyCells.add(new Position(m.r, m.c));
     }
 
     // shuffle empties and relocate movers
     Collections.shuffle(emptyCells);
-    int moves = Math.min(movers.size(), emptyCells.size());
 
-    for (int i = 0; i < moves; i++) {
+    for (int i = 0; i < movers.size(); i++) {
       Mover m = movers.get(i);
-      int[] dest = emptyCells.get(i);
-      nextGrid.setCellState(dest[0], dest[1], m.state);
-    }
-
-    // if movers > emptyCells, put the extras back
-    for (int i = moves; i < movers.size(); i++) {
-      Mover m = movers.get(i);
-      nextGrid.setCellState(m.r, m.c, m.state);
+      Position destination = emptyCells.get(i);
+      nextGrid.setCellState(destination.row, destination.col, m.state);
     }
 
     return nextGrid;
@@ -111,6 +111,8 @@ public class SegregationRule extends GameRule {
     return fracSame >= threshold;
   }
 
+  private record Position(int row, int col) {}
+
   private static class Mover {
     final int r;
     final int c;
@@ -121,11 +123,6 @@ public class SegregationRule extends GameRule {
       this.c = c;
       this.state = state;
     }
-  }
-
-  @Override
-  public NeighborStrategy getDefaultNeighborStrategy() {
-    return new MooreNeighborStrategy();
   }
 
   @Override
