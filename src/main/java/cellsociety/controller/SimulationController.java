@@ -92,7 +92,21 @@ public class SimulationController {
 
     setSlotCount(DEFAULT_SLOTS);
 
-    myWires.wireAll(mySlots);
+    myWires.wireAll(mySlots, this::handleSplashLoad);
+  }
+
+  /**
+   * Shows the file chooser and loads the selected config into slot 0.
+   * Called when the user clicks "Load Simulation" in the settings/splash panel.
+   */
+  private void handleSplashLoad() {
+    File xmlFile = mySimView.showOpenConfigDialog();
+    if (xmlFile == null) return;
+    try {
+      loadConfigIntoSlot(0, xmlFile);
+    } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
+      myErrorHandler.handle(ex);
+    }
   }
 
   /**
@@ -133,18 +147,8 @@ public class SimulationController {
   /**
    * Loads an XML config file into the given slot index.
    *
-   * <p>Purpose: instantiate and display a simulation for the selected slot.</p>
-   *
-   * <p>Assumptions: {@code xmlFile} is non-null and readable.</p>
-   *
-   * <p>Exceptions: may throw parsing/IO exceptions if loading fails.</p>
-   *
    * @param slotIndex zero-based slot index
    * @param xmlFile configuration file to load
-   * @throws ParserConfigurationException if the XML parser cannot be configured
-   * @throws IOException if the file cannot be read
-   * @throws SAXException if the XML is malformed
-   * @throws IllegalArgumentException if the configuration is invalid
    */
   public void loadConfigIntoSlot(int slotIndex, File xmlFile)
       throws ParserConfigurationException, IOException, SAXException, IllegalArgumentException {
@@ -288,5 +292,5 @@ public class SimulationController {
     return Math.max(min, Math.min(max, value));
   }
 
-  public void setMyBundle(ResourceBundle bundle){ myBundle = bundle; }
+  public void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
 }

@@ -1,6 +1,10 @@
 package cellsociety.Model.CellState;
 
-/** Percolation cell states: CLOSED, OPEN, FULL. */
+/**
+ * Percolation cell states: CLOSED, OPEN, FULL.
+ *
+ * @author Michael Lei
+ */
 public enum PercolotionState implements CellState {
   CLOSED(0),
   OPEN(1),

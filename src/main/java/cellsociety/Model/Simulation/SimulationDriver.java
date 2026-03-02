@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
  * Controls run state (start/pause), speed, and drives periodic stepping. Invoked by the controller
  * when the user presses Start, Pause, or changes speed. Notifies a callback after each step so
  * the view can refresh. Does not depend on JavaFX or file format.
+ *
+ * @author Michael Lei
  */
 public class SimulationDriver {
   private Simulation simulation;

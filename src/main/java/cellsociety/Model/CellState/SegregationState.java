@@ -1,6 +1,10 @@
 package cellsociety.Model.CellState;
 
-/** Segregation cell states: EMPTY, GROUP_A, GROUP_B. */
+/**
+ * Segregation cell states: EMPTY, GROUP_A, GROUP_B.
+ *
+ * @author Ixa Sigler
+ */
 public enum SegregationState implements CellState {
   EMPTY(0),
   GROUP_A(1),
@@ -48,9 +52,9 @@ public enum SegregationState implements CellState {
   /** Returns the next state in the click-to-toggle cycle: EMPTY -> GROUP_A -> GROUP_B -> EMPTY. */
   public static SegregationState getNextStateInCycle(CellState current) {
     return switch (current) {
-      case EMPTY -> GROUP_A;
-      case GROUP_A -> GROUP_B;
-      case GROUP_B -> EMPTY;
+      case SegregationState.EMPTY -> SegregationState.GROUP_A;
+      case SegregationState.GROUP_A -> SegregationState.GROUP_B;
+      case SegregationState.GROUP_B -> SegregationState.EMPTY;
       default -> (SegregationState) current;
     };
   }

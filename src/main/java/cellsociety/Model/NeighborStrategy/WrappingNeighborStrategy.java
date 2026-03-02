@@ -6,6 +6,8 @@ import java.util.List;
 /**
  * Decorates any {@link NeighborStrategy} so that neighbor positions wrap toroidally:
  * moving off one edge reappears on the opposite edge.
+ *
+ * @author Michael Lei
  */
 public class WrappingNeighborStrategy implements NeighborStrategy {
 

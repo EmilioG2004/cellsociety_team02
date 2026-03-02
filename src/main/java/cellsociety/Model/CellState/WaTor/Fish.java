@@ -1,11 +1,13 @@
-package cellsociety.Model.Creature;
+package cellsociety.Model.CellState.WaTor;
 
-import cellsociety.Model.CellState.WaTorCellState;
-import cellsociety.Model.CellState.WaTorTurnResult;
 import java.util.List;
 import java.util.Random;
 
-/** A fish in the Wa-Tor simulation. Reproduces after BREED_THRESHOLD steps. */
+/**
+ * A fish in the Wa-Tor simulation. Reproduces after BREED_THRESHOLD steps.
+ *
+ * @author Michael Lei
+ */
 public class Fish extends Creature {
 
   /** Default steps before a fish can reproduce (config key if made configurable). */
