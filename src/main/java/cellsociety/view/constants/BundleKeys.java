@@ -1,4 +1,4 @@
-package cellsociety.constants;
+package cellsociety.view.constants;
 
 /**
  * Centralized ResourceBundle key names used by the UI.

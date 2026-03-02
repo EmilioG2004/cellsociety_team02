@@ -1,4 +1,4 @@
-package cellsociety.constants;
+package cellsociety.view.constants;
 
 /**
  * Centralized resource paths and bundle names.
