@@ -17,7 +17,7 @@ public class ViewTest extends DukeApplicationTest {
     SimulationView view = new SimulationView(bundle);
     @SuppressWarnings("unused") // controller wires view buttons; needed for test setup
     Scene scene = new Scene(view.getRoot(), 1200, 750);
-    SimulationController controller = new SimulationController(view, scene);
+    SimulationController controller = new SimulationController(view, scene, bundle);
 
     stage.setScene(scene);
     stage.show();

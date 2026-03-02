@@ -1,6 +1,10 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+import static cellsociety.view.constants.SimulationUiConstants.*;
+
 import cellsociety.config.SimulationConfig;
+import cellsociety.view.constants.ResourcePaths;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,20 +44,19 @@ import java.io.File;
  * @author Emilio Garcia
  */
 public class SimulationView {
-  public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
   private static final String BASE_CSS =
-      SimulationView.class.getResource("/cellsociety/stylesheets/base.css").toExternalForm();
+      SimulationView.class.getResource(ResourcePaths.CSS_BASE).toExternalForm();
 
   private static final String LIGHT_CSS =
-      SimulationView.class.getResource("/cellsociety/stylesheets/light.css").toExternalForm();
+      SimulationView.class.getResource(ResourcePaths.CSS_LIGHT).toExternalForm();
 
   private static final String DARK_CSS =
-      SimulationView.class.getResource("/cellsociety/stylesheets/dark.css").toExternalForm();
+      SimulationView.class.getResource(ResourcePaths.CSS_DARK).toExternalForm();
 
   private static final String DUKE_CSS =
-      SimulationView.class.getResource("/cellsociety/stylesheets/duke.css").toExternalForm();
+      SimulationView.class.getResource(ResourcePaths.CSS_DUKE).toExternalForm();
 
-  private final ResourceBundle myBundle;
+  private ResourceBundle myBundle;
   private final ButtonManager myButtons;
 
   private final StackPane myRoot = new StackPane();
@@ -68,22 +71,12 @@ public class SimulationView {
 
   private GridView myGridView;
 
-  /**
-   * Creates a SimulationView without showing the settings splash.
-   *
-   * <p>Purpose: convenience constructor for the typical application startup path.</p>
-   *
-   * <p>Assumptions: {@code bundle} contains all required keys.</p>
-   *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
-   *
-   * <p>Return value: none.</p>
-   *
-   * @param bundle localization bundle for UI strings
-   */
-  public SimulationView(ResourceBundle bundle){
-    this(bundle, false);
-  }
+  // Multi-sim dashboard UI
+  private VBox myMultiRoot;
+  private TilePane myTile;
+  private ScrollPane myScroll;
+  private ChoiceBox<Integer> mySlotChoice;
+  private Label mySlotLabel;
 
   /**
    * Creates a SimulationView with optional initial settings splash.
@@ -97,9 +90,8 @@ public class SimulationView {
    * <p>Return value: none.</p>
    *
    * @param bundle localization bundle for UI strings
-   * @param showSplash true to display the settings splash immediately
    */
-  public SimulationView(ResourceBundle bundle, boolean showSplash){
+  public SimulationView(ResourceBundle bundle){
     myBundle = bundle;
     myButtons = new ButtonManager(myBundle);
     myRoot.getStyleClass().add("app-root");
@@ -107,14 +99,11 @@ public class SimulationView {
     mySpeedMultiplier = 1.0;
     applyLanguage(myBundle);
     buildTop();
-    myMain.setPadding(new Insets(12));
+    buildCenter();
+    myMain.setPadding(new Insets(MAIN_PADDING));
     myRoot.getChildren().addAll(myMain, mySettings);
     bindSplashToWindow();
-    if (showSplash){
-      openSettings();
-    } else {
-      closeSettings();
-    }
+    openSettings();
   }
 
   private void bindSplashToWindow() {
@@ -135,63 +124,92 @@ public class SimulationView {
     HBox myControlBar = buildControlBar();
 
     VBox myTopBox = new VBox(myTitle, myUploadRow, myControlBar);
-    myTopBox.setSpacing(8);
+    myTopBox.setSpacing(TOP_BOX_SPACING);
     myMain.setTop(myTopBox);
   }
 
   private Label buildTitle() {
     Label myTitle = myButtons.getTitleLabel();
-    myTitle.setFont(Font.font(28));
-    VBox.setMargin(myTitle, new Insets(8,0,6,0));
+    myTitle.setFont(Font.font(TITLE_FONT_SIZE));
+    VBox.setMargin(myTitle, new Insets(SPACING_SMALL,0,UPLOAD_ROW_PADDING_TOP,0));
     myTitle.setMaxWidth(Double.MAX_VALUE);
     myTitle.setAlignment(Pos.CENTER);
     return myTitle;
   }
 
   private HBox buildUploadRow() {
-    HBox myUploadRow = new HBox(12);
+    HBox myUploadRow = new HBox(SPACING_MEDIUM);
     myUploadRow.getChildren().addAll(myButtons.getUploadRowButtons());
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
-    myUploadRow.setPadding(new Insets(6,10,10,10));
+    myUploadRow.setPadding(new Insets(
+        UPLOAD_ROW_PADDING_TOP,
+        UPLOAD_ROW_PADDING_RIGHT,
+        UPLOAD_ROW_PADDING_BOTTOM,
+        UPLOAD_ROW_PADDING_LEFT));
     myUploadRow.getStyleClass().add("upload-row");
     return myUploadRow;
   }
 
   private HBox buildControlBar(){
-    HBox leftBox = new HBox(12);
+    HBox leftBox = new HBox(SPACING_MEDIUM);
     leftBox.getChildren().addAll(myButtons.getControlBarLeftNodes());
     leftBox.setAlignment(Pos.CENTER_LEFT);
 
     Region spacer = new Region();
     HBox.setHgrow(spacer, Priority.ALWAYS);
 
-    HBox bar = new HBox(12, leftBox, spacer);
+    HBox bar = new HBox(SPACING_MEDIUM, leftBox, spacer);
     bar.setAlignment(Pos.CENTER_LEFT);
-    bar.setPadding(new Insets(14));
-    bar.setMinHeight(64);
+    bar.setPadding(new Insets(CONTROL_BAR_PADDING));
+    bar.setMinHeight(CONTROL_BAR_MIN_HEIGHT);
     bar.getStyleClass().add("control-bar");
 
     return bar;
   }
 
   private void buildCenter(){
-    if (myGridView == null) return;
     if (centerPane == null) {
       centerPane = new StackPane();
-      centerPane.setPadding(new Insets(18,0,18,0));
+      centerPane.setPadding(new Insets(CENTER_VERTICAL_PADDING,0,CENTER_VERTICAL_PADDING,0));
       myMain.setCenter(centerPane);
     }
-    StackPane card = buildCenterCard();
-    Node gridNode = myGridView.getNode();
-    card.getChildren().setAll(gridNode);
-    centerPane.getChildren().setAll(card);
-    myGridView.bindToContainer(card);
+    if (myMultiRoot == null) {
+      buildMultiSimDashboard();
+    }
+    setCenterContent(myMultiRoot);
+  }
 
+  private void buildMultiSimDashboard() {
+    myTile = new TilePane();
+    myTile.setPadding(new Insets(TILE_PADDING));
+    myTile.setHgap(TILE_GAP);
+    myTile.setVgap(TILE_GAP);
+    myTile.setPrefColumns(TILE_PREF_COLUMNS);
+    myTile.setPrefTileWidth(TILE_PREF_WIDTH);
+    myTile.setPrefTileHeight(TILE_PREF_HEIGHT);
+
+    myScroll = new ScrollPane(myTile);
+    myScroll.setFitToWidth(true);
+    myScroll.setFitToHeight(true);
+    myScroll.getStyleClass().add("card-scroll");
+
+    mySlotChoice = new ChoiceBox<>();
+
+    mySlotLabel = new Label(myBundle.getString(LABEL_SLOTS));
+    HBox header = new HBox(SPACING_SMALL, mySlotLabel, mySlotChoice);
+    header.setPadding(new Insets(
+        SLOT_HEADER_PADDING_TOP,
+        SLOT_HEADER_PADDING_RIGHT,
+        SLOT_HEADER_PADDING_BOTTOM,
+        SLOT_HEADER_PADDING_LEFT));
+
+    myMultiRoot = new VBox(SPACING_SMALL, header, myScroll);
+    myMultiRoot.setPadding(new Insets(MULTI_ROOT_PADDING));
   }
 
   private StackPane buildCenterCard() {
     StackPane card = new StackPane();
-    card.setPadding(new Insets(18));
+    card.setPadding(new Insets(CENTER_CARD_PADDING));
     card.prefWidthProperty().bind(centerPane.widthProperty());
     card.prefHeightProperty().bind(centerPane.heightProperty());
 
@@ -221,10 +239,10 @@ public class SimulationView {
    */
   public File showOpenConfigDialog() {
     FileChooser chooser = new FileChooser();
-    chooser.setTitle("Open Simulation Configuration");
+    chooser.setTitle(myBundle.getString(FILE_OPEN_CONFIG_TITLE));
     chooser.setInitialDirectory(new File(DATA_FILE_FOLDER));
     chooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("XML Files", "*.xml")
+        new FileChooser.ExtensionFilter(myBundle.getString(FILE_FILTER_XML), XML_FILE_EXTENSION)
     );
 
     Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
@@ -244,9 +262,9 @@ public class SimulationView {
    */
   public File showSaveConfigDialog(){
     FileChooser chooser = new FileChooser();
-    chooser.setTitle("Open Simulation Configuration");
+    chooser.setTitle(myBundle.getString(FILE_SAVE_CONFIG_TITLE));
     chooser.getExtensionFilters().add(
-        new ExtensionFilter("XML Files", "*.xml")
+        new ExtensionFilter(myBundle.getString(FILE_FILTER_XML), XML_FILE_EXTENSION)
     );
 
     Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
@@ -269,7 +287,7 @@ public class SimulationView {
   public void showAboutSplash(SimulationConfig config){
     if (centerPane == null){
       centerPane = new StackPane();
-      centerPane.setPadding(new Insets(18,0,18,0));
+      centerPane.setPadding(new Insets(CENTER_VERTICAL_PADDING,0,CENTER_VERTICAL_PADDING,0));
       myMain.setCenter(centerPane);
     }
     myAboutDialog.generateInfo(config);
@@ -356,26 +374,6 @@ public class SimulationView {
   public GridView getMyGridView() { return myGridView; }
 
   /**
-   * Creates and installs a new grid view for the given dimensions.
-   *
-   * <p>Purpose: prepares the center card to render a simulation grid.</p>
-   *
-   * <p>Assumptions: rows and cols are positive.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * <p>Return value: none.</p>
-   *
-   * @param rows number of grid rows
-   * @param cols number of grid columns
-   */
-  public void setGrid(int rows, int cols){
-    this.myGridView = new GridPaneView(rows, cols);
-    buildCenter();
-    buildBottom();
-  }
-
-  /**
    * Doubles the stored speed multiplier.
    *
    * <p>Purpose: keeps UI speed label in sync with controller speed changes.</p>
@@ -426,10 +424,14 @@ public class SimulationView {
    * @param bundle localization bundle for UI strings
    */
   public void applyLanguage(ResourceBundle bundle) {
-    updateSpeedLabel();
+    myBundle = bundle;
     myButtons.applyLanguage(bundle);
     mySettings.applyLanguage(bundle);
     myAboutDialog.applyLanguage(bundle);
+    updateSpeedLabel();
+    if (mySlotLabel != null) {
+      mySlotLabel.setText(bundle.getString(LABEL_SLOTS));
+    }
   }
 
   /**
@@ -448,8 +450,8 @@ public class SimulationView {
    */
   public void applyTheme(Scene scene, String themeChoice) {
     String themeCss = switch (themeChoice) {
-      case "Dark" -> DARK_CSS;
-      case "Duke" -> DUKE_CSS;
+      case ResourcePaths.THEME_DARK -> DARK_CSS;
+      case ResourcePaths.THEME_DUKE -> DUKE_CSS;
       default -> LIGHT_CSS;
     };
     scene.getStylesheets().setAll(BASE_CSS, themeCss);
@@ -504,12 +506,34 @@ public class SimulationView {
   public void setCenterContent(Node content) {
     if (centerPane == null) {
       centerPane = new StackPane();
-      centerPane.setPadding(new Insets(18,0,18,0));
+      centerPane.setPadding(new Insets(CENTER_VERTICAL_PADDING,0,CENTER_VERTICAL_PADDING,0));
       myMain.setCenter(centerPane);
     }
     StackPane card = buildCenterCard();
     card.getChildren().setAll(content);
     centerPane.getChildren().setAll(card);
+  }
+
+  /**
+   * Returns the TilePane used by the multi-sim dashboard.
+   *
+   * <p>Assumptions: the dashboard has been built.</p>
+   *
+   * @return multi-sim TilePane
+   */
+  public TilePane getMultiSimTile() {
+    return myTile;
+  }
+
+  /**
+   * Returns the slot count choice box used by the multi-sim dashboard.
+   *
+   * <p>Assumptions: the dashboard has been built.</p>
+   *
+   * @return slot count choice box
+   */
+  public ChoiceBox<Integer> getMultiSimSlotChoice() {
+    return mySlotChoice;
   }
 
 }

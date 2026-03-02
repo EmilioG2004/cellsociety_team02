@@ -20,14 +20,14 @@ import javafx.scene.Node;
  *
  * <p>Example usage:</p>
  * <pre>{@code
- * MultiSimSlot slot = new MultiSimSlot(index, panel, presenter);
+ * SimulationSlot slot = new SimulationSlot(index, panel, presenter);
  * slot.setSimulation(sim);
  * slot.start();
  * }</pre>
  *
  * @author Emilio Garcia
  */
-public class MultiSimSlot {
+public class SimulationSlot {
 
   private final int myIndex;
   private final SimulationPanel myPanel;
@@ -47,10 +47,11 @@ public class MultiSimSlot {
    * @param panel render-only panel
    * @param presenter presenter/driver for the slot
    */
-  public MultiSimSlot(int index, SimulationPanel panel, SimulationPresenter presenter) {
+  public SimulationSlot(int index, SimulationPanel panel, SimulationPresenter presenter) {
     myIndex = index;
     myPanel = panel;
     myPresenter = presenter;
+    myPanel.setOnCellClicked(myPresenter::toggleCellState);
   }
 
   /**
@@ -104,7 +105,7 @@ public class MultiSimSlot {
    * @param sim simulation to display
    */
   public void setSimulation(Simulation sim) {
-    myPresenter.setSimulation(sim, sim.getReadOnlyGrid().getRows(), sim.getReadOnlyGrid().getCols());
+    myPresenter.setSimulation(sim, sim.getGridViewData().getRows(), sim.getGridViewData().getCols());
   }
 
   /**
@@ -123,6 +124,18 @@ public class MultiSimSlot {
   }
 
   /**
+   * Returns this slot's stored configuration.
+   *
+   * @return configuration snapshot used to build the current simulation
+   */
+  public SimulationConfig getConfig() {
+    if (myConfig == null) {
+      throw new IllegalStateException("No configuration set for slot " + myIndex);
+    }
+    return myConfig;
+  }
+
+  /**
    * Resets this slot to its stored initial configuration.
    *
    * <p>Assumptions: {@link #setConfig(SimulationConfig)} has been called.</p>
@@ -132,7 +145,7 @@ public class MultiSimSlot {
    * <p>Return value: none.</p>
    */
   public void reset() {
-    if (myConfig == null) return;
+    if (myConfig == null) throw new IllegalArgumentException("No configuration set.");
     Simulation sim = SimulationFactory.createSimulation(myConfig);
     setSimulation(sim);
   }
@@ -148,10 +161,7 @@ public class MultiSimSlot {
    */
   public void toggleOutline() {
     if (!hasSimulation()) return;
-    myPanel.toggleOutline(
-        myPresenter.getDriver().getSimulation().getReadOnlyGrid(),
-        myPresenter.getDriver().getSimulation().getRule().getStateColors()
-    );
+    myPanel.toggleOutline(myPresenter.getDriver().getSimulation().getGridViewData());
   }
 
   /**
@@ -274,4 +284,6 @@ public class MultiSimSlot {
   public double getStepsPerSecond() {
     return myPresenter.getDriver().getStepsPerSecond();
   }
+
+  public SimulationPanel getMyPanel() { return myPanel; }
 }

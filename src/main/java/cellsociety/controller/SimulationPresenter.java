@@ -69,8 +69,22 @@ public class SimulationPresenter {
     myDriver.setSimulation(sim);
 
     myRenderer.setGrid(rows, cols);
-    myRenderer.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    myRenderer.render(sim.getGridViewData());
     myRenderer.setGeneration(sim.getGeneration());
+  }
+
+  /**
+   * Toggles the clicked cell and immediately refreshes the slot.
+   *
+   * @param row clicked row index
+   * @param col clicked column index
+   */
+  public void toggleCellState(int row, int col) {
+    if (!myDriver.hasSimulation()) {
+      throw new IllegalStateException("No simulation loaded.");
+    }
+    myDriver.toggleCellState(row, col);
+    refreshFromSimulation();
   }
 
   /**
@@ -80,7 +94,7 @@ public class SimulationPresenter {
     if (!myDriver.hasSimulation()) return;
 
     Simulation sim = myDriver.getSimulation();
-    myRenderer.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    myRenderer.render(sim.getGridViewData());
     myRenderer.setGeneration(sim.getGeneration());
   }
 

@@ -1,5 +1,7 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -48,7 +50,6 @@ public class ButtonManager {
   private final Button mySaveButton = new Button();
   private final Button myResetButton = new Button();
   private final Button myChangeDirectionButton = new Button();
-  private final Button myAboutButton = new Button();
   private final Button myToggleOutlineButton = new Button();
   private final Button mySettingsButton = new Button();
   private final Button myRotateLeftButton = new Button();
@@ -71,7 +72,7 @@ public class ButtonManager {
   public ButtonManager(ResourceBundle bundle) {
     myBundle = bundle;
     applyLanguage(bundle);
-    myForwardButton.setText(myBundle.getString("button.stepForward"));
+    myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
 
   }
 
@@ -91,26 +92,25 @@ public class ButtonManager {
   public void applyLanguage(ResourceBundle bundle) {
     myBundle = bundle;
 
-    myTitle.setText(myBundle.getString("app.title"));
-    myUploadButton.setText(myBundle.getString("button.uploadConfig"));
-    myForwardButton.setText(myBundle.getString("button.stepForward"));
-    myBackButton.setText(myBundle.getString("button.stepBackward"));
-    myStartButton.setText(myBundle.getString("button.start"));
-    myPauseButton.setText(myBundle.getString("button.pause"));
-    mySpeedUpButton.setText(myBundle.getString("button.speedUp"));
-    mySlowDownButton.setText(myBundle.getString("button.slowDown"));
-    mySaveButton.setText(myBundle.getString("button.saveState"));
-    myResetButton.setText(myBundle.getString("button.resetGrid"));
-    myAboutButton.setText(myBundle.getString("button.aboutConfig"));
-    myToggleOutlineButton.setText(myBundle.getString("button.toggleOutlines"));
-    mySettingsButton.setText(myBundle.getString("button.settings"));
-    myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
-    myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
-    myChangeDirectionButton.setText(myBundle.getString("button.changeDirection"));
-    myMultiSimButton.setText(myBundle.getString("button.multisim"));
+    myTitle.setText(myBundle.getString(APP_TITLE));
+    myUploadButton.setText(myBundle.getString(BUTTON_UPLOAD_CONFIG));
+    myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
+    myBackButton.setText(myBundle.getString(BUTTON_STEP_BACKWARD));
+    myStartButton.setText(myBundle.getString(BUTTON_START));
+    myPauseButton.setText(myBundle.getString(BUTTON_PAUSE));
+    mySpeedUpButton.setText(myBundle.getString(BUTTON_SPEED_UP));
+    mySlowDownButton.setText(myBundle.getString(BUTTON_SLOW_DOWN));
+    mySaveButton.setText(myBundle.getString(BUTTON_SAVE_STATE));
+    myResetButton.setText(myBundle.getString(BUTTON_RESET_GRID));
+    myToggleOutlineButton.setText(myBundle.getString(BUTTON_TOGGLE_OUTLINES));
+    mySettingsButton.setText(myBundle.getString(BUTTON_SETTINGS));
+    myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
+    myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
+    myChangeDirectionButton.setText(myBundle.getString(BUTTON_CHANGE_DIRECTION));
+    myMultiSimButton.setText(myBundle.getString(BUTTON_MULTI_SIM));
 
 
-    myStateStackSizeLabel.setText(myBundle.getString("label.generation.unset"));
+    myStateStackSizeLabel.setText(myBundle.getString(LABEL_GENERATION_UNSET));
   }
 
   /**
@@ -127,7 +127,7 @@ public class ButtonManager {
    * @param speedMultiplier current speed multiplier (e.g., 0.5, 1.0, 2.0)
    */
   public void setSpeedLabel(double speedMultiplier) {
-    String pattern = myBundle.getString("label.currentSpeed");
+    String pattern = myBundle.getString(LABEL_CURRENT_SPEED);
     mySpeedLabel.setText(MessageFormat.format(pattern, speedMultiplier));
   }
 
@@ -143,7 +143,7 @@ public class ButtonManager {
    * @return ordered list of upload-row buttons
    */
   public List<Button> getUploadRowButtons() {
-    return List.of(myUploadButton, myMultiSimButton, mySaveButton, myAboutButton, mySettingsButton);
+    return List.of(mySaveButton, mySettingsButton);
   }
 
   /**
@@ -168,8 +168,7 @@ public class ButtonManager {
         myBackButton,
         myChangeDirectionButton,
         myToggleOutlineButton,
-        mySpeedLabel,
-        myStateStackSizeLabel
+        mySpeedLabel
     );
   }
 
@@ -309,16 +308,6 @@ public class ButtonManager {
    */
   public Button getChangeDirectionButton() { return myChangeDirectionButton; }
   /**
-   * Returns the about button.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return button that opens the about dialog
-   */
-  public Button getAboutButton() { return myAboutButton; }
-  /**
    * Returns the outline toggle button.
    *
    * <p>Assumptions: none.</p>
@@ -358,14 +347,4 @@ public class ButtonManager {
    * @return button that rotates grid right
    */
   public Button getRotateRightButton() { return myRotateRightButton; }
-  /**
-   * Returns the multi-simulation dashboard button.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return button that opens multi-sim mode
-   */
-  public Button getMyMultiSimButton() { return myMultiSimButton; }
 }
