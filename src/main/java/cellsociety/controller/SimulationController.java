@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.TilePane;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import cellsociety.view.constants.ResourcePaths;
@@ -52,16 +51,12 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final Scene myScene;
   private final WiringManager myWires;
-
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
   private final ConfigSaver myConfigSaver;
   private final ErrorHandler myErrorHandler;
-
   private final List<SimulationSlot> mySlots;
 
-  private TilePane myTile;
-  private ChoiceBox<Integer> mySlotChoice;
 
   /**
    * Constructs a controller and wires all UI controls.
@@ -88,8 +83,7 @@ public class SimulationController {
     myScene = scene;
     myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll);
 
-    myTile = mySimView.getMultiSimTile();
-    mySlotChoice = mySimView.getMultiSimSlotChoice();
+    ChoiceBox<Integer> mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
       mySlotChoice.getItems().add(i);
     }
@@ -278,9 +272,9 @@ public class SimulationController {
   }
 
   private void rebuildTileChildren() {
-    myTile.getChildren().clear();
+    mySimView.getMultiSimTile().getChildren().clear();
     for (SimulationSlot slot : mySlots) {
-      myTile.getChildren().add(slot.getNode());
+      mySimView.getMultiSimTile().getChildren().add(slot.getNode());
     }
   }
 
