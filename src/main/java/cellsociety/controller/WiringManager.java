@@ -66,10 +66,10 @@ public class WiringManager {
    *
    * <p>Return value: none.</p>
    */
-  public void wireAll(List<SimulationSlot> mySlots) {
+  public void wireAll(List<SimulationSlot> mySlots, Runnable onSplashLoad) {
     wireAboutDialogClose();
     wireApplyChanges(mySlots);
-    wireSplashLoad();
+    wireSplashLoad(onSplashLoad);
     wireSettings();
     wireForward(mySlots);
     wireBackward(mySlots);
@@ -266,8 +266,11 @@ public class WiringManager {
     });
   }
 
-  private void wireSplashLoad() {
+  private void wireSplashLoad(Runnable onSplashLoad) {
     mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
+      if (onSplashLoad != null) {
+        onSplashLoad.run();
+      }
       mySimView.closeSettings();
     });
   }

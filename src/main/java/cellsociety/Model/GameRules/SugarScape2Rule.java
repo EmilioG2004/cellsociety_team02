@@ -156,7 +156,7 @@ public class SugarScape2Rule extends SugarScapeRule {
 
   @Override
   public CellState fromInt(int value) {
-    if (value == -1) {
+    if (value >= 100) {
       return new SugarScape2CellState(new Patch(), createAgent2());
     }
     if (value >= 0) {

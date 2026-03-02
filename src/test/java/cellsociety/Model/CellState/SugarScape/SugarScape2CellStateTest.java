@@ -36,15 +36,12 @@ class SugarScape2CellStateTest {
     Agent2 a = fixedAgent2(10, 1, 1);
     SugarScape2CellState s = new SugarScape2CellState(new Patch(), a);
     int result = s.toInt();
-    assertTrue(
-        result == SugarScape2CellState.MALE_AGENT_INT
-            || result == SugarScape2CellState.FEMALE_AGENT_INT,
-        "Non-post-fertile agent should return MALE or FEMALE int, got: " + result);
+    assertTrue(result == 100 || result == 101,
+        "Non-post-fertile agent should return 100 (male) or 101 (female), got: " + result);
   }
 
   @Test
-  void toInt_maleAgent_returnsNegativeOne() {
-    // Find a male agent (may need a few tries due to random gender)
+  void toInt_maleAgent_returns100() {
     Agent2 male = null;
     for (int i = 0; i < 100; i++) {
       Agent2 candidate = fixedAgent2(10, 1, 1);
@@ -55,11 +52,11 @@ class SugarScape2CellStateTest {
     }
     assert male != null : "Could not create male agent in 100 tries";
     SugarScape2CellState s = new SugarScape2CellState(new Patch(), male);
-    assertEquals(SugarScape2CellState.MALE_AGENT_INT, s.toInt());
+    assertEquals(100, s.toInt());
   }
 
   @Test
-  void toInt_femaleAgent_returnsNegativeTwo() {
+  void toInt_femaleAgent_returns101() {
     Agent2 female = null;
     for (int i = 0; i < 100; i++) {
       Agent2 candidate = fixedAgent2(10, 1, 1);
@@ -70,17 +67,17 @@ class SugarScape2CellStateTest {
     }
     assert female != null : "Could not create female agent in 100 tries";
     SugarScape2CellState s = new SugarScape2CellState(new Patch(), female);
-    assertEquals(SugarScape2CellState.FEMALE_AGENT_INT, s.toInt());
+    assertEquals(101, s.toInt());
   }
 
   // ---------- B (Boundaries): post-fertile age ----------
 
   @Test
-  void toInt_postFertileAgent_returnsNegativeThree() {
+  void toInt_postFertileAgent_returns102() {
     Agent2 a = fixedAgent2(10, 1, 1);
     for (int i = 0; i < 51; i++) a.incrementAge();  // age=51 > fertileEnd=50
     SugarScape2CellState s = new SugarScape2CellState(new Patch(), a);
-    assertEquals(SugarScape2CellState.POST_FERTILE_AGENT_INT, s.toInt());
+    assertEquals(102, s.toInt());
   }
 
   // ---------- I (Interface): getNextInCycle creates Agent2 ----------

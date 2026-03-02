@@ -53,9 +53,9 @@ class SugarScapeCellStateTest {
   }
 
   @Test
-  void toInt_withAgent_returnsNegativeOne() {
+  void toInt_withAgent_returns100() {
     SugarScapeCellState s = new SugarScapeCellState(new Patch(), fixedAgent());
-    assertEquals(-1, s.toInt());
+    assertEquals(100, s.toInt());
   }
 
   // ---------- M (Many): state transitions ----------

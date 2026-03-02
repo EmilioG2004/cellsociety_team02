@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Conway's Game of Life: Moore neighborhood, birth on 3, survive on 2 or 3.
  *
- * @author Michael Lei
+ * @author EmilioGarcia
  */
 public class ConwayGameOfLifeRule extends GameRule {
 

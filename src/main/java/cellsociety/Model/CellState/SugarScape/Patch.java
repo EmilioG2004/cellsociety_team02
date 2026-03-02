@@ -26,6 +26,17 @@ public class Patch {
     this(DEFAULT_SUGAR_CAPACITY);
   }
 
+  /** Creates a patch with the given capacity and current sugar level (for copying). */
+  public Patch(int sugarCapacity, int currentSugar) {
+    this.sugarCapacity = sugarCapacity;
+    this.sugar = Math.min(sugarCapacity, Math.max(0, currentSugar));
+  }
+
+  /** Returns a copy of this patch with the same capacity and sugar level. */
+  public Patch copy() {
+    return new Patch(sugarCapacity, sugar);
+  }
+
   /** Returns the current sugar level of this patch. */
   public int getSugar() {
     return this.sugar;

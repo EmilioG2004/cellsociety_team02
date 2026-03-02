@@ -189,8 +189,8 @@ class SugarScapeRuleTest {
   // ---------- I (Interface): fromInt, getDefaultNeighborStrategy ----------
 
   @Test
-  void fromInt_negativeOne_createsOccupiedState() {
-    CellState state = rule.fromInt(-1);
+  void fromInt_agentInt100_createsOccupiedState() {
+    CellState state = rule.fromInt(100);
     assertInstanceOf(SugarScapeCellState.class, state);
     assertFalse(((SugarScapeCellState) state).isVacant());
   }
@@ -214,8 +214,8 @@ class SugarScapeRuleTest {
   }
 
   @Test
-  void fromInt_negativeTwoOrLess_throws() {
-    assertThrows(IllegalArgumentException.class, () -> rule.fromInt(-2));
+  void fromInt_negative_throws() {
+    assertThrows(IllegalArgumentException.class, () -> rule.fromInt(-1));
   }
 
   @Test
@@ -238,7 +238,7 @@ class SugarScapeRuleTest {
         "agentVision", 3.0,
         "agentInitialMinimumSugar", 10.0, "agentInitialMaximumSugar", 10.0,
         "agentMinimumMetabolism", 1.0, "agentMaximumMetabolism", 1.0));
-    SugarScapeCellState s = (SugarScapeCellState) r.fromInt(-1);
+    SugarScapeCellState s = (SugarScapeCellState) r.fromInt(100);
     assertEquals(3, s.getAgent().getVision());
   }
 

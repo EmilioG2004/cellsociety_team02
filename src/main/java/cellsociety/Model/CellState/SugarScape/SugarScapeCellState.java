@@ -10,11 +10,6 @@ import cellsociety.Model.CellState.CellState;
  */
 public class SugarScapeCellState implements CellState {
 
-  /** Int encoding for config and fromInt. */
-  public static final int NO_SUGAR_INT = 0;
-  public static final int MAX_SUGAR_INT = 1;
-  public static final int HAS_AGENT_INT = 2;
-
   /** Representative instance for a cell with no agent. */
   public static final SugarScapeCellState NO_AGENT = new SugarScapeCellState(new Patch(), null);
   /** Representative instance for a cell with an agent. */
@@ -54,9 +49,15 @@ public class SugarScapeCellState implements CellState {
     this.agent = agent;
   }
 
+  /** Returns a new state with the same patch (copied) and no agent. Used so the next grid has its own state instances. */
+  public SugarScapeCellState copyWithoutAgent() {
+    return new SugarScapeCellState(patch.copy(), null);
+  }
+
+  /** Patch sugar 0..99; agent is 100 (avoids conflict with patch states). */
   @Override
   public int toInt() {
-    if (agent != null) return -1;
+    if (agent != null) return 100;
     return getPatchSugar();
   }
 

@@ -5,12 +5,18 @@ import cellsociety.Model.CellState.SegregationState;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/** Schelling Segregation: unhappy agents (same-type ratio below threshold) move to random EMPTY cells. Param: satisfactionThreshold in [0,1], default 0.3. */
+/**
+ * Schelling Segregation: unhappy agents (same-type ratio below threshold) move to random EMPTY
+ * cells. Param: satisfactionThreshold in [0,1], default 0.3.
+ *
+ * @author Michael Lei
+ */
 public class SegregationRule extends GameRule {
 
   private static final double DEFAULT_THRESHOLD = 0.3;
@@ -28,18 +34,15 @@ public class SegregationRule extends GameRule {
     validateParameters(parameters);
   }
 
-  public SegregationRule(NeighborStrategy strategy, Map<String, Double> parameters) {
-    super(parameters);
-    validateParameters(parameters);
-  }
-
   @Override
   public NeighborStrategy getDefaultNeighborStrategy() {
     return new MooreNeighborStrategy();
   }
 
   private static void validateParameters(Map<String, Double> parameters) {
-    if (parameters.containsKey(PARAM_SATISFACTION_THRESHOLD) && (parameters.get(PARAM_SATISFACTION_THRESHOLD) < THRESHOLD_MIN || parameters.get(PARAM_SATISFACTION_THRESHOLD) > THRESHOLD_MAX)) {
+    if (parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
+        && (parameters.get(PARAM_SATISFACTION_THRESHOLD) < THRESHOLD_MIN
+            || parameters.get(PARAM_SATISFACTION_THRESHOLD) > THRESHOLD_MAX)) {
       throw new IllegalArgumentException("satisfactionThreshold must be between 0 and 1");
     }
   }
@@ -92,13 +95,11 @@ public class SegregationRule extends GameRule {
 
     int occupied = 0;
     int same = 0;
-
     for (CellState n : neighbors) {
       if (n == SegregationState.EMPTY) continue;
       occupied++;
       if (n == self) same++;
     }
-
     if (occupied == NO_OCCUPIED_NEIGHBORS) return true;
 
     double fracSame = (double) same / occupied;

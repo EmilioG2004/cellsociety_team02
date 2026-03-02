@@ -4,6 +4,7 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SugarScape.Agent;
 import cellsociety.Model.CellState.SugarScape.Patch;
 import cellsociety.Model.CellState.SugarScape.SugarScapeCellState;
+import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
@@ -69,11 +70,17 @@ public class SugarScapeRule extends GameRule {
 
   @Override
   public Grid getNextGrid(Grid currentGrid) {
-    Grid next = currentGrid.deepCopy();
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
+    // Build next grid with new state instances (patch copied, no agent) so we don't mutate current.
+    CellState[][] copiedStates = new CellState[rows][cols];
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        copiedStates[r][c] = ((SugarScapeCellState) currentGrid.getCellState(r, c)).copyWithoutAgent();
+      }
+    }
+    Grid next = new ArrayGrid(copiedStates, currentGrid.getNeighborStrategy());
 
-    clearAgents(next, rows, cols);
     List<int[]> agentPositions = getAgentPositions(currentGrid, rows, cols);
     Collections.shuffle(agentPositions);
 
@@ -95,6 +102,7 @@ public class SugarScapeRule extends GameRule {
       }
       claimed.add(key(best[0], best[1]));
 
+      // Source cell in next is already vacant (copyWithoutAgent); only clear if we moved
       if (best[0] != r || best[1] != c) {
         ((SugarScapeCellState) next.getCellState(r, c)).setAgent(null);
       }
@@ -127,7 +135,7 @@ public class SugarScapeRule extends GameRule {
       int agentRow, int agentCol) {
     int[] best = new int[]{agentRow, agentCol};
     int bestSugar = grid.getCellState(agentRow, agentCol) instanceof SugarScapeCellState ss
-        ? ss.getPatchSugar() : -1;
+        ? ss.getPatchSugar() : 0;
     int bestDist = 0;
 
     for (int[] n : neighbors) {
@@ -147,17 +155,6 @@ public class SugarScapeRule extends GameRule {
     }
     return best;
   }
-  private void clearAgents(Grid next, int rows, int cols) {
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        CellState state = next.getCellState(r, c);
-        if (state instanceof SugarScapeCellState ss) {
-          ss.setAgent(null);
-        }
-      }
-    }
-  }
-
   /** Returns positions of all occupied cells in the grid. */
   protected List<int[]> getAgentPositions(Grid grid, int rows, int cols) {
     List<int[]> out = new ArrayList<>();
@@ -173,7 +170,7 @@ public class SugarScapeRule extends GameRule {
   }
   @Override
   public CellState fromInt(int value) {
-    if (value == -1) {
+    if (value >= 100) {
       return new SugarScapeCellState(new Patch(), createAgent());
     }
     if (value >= 0) {
