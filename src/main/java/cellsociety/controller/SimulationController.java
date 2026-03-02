@@ -1,5 +1,8 @@
 package cellsociety.controller;
 
+import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
+import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+
 import cellsociety.Model.Simulation;
 import cellsociety.Model.SimulationFactory;
 import cellsociety.view.SimulationPanel;
@@ -44,9 +47,6 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final Scene myScene;
   private final WiringManager myWires;
-  private static final int MAX_SLOTS = 9;
-  private static final int DEFAULT_SLOTS = 1;
-  private static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
 
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;

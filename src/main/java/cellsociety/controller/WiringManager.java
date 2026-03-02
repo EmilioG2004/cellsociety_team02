@@ -6,6 +6,7 @@ import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_FORWARD;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.view.SimulationView;
+import cellsociety.view.constants.ResourcePaths;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -275,9 +276,9 @@ public class WiringManager {
 
   private ResourceBundle loadLanguageBundle(String choice) {
     return switch (choice) {
-      case "Spanish" -> ResourceBundle.getBundle("cellsociety.Languages.Spanish");
-      case "Portuguese" -> ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
-      default -> ResourceBundle.getBundle("cellsociety.Languages.English");
+      case ResourcePaths.LANGUAGE_SPANISH -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_SPANISH);
+      case ResourcePaths.LANGUAGE_PORTUGUESE -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_PORTUGUESE);
+      default -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_ENGLISH);
     };
   }
 }

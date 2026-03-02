@@ -1,6 +1,7 @@
 package cellsociety.view;
 
 import static cellsociety.view.constants.BundleKeys.*;
+import static cellsociety.view.constants.SimulationUiConstants.*;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
@@ -45,8 +46,6 @@ import javafx.scene.layout.VBox;
  */
 public class SimulationPanel implements SimulationRenderer {
 
-  private static final double SPACING = 8;
-
   private ResourceBundle myBundle;
   private int myGeneration;
 
@@ -79,8 +78,8 @@ public class SimulationPanel implements SimulationRenderer {
   public SimulationPanel(ResourceBundle bundle) {
     myBundle = bundle;
 
-    myRoot = new VBox(SPACING);
-    myRoot.setPadding(new Insets(8));
+    myRoot = new VBox(SPACING_SMALL);
+    myRoot.setPadding(new Insets(SPACING_SMALL));
     myRoot.setAlignment(Pos.CENTER);
     myRoot.setFillWidth(true);
 
@@ -97,14 +96,14 @@ public class SimulationPanel implements SimulationRenderer {
     myRotateRightButton.setOnAction(e -> rotateRight());
 
     myGridContainer = new StackPane();
-    myGridContainer.setPadding(new Insets(8));
+    myGridContainer.setPadding(new Insets(SPACING_SMALL));
     myGridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-    HBox header = new HBox(8, myGenerationLabel, myLoadButton, myAboutButton);
+    HBox header = new HBox(SPACING_SMALL, myGenerationLabel, myLoadButton, myAboutButton);
     header.setAlignment(Pos.CENTER);
     HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
 
-    HBox lower = new HBox(8, myRotateLeftButton, myRotateRightButton);
+    HBox lower = new HBox(SPACING_SMALL, myRotateLeftButton, myRotateRightButton);
     lower.setAlignment(Pos.CENTER);
 
 

@@ -6,6 +6,16 @@ package cellsociety.view.constants;
 public final class ResourcePaths {
   private ResourcePaths() {}
 
+  // Language names used by settings and wiring
+  public static final String LANGUAGE_ENGLISH = "English";
+  public static final String LANGUAGE_SPANISH = "Spanish";
+  public static final String LANGUAGE_PORTUGUESE = "Portuguese";
+
+  // Theme names used by settings and view switching
+  public static final String THEME_LIGHT = "Light";
+  public static final String THEME_DARK = "Dark";
+  public static final String THEME_DUKE = "Duke";
+
   // Language bundles
   public static final String BUNDLE_ENGLISH = "cellsociety.Languages.English";
   public static final String BUNDLE_SPANISH = "cellsociety.Languages.Spanish";
