@@ -12,7 +12,7 @@ import cellsociety.view.SimulationPanel;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationFactory;
 import cellsociety.Model.Simulation.SimulationDriver;
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.SimulationConfig;
@@ -241,8 +241,8 @@ public class SimulationController {
     }
 
     SimulationConfig initialConfig = slot.getConfig();
-    GridViewData grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
-    int[][] intSnapshot = GridViewData.produceIntArray(grid);
+    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+    int[][] intSnapshot = ViewGrid.produceIntArray(grid);
 
     SimulationConfig configSnapshot = new SimulationConfig(
         initialConfig.getSimulationType(),
@@ -289,8 +289,8 @@ public class SimulationController {
     for (SimulationSlot slot : mySlots) {
       if (!slot.hasSimulation()) continue;
       SimulationConfig base = slot.getConfig();
-      GridViewData grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
-      int[][] states = GridViewData.produceIntArray(grid);
+      ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+      int[][] states = ViewGrid.produceIntArray(grid);
       SimulationConfig snapshot = new SimulationConfig(
           base.getSimulationType(),
           base.getRuleClass(),

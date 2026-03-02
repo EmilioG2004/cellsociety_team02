@@ -1,6 +1,6 @@
 package cellsociety.view;
 
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
@@ -21,14 +21,14 @@ import javafx.scene.shape.Rectangle;
  * while remaining compatible with the {@link GridView} interface.</p>
  *
  * <p>Assumptions: grid dimensions are fixed for the lifetime of the view; the
- * provided {@link GridViewData} matches those dimensions.</p>
+ * provided {@link ViewGrid} matches those dimensions.</p>
  *
  * <p>Dependencies: JavaFX {@link GridPane}, {@link Rectangle}, and binding APIs.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
  * GridView gridView = new GridPaneView(20, 20);
- * gridView.render(sim.getGridViewData());
+ * gridView.render(sim.getViewGrid());
  * }</pre>
  *
  * <p>Other details: rotation is implemented by rotating the underlying GridPane
@@ -162,7 +162,7 @@ public class GridPaneView implements GridView {
    * <p>Return value: none.</p>
    */
   @Override
-  public void render(GridViewData grid) {
+  public void render(ViewGrid grid) {
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {
         myCells[r][c].setFill(stateToColor(grid.getCellStateInt(r, c)));
@@ -199,7 +199,7 @@ public class GridPaneView implements GridView {
    * <p>Return value: none.</p>
    */
   @Override
-  public void toggleOutline(GridViewData grid){
+  public void toggleOutline(ViewGrid grid){
     isOutlined = !isOutlined;
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {

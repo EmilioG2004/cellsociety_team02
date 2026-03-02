@@ -1,6 +1,6 @@
 package cellsociety.view;
 
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import javafx.scene.Node;
 
 /**
@@ -11,13 +11,13 @@ import javafx.scene.Node;
  *
  * <p>Assumptions: implementations maintain their own internal view state and size.</p>
  *
- * <p>Dependencies: {@link GridViewData} for grid state and JavaFX {@link Node} for embedding.</p>
+ * <p>Dependencies: {@link ViewGrid} for grid state and JavaFX {@link Node} for embedding.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
  * SimulationRenderer renderer = new SimulationPanel(bundle);
  * renderer.setGrid(rows, cols);
- * renderer.render(sim.getGridViewData());
+ * renderer.render(sim.getViewGrid());
  * }</pre>
  *
  * @author Emilio Garcia
@@ -54,7 +54,7 @@ public interface SimulationRenderer {
    *
    * @param grid read-only view data of the simulation grid
    */
-  void render(GridViewData grid);
+  void render(ViewGrid grid);
 
   /**
    * Updates the displayed generation counter.

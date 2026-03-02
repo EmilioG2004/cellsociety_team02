@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Read-only view of a grid of cell states. Extends GridViewData so it can be passed
+ * Read-only view of a grid of cell states. Extends ViewGrid so it can be passed
  * to the view as the minimal interface. Rules and simulation use the full API (getCellState,
- * getNeighbors, etc.); the view uses only GridViewData (getRows, getCols, getCellStateInt).
+ * getNeighbors, etc.); the view uses only ViewGrid (getRows, getCols, getCellStateInt).
  *
  * @author Michael Lei
  */
-public interface ReadOnlyGrid extends GridViewData {
+public interface ReadOnlyGrid extends ViewGrid {
 
   CellState getCellState(int row, int col);
 
@@ -24,8 +24,6 @@ public interface ReadOnlyGrid extends GridViewData {
 
   boolean isInBounds(int row, int col);
 
-  /** Neighbor strategy is "attached" to the grid (stored by the concrete implementation). */
-  NeighborStrategy getNeighborStrategy();
 
   /**
    * Returns all neighbor states at (row, col). Positions are determined by this grid's
