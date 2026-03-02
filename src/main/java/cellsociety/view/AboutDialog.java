@@ -1,5 +1,7 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+
 import cellsociety.config.SimulationConfig;
 
 import java.text.MessageFormat;
@@ -143,15 +145,15 @@ public class AboutDialog extends StackPane{
    */
   public void applyLanguage(ResourceBundle bundle){
     myBundle = bundle;
-    myTitle.setText(bundle.getString("about.title"));
-    myCloseButton.setText(bundle.getString("button.closePanel"));
+    myTitle.setText(bundle.getString(ABOUT_TITLE));
+    myCloseButton.setText(bundle.getString(BUTTON_CLOSE_PANEL));
 
     if (myConfig == null) return;
 
-    myType.setText(MessageFormat.format(bundle.getString("about.simulationType"), myConfig.getSimulationType()));
-    myDescription.setText(MessageFormat.format(bundle.getString("about.description"), myConfig.getDescription()));
-    myAuthor.setText(MessageFormat.format(bundle.getString("about.author"), myConfig.getAuthor()));
-    myParameters.setText(MessageFormat.format(bundle.getString("about.parameters"), myConfig.getParameters()));
+    myType.setText(MessageFormat.format(bundle.getString(ABOUT_SIMULATION_TYPE), myConfig.getSimulationType()));
+    myDescription.setText(MessageFormat.format(bundle.getString(ABOUT_DESCRIPTION), myConfig.getDescription()));
+    myAuthor.setText(MessageFormat.format(bundle.getString(ABOUT_AUTHOR), myConfig.getAuthor()));
+    myParameters.setText(MessageFormat.format(bundle.getString(ABOUT_PARAMETERS), myConfig.getParameters()));
   }
 
 }

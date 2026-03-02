@@ -1,5 +1,8 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+import static cellsociety.view.constants.SimulationUiConstants.SPACING_MEDIUM;
+
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,6 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
+import cellsociety.view.constants.ResourcePaths;
 
 /**
  * Full-screen settings overlay for language/theme selection and initial upload.
@@ -40,6 +44,7 @@ public class SettingsSplash extends StackPane {
   private final ChoiceBox<String> myThemes = new ChoiceBox<>();
   private final Button myApplyChanges;
   private final Button myLoadButton;
+  private static final double SETTINGS_PADDING = 20;
   /**
    * Creates the settings splash and builds the dialog content.
    *
@@ -72,8 +77,8 @@ public class SettingsSplash extends StackPane {
 
   private void buildDialog(){
     getChildren().clear();
-    VBox myPane = new VBox(12, myTitle, mySubtitle, myLanguage, myLanguages, myTheme, myThemes, myLoadButton, myApplyChanges);
-    myPane.setPadding(new Insets(20,20,20,20));
+    VBox myPane = new VBox(SPACING_MEDIUM, myTitle, mySubtitle, myLanguage, myLanguages, myTheme, myThemes, myLoadButton, myApplyChanges);
+    myPane.setPadding(new Insets(SETTINGS_PADDING, SETTINGS_PADDING, SETTINGS_PADDING, SETTINGS_PADDING));
     myPane.setAlignment(Pos.CENTER);
 
     getChildren().add(myPane);
@@ -91,8 +96,14 @@ public class SettingsSplash extends StackPane {
    * <p>Return value: none.</p>
    */
   public void buildDropdowns(){
-    myLanguages.getItems().addAll("English", "Spanish", "Portuguese");
-    myThemes.getItems().addAll("Light", "Dark", "Duke");
+    myLanguages.getItems().addAll(
+        ResourcePaths.LANGUAGE_ENGLISH,
+        ResourcePaths.LANGUAGE_SPANISH,
+        ResourcePaths.LANGUAGE_PORTUGUESE);
+    myThemes.getItems().addAll(
+        ResourcePaths.THEME_LIGHT,
+        ResourcePaths.THEME_DARK,
+        ResourcePaths.THEME_DUKE);
   }
 
   /**
@@ -109,21 +120,21 @@ public class SettingsSplash extends StackPane {
    * @param bundle localization bundle for UI strings
    */
   public void applyLanguage(ResourceBundle bundle){
-    myTitle.setText(bundle.getString("settings.dialog.title"));
-    mySubtitle.setText(bundle.getString("settings.title"));
-    myLanguage.setText(bundle.getString("settings.language"));
-    myTheme.setText(bundle.getString("settings.theme"));
-    myApplyChanges.setText(bundle.getString("button.applyChanges"));
-    myLoadButton.setText(bundle.getString("button.loadSimulation"));
+    myTitle.setText(bundle.getString(SETTINGS_DIALOG_TITLE));
+    mySubtitle.setText(bundle.getString(SETTINGS_TITLE));
+    myLanguage.setText(bundle.getString(SETTINGS_LANGUAGE));
+    myTheme.setText(bundle.getString(SETTINGS_THEME));
+    myApplyChanges.setText(bundle.getString(BUTTON_APPLY_CHANGES));
+    myLoadButton.setText(bundle.getString(BUTTON_LOAD_SIMULATION));
 
     myLanguages.setConverter(new StringConverter<>() {
       @Override
       public String toString(String value) {
         if (value == null) return "";
         return switch (value) {
-          case "English" -> bundle.getString("language.english");
-          case "Spanish" -> bundle.getString("language.spanish");
-          case "Portuguese" -> bundle.getString("language.portuguese");
+          case ResourcePaths.LANGUAGE_ENGLISH -> bundle.getString(LANGUAGE_ENGLISH);
+          case ResourcePaths.LANGUAGE_SPANISH -> bundle.getString(LANGUAGE_SPANISH);
+          case ResourcePaths.LANGUAGE_PORTUGUESE -> bundle.getString(LANGUAGE_PORTUGUESE);
           default -> value;
         };
       }
@@ -139,9 +150,9 @@ public class SettingsSplash extends StackPane {
       public String toString(String value) {
         if (value == null) return "";
         return switch (value) {
-          case "Light" -> bundle.getString("theme.light");
-          case "Dark" -> bundle.getString("theme.dark");
-          case "Duke" -> bundle.getString("theme.duke");
+          case ResourcePaths.THEME_LIGHT -> bundle.getString(THEME_LIGHT);
+          case ResourcePaths.THEME_DARK -> bundle.getString(THEME_DARK);
+          case ResourcePaths.THEME_DUKE -> bundle.getString(THEME_DUKE);
           default -> value;
         };
       }
