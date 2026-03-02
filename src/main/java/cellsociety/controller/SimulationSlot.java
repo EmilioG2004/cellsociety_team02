@@ -9,7 +9,7 @@ import javafx.scene.Node;
 /**
  * Container for a single multi-simulation slot (panel + presenter/driver).
  *
- * <p>Purpose: provides a uniform interface for {@link MultiSimController} to
+ * <p>Purpose: provides a uniform interface for to
  * manage multiple panels and their simulations.</p>
  *
  * <p>Assumptions: {@link SimulationPresenter} is non-null and manages its own

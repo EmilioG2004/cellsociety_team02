@@ -26,7 +26,7 @@ import java.io.File;
  * center grid card, and optional dialogs) and exposes accessors for controller wiring.</p>
  *
  * <p>Assumptions: a valid {@link ResourceBundle} is supplied; controllers will call
- * {@link #setGrid(int, int)} before attempting to render, and apply themes on a live {@link Scene}.</p>
+ *  before attempting to render, and apply themes on a live {@link Scene}.</p>
  *
  * <p>Dependencies: {@link ButtonManager} for controls, JavaFX layout panes,
  * {@link GridView} implementations for rendering, and dialog components
