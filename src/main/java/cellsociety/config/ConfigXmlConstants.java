@@ -35,11 +35,18 @@ final class ConfigXmlConstants {
   static final String CONFIG_PARAM_NAME_ATTR = "name";
   static final String CONFIG_PARAM_VALUE_ATTR = "value";
 
-  public static final String CONFIG_SIMULATION_STATE = "simulationState";
-  public static final String CONFIG_SETTINGS = "settings";
-  public static final String CONFIG_SIMULATIONS = "simulations";
+  static final String CONFIG_PREFERENCES = "preferences";
 
-  public static final String CONFIG_THEME = "theme";
-  public static final String CONFIG_SIMULATION_SPEED = "simulationSpeed";
-  public static final String CONFIG_LANGUAGE = "language";
+  static final String CONFIG_THEME = "theme";
+  static final String CONFIG_LANGUAGE = "language";
+  static final String CONFIG_SIMULATION_SPEED = "simulationSpeed";
+
+  static final String CONFIG_COLOR_MAP = "colorMap";
+  static final String CONFIG_COLOR_ENTRY = "colorEntry";
+
+  static final String CONFIG_COLOR_STATE_ATTR = "state";
+  static final String CONFIG_COLOR_VALUE_ATTR = "color";
+
+  static final String CONFIG_SIMULATION_STATE = "simulationState";
+  static final String CONFIG_SIMULATIONS = "simulations";
 }

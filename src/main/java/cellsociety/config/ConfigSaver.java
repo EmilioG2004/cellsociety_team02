@@ -44,7 +44,7 @@ public class ConfigSaver {
         .newDocument();
   }
 
-  private Element buildSimulationElement(Document doc, SimulationConfig config) {
+  public Element buildSimulationElement(Document doc, SimulationConfig config) {
     Element simulationEl = doc.createElement(CONFIG_SIMULATION);
     simulationEl.setAttribute(CONFIG_SIM_TYPE_ATTR, trimmed(config.getSimulationType()));
     simulationEl.setAttribute(CONFIG_SIM_CLASS_ATTR, trimmed(config.getRuleClass()));
