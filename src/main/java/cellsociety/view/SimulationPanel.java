@@ -3,13 +3,10 @@ package cellsociety.view;
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Grid.ReadOnlyGrid;
-
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
+import cellsociety.Model.Grid.GridViewData;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -28,7 +25,7 @@ import javafx.scene.layout.VBox;
  * {@link SimulationView} UI.</p>
  *
  * <p>Assumptions: the caller initializes the grid via {@link #setGrid(int, int)}
- * before calling {@link #render(ReadOnlyGrid, Map)}.</p>
+ * before calling {@link #render(GridViewData)}.</p>
  *
  * <p>Dependencies: {@link GridView} implementations, JavaFX layout nodes, and
  * localized strings from {@link ResourceBundle}.</p>
@@ -37,7 +34,7 @@ import javafx.scene.layout.VBox;
  * <pre>{@code
  * SimulationPanel panel = new SimulationPanel(bundle);
  * panel.setGrid(rows, cols);
- * panel.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * panel.render(sim.getGridViewData());
  * }</pre>
  *
  * <p>Other details: this panel exposes controls for loading, viewing metadata, and rotating
@@ -141,9 +138,9 @@ public class SimulationPanel implements SimulationRenderer {
    * <p>Return value: none.</p>
    */
   @Override
-  public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+  public void render(GridViewData grid) {
     if (myGridView == null) return;
-    myGridView.render(grid, stateColors);
+    myGridView.render(grid);
   }
 
   /**
@@ -216,19 +213,17 @@ public class SimulationPanel implements SimulationRenderer {
    *
    * <p>Purpose: mirror the global outline toggle in multi-sim mode.</p>
    *
-   * <p>Assumptions: {@code grid} dimensions match the current grid; {@code stateColors}
-   * contains entries for all cell states.</p>
+   * <p>Assumptions: {@code grid} dimensions match the current grid.</p>
    *
    * <p>Exceptions: none.</p>
    *
    * <p>Return value: none.</p>
    *
    * @param grid read-only grid used to update outlines
-   * @param stateColors mapping from cell states to color strings
    */
-  public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+  public void toggleOutline(GridViewData grid) {
     if (myGridView == null) return;
-    myGridView.toggleOutline(grid, stateColors);
+    myGridView.toggleOutline(grid);
   }
 
   /**

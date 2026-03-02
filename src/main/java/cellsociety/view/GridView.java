@@ -1,9 +1,6 @@
 package cellsociety.view;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Grid.ReadOnlyGrid;
-
-import java.util.Map;
+import cellsociety.Model.Grid.GridViewData;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
@@ -14,17 +11,17 @@ import javafx.scene.layout.Region;
  * allowing multiple implementations (e.g., GridPane, Canvas) without rewriting
  * controllers or views.</p>
  *
- * <p>Assumptions: the {@link ReadOnlyGrid} dimensions match the implementation's
+ * <p>Assumptions: the {@link GridViewData} dimensions match the implementation's
  * internal grid dimensions; implementers do not mutate the grid.</p>
  *
- * <p>Dependencies: {@link ReadOnlyGrid} for state access, JavaFX {@link Node} and
- * {@link Region} for embedding and sizing, and state-color mappings.</p>
+ * <p>Dependencies: {@link GridViewData} for state access, JavaFX {@link Node} and
+ * {@link Region} for embedding and sizing.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
  * GridView gridView = new GridPaneView(rows, cols);
  * container.getChildren().add(gridView.getNode());
- * gridView.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * gridView.render(sim.getGridViewData());
  * }</pre>
  *
  * <p>Other details: implementations should keep rendering fast and avoid allocating
@@ -38,20 +35,18 @@ public interface GridView {
    * Renders the current simulation state.
    *
    * <p>Purpose: updates the visual representation of each cell using the provided
-   * grid state and state-to-color mapping.</p>
+   * grid state.</p>
    *
-   * <p>Assumptions: {@code grid} dimensions match the view's dimensions; {@code stateColors}
-   * contains an entry for every possible cell state.</p>
+   * <p>Assumptions: {@code grid} dimensions match the view's dimensions.</p>
    *
    * <p>Exceptions: may throw {@link IllegalArgumentException} if dimensions do not match
    * (implementation-defined).</p>
    *
    * <p>Return value: none.</p>
    *
-   * @param grid read-only view of the simulation grid
-   * @param stateColors mapping from cell states to color strings (e.g., "#RRGGBB")
+   * @param grid read-only view data of the simulation grid
    */
-  void render(ReadOnlyGrid grid, Map<CellState, String> stateColors);
+  void render(GridViewData grid);
 
   /**
    * Clears the visual grid.
@@ -106,9 +101,8 @@ public interface GridView {
    * <p>Return value: none.</p>
    *
    * @param grid read-only grid used to re-apply outlines correctly
-   * @param stateColors mapping for state-dependent outline colors (if used)
    */
-  void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors);
+  void toggleOutline(GridViewData grid);
 
   /**
    * Rotates the grid 90 degrees counterclockwise.

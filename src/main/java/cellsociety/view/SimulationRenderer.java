@@ -1,9 +1,6 @@
 package cellsociety.view;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Grid.ReadOnlyGrid;
-
-import java.util.Map;
+import cellsociety.Model.Grid.GridViewData;
 import javafx.scene.Node;
 
 /**
@@ -14,13 +11,13 @@ import javafx.scene.Node;
  *
  * <p>Assumptions: implementations maintain their own internal view state and size.</p>
  *
- * <p>Dependencies: {@link ReadOnlyGrid} for grid state and JavaFX {@link Node} for embedding.</p>
+ * <p>Dependencies: {@link GridViewData} for grid state and JavaFX {@link Node} for embedding.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
  * SimulationRenderer renderer = new SimulationPanel(bundle);
  * renderer.setGrid(rows, cols);
- * renderer.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * renderer.render(sim.getGridViewData());
  * }</pre>
  *
  * @author Emilio Garcia
@@ -45,7 +42,7 @@ public interface SimulationRenderer {
   void setGrid(int rows, int cols);
 
   /**
-   * Renders the grid's current state using the provided state-to-color mapping.
+   * Renders the grid's current state.
    *
    * <p>Purpose: updates cell visuals to match the simulation state.</p>
    *
@@ -55,10 +52,9 @@ public interface SimulationRenderer {
    *
    * <p>Return value: none.</p>
    *
-   * @param grid read-only view of the simulation grid
-   * @param stateColors mapping from cell states to color strings
+   * @param grid read-only view data of the simulation grid
    */
-  void render(ReadOnlyGrid grid, Map<CellState, String> stateColors);
+  void render(GridViewData grid);
 
   /**
    * Updates the displayed generation counter.
