@@ -15,7 +15,7 @@ import java.util.List;
 public class ArrayGrid implements Grid {
 
   private final CellState[][] cells;
-  private final NeighborStrategy neighborStrategy;
+  private NeighborStrategy neighborStrategy;
 
   /**
    * Creates a grid from a 2D array of cell states. The array is copied defensively.
@@ -49,9 +49,15 @@ public class ArrayGrid implements Grid {
     this.cells = new CellState[rows][cols];
     this.neighborStrategy = strategy;
   }
+  @Override
+  public void setNeighborStrategy(NeighborStrategy strategy) {
+    if (strategy == null) {
+      throw new IllegalArgumentException("NeighborStrategy cannot be null");
+    }
+    this.neighborStrategy = strategy;
+  }
 
   // -------------------- ReadOnlyGrid --------------------
-
   @Override
   public int getRows() {
     return cells.length;
