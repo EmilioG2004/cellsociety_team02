@@ -1,47 +1,63 @@
 package cellsociety.Model.Grid;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Read-only view of a grid of cell states. Allows consumers (e.g. the view) to read
- * dimensions and per-cell state without depending on the grid's internal representation
- * or receiving a full 2D array.
+ * Read-only view of a grid of cell states. Extends GridViewData so it can be passed
+ * to the view as the minimal interface. Rules and simulation use the full API (getCellState,
+ * getNeighbors, etc.); the view uses only GridViewData (getRows, getCols, getCellStateInt).
  */
-public interface ReadOnlyGrid {
-
-  int getRows();
-
-  int getCols();
+public interface ReadOnlyGrid extends GridViewData {
 
   CellState getCellState(int row, int col);
 
-  /**
-   * Copies this grid's state into a new 2D array. Use only when a caller truly needs
-   * an array (e.g. for serialization); prefer getRows/getCols/getCellState for display.
-   */
-  static CellState[][] copyToArray(ReadOnlyGrid grid) {
-    int rows = grid.getRows();
-    int cols = grid.getCols();
-    CellState[][] out = new CellState[rows][cols];
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        out[r][c] = grid.getCellState(r, c);
-      }
-    }
-    return out;
+  @Override
+  default int getCellStateInt(int row, int col) {
+    return getCellState(row, col).toInt();
   }
 
-  public static int[][] produceIntArray(CellState[][] states, GameRule rule){
-    int rows = states.length;
-    int cols = states[0].length;
-    int[][] out = new int[rows][cols];
-    for (int r = 0; r < rows; r++){
-      for (int c = 0; c < cols; c++){
-        out[r][c] = rule.fromState(states[r][c]);
-      }
-    }
+  boolean isInBounds(int row, int col);
 
-    return out;
+  /** Neighbor strategy is "attached" to the grid (stored by the concrete implementation). */
+  NeighborStrategy getNeighborStrategy();
+
+  /**
+   * Returns all neighbor states at (row, col). Positions are determined by this grid's
+   * NeighborStrategy (which handles bounds and wrapping); the grid only looks up cell states.
+   */
+  List<CellState> getNeighbors(int row, int col);
+
+  /**
+   * Returns a map from each neighbor's position to its cell state at (row, col).
+   * Useful when a rule needs both the position and state of neighbors (e.g. movement, claiming).
+   */
+  default Map<Position, CellState> getNeighborStates(int row, int col) {
+    Map<Position, CellState> map = new HashMap<>();
+    for (int[] pos : getNeighborStrategy().getNeighborPositions(getRows(), getCols(), row, col)) {
+      map.put(new Position(pos[0], pos[1]), getCellState(pos[0], pos[1]));
+    }
+    return map;
+  }
+
+  /**
+   * Returns the number of neighbors at (row, col) whose state equals {@code target}.
+   */
+  default int countNeighborsWithState(int row, int col, CellState target) {
+    return countNeighborsWithState(row, col, target.toInt());
+  }
+
+  /**
+   * Returns the number of neighbors at (row, col) whose state's int value equals {@code targetStateInt}.
+   */
+  default int countNeighborsWithState(int row, int col, int targetStateInt) {
+    int count = 0;
+    for (CellState cell : getNeighbors(row, col)) {
+      if (cell.toInt() == targetStateInt) count++;
+    }
+    return count;
   }
 }

@@ -3,7 +3,7 @@ package cellsociety.Model;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
-import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationDriver;
 
@@ -26,13 +26,13 @@ class SimulationDriverTest {
 
   private SimulationDriver driver;
   private Simulation simulation;
-  private Grid grid;
+  private ArrayGrid grid;
   private GameRule rules;
 
   @BeforeEach
   void setUp() {
     driver = new SimulationDriver();
-    grid = new Grid(3, 3);
+    grid = new ArrayGrid(3, 3);
     CellState[][] initial = {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD},
@@ -300,7 +300,7 @@ class SimulationDriverTest {
     driver.setSimulation(simulation);
     driver.start();
 
-    Grid newGrid = new Grid(2, 2);
+    ArrayGrid newGrid = new ArrayGrid(2, 2);
     newGrid.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, new ConwayGameOfLifeRule());
     Simulation newSim = new Simulation(newGrid, new ConwayGameOfLifeRule());
     driver.setSimulation(newSim);

@@ -1,7 +1,12 @@
 package cellsociety;
 
+import static cellsociety.view.constants.SimulationUiConstants.DATA_FILE_FOLDER;
+import static cellsociety.view.constants.SimulationUiConstants.VERSION_KEY;
+import static cellsociety.view.constants.SimulationUiConstants.XML_FILE_EXTENSION;
+
 import cellsociety.controller.SimulationController;
 import cellsociety.view.SimulationView;
+import cellsociety.view.constants.ResourcePaths;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -23,32 +28,24 @@ import org.xml.sax.SAXException;
  * Feel free to completely change this code or delete it entirely. 
  */
 public class Main extends Application {
-    // kind of data files to look for
-    public static final String DATA_FILE_EXTENSION = "*.xml";
-    // default to start in the data folder to make it easy on the user to find
-    public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
     // NOTE: make ONE chooser since generally accepted behavior is that it remembers where user left it last
-    private final static FileChooser FILE_CHOOSER = makeChooser(DATA_FILE_EXTENSION);
-    // internal configuration file
-    public static final String INTERNAL_CONFIGURATION = "cellsociety.Version";
+    private final static FileChooser FILE_CHOOSER = makeChooser(XML_FILE_EXTENSION);
 
-    public static final int APP_WIDTH = 1200;
-    public static final int APP_HEIGHT = 750;
 
     /**
      * @see Application#start(Stage)
      */
     @Override
     public void start (Stage primaryStage) {
-        ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.Languages.English");
-        buildGUI(primaryStage, bundle, true);
+        ResourceBundle bundle = ResourceBundle.getBundle(ResourcePaths.BUNDLE_ENGLISH);
+        buildGUI(primaryStage, bundle);
     }
 
     //TO-DO REFACTOR: leave view creation, remove scene creation, in controller when creating controller then create scene
-    private void buildGUI(Stage stage, ResourceBundle bundle, boolean showSplash){
-        SimulationView view = new SimulationView(bundle, showSplash);
-        Scene scene = new Scene(view.getRoot(), APP_WIDTH, APP_HEIGHT);
-        SimulationController controller = new SimulationController(view, scene);
+    private void buildGUI(Stage stage, ResourceBundle bundle){
+        SimulationView view = new SimulationView(bundle);
+        Scene scene = new Scene(view.getRoot());
+        SimulationController controller = new SimulationController(view, scene, bundle);
 
         stage.setScene(scene);
         view.applyTheme(scene, "Light");
@@ -86,8 +83,8 @@ public class Main extends Application {
      * A method to test getting internal resources.
      */
     public double getVersion () {
-        ResourceBundle resources = ResourceBundle.getBundle(INTERNAL_CONFIGURATION);
-        return Double.parseDouble(resources.getString("Version"));
+        ResourceBundle resources = ResourceBundle.getBundle(ResourcePaths.BUNDLE_VERSION);
+        return Double.parseDouble(resources.getString(VERSION_KEY));
     }
 
     // get value of Element's text

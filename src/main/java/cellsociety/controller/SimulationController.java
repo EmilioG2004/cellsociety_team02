@@ -1,19 +1,29 @@
 package cellsociety.controller;
 
+import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
+import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+import cellsociety.view.SimulationPanel;
 import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.SimulationFactory;
 import cellsociety.Model.Simulation.SimulationDriver;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
-import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
-import java.text.MessageFormat;
-import javafx.application.Platform;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.TilePane;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 /**
  * Primary controller that wires {@link SimulationView} to simulation logic.
  *
- * <p>Purpose: connects UI controls to a {@link SimulationDriver}, handles configuration
+ * <p>Purpose: connects UI controls to all SimulationPresenters, handles configuration
  * loading/saving through the {@link cellsociety.config} package, and refreshes the view
  * after simulation steps.</p>
  *
@@ -30,22 +40,22 @@ import javafx.scene.Scene;
  * SimulationController controller = new SimulationController(view, scene);
  * }</pre>
  *
- * <p>Other details: when multi-sim mode is active, some controls route to
- * {@link MultiSimController} instead of the single-simulation driver.</p>
- *
  * @author Emilio Garcia
  */
 public class SimulationController {
 
   private final SimulationView mySimView;
-  private final SimulationDriver myDriver;
-  private final ConfigLoader myConfigLoader;
   private final Scene myScene;
-  private SimulationConfig initialConfig;
-  private final ConfigSaver myConfigSaver;
   private final WiringManager myWires;
-  private final MultiSimController myMultiController;
-  private boolean myMultiMode;
+
+  private ResourceBundle myBundle;
+  private final ConfigLoader myConfigLoader;
+  private final ErrorHandler myErrorHandler;
+
+  private final List<SimulationSlot> mySlots;
+
+  private TilePane myTile;
+  private ChoiceBox<Integer> mySlotChoice;
 
   /**
    * Constructs a controller and wires all UI controls.
@@ -62,128 +72,132 @@ public class SimulationController {
    * @param simView the view whose controls are connected to simulation behavior
    * @param scene the scene used for theme updates
    */
-  public SimulationController(SimulationView simView, Scene scene) {
-    mySimView = simView;
-    myDriver = new SimulationDriver();
+  public SimulationController(SimulationView simView, Scene scene, ResourceBundle bundle) {
+    myBundle = bundle;
     myConfigLoader = new ConfigLoader();
-    myConfigSaver = new ConfigSaver();
+    mySimView = simView;
+    myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
+    mySlots = new ArrayList<>();
     myScene = scene;
-    myMultiController = new MultiSimController(mySimView.getMyBundle());
-    myWires = new WiringManager(
-        mySimView,
-        myDriver,
-        myConfigLoader,
-        myConfigSaver,
-        myScene,
-        this::setSimulation,
-        this::setInitialConfig,
-        () -> initialConfig,
-        this:: openMultiSimDashboard,
-        this::isMultiMode,
-        () -> myMultiController.startAllLoaded(),
-        () -> myMultiController.pauseAll(),
-        () -> myMultiController.stepAllLoaded(),
-        () -> myMultiController.stepBackAllLoaded(),
-        () -> myMultiController.resetAllLoaded(),
-        () -> myMultiController.toggleOutlineAll(),
-        () -> myMultiController.speedUpAll(2.0),
-        () -> myMultiController.slowDownAll(2.0),
-        () -> myMultiController.toggleDirectionAll()
-    );
-    myMultiMode = false;
+    myWires = new WiringManager(mySimView, myScene, this::setMyBundle);
 
-    myWires.wireAll();
+    myTile = mySimView.getMultiSimTile();
+    mySlotChoice = mySimView.getMultiSimSlotChoice();
+    for (int i = 1; i <= MAX_SLOTS; i++) {
+      mySlotChoice.getItems().add(i);
+    }
+    mySlotChoice.setValue(DEFAULT_SLOTS);
+    mySlotChoice.setOnAction(e -> setSlotCount(mySlotChoice.getValue()));
 
-    myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshViewFromSimulation));
+    setSlotCount(DEFAULT_SLOTS);
+
+    myWires.wireAll(mySlots);
   }
 
   /**
-   * Installs a simulation into the driver and renders it immediately.
+   * Sets how many slots exist (clamped to [1, MAX_SLOTS]).
    *
-   * <p>Purpose: allows a simulation to be installed programmatically without the upload flow.</p>
+   * <p>Purpose: allows the user to choose how many panels to display.</p>
    *
-   * <p>Assumptions: {@code sim} is non-null and provides a complete state-color mapping.</p>
+   * <p>Assumptions: {@code desired} may be any integer; values outside the range are clamped.</p>
    *
    * <p>Exceptions: none.</p>
    *
    * <p>Return value: none.</p>
    *
-   * @param sim the simulation to run and display
+   * @param desired requested number of slots
    */
-  public void setSimulation(Simulation sim) {
-    myMultiMode = false;
-    myDriver.setSimulation(sim);
-    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
-    mySimView.getMyGridView().setOnCellClicked((row, col) -> {
-      if (!myDriver.hasSimulation()) return;
-      myDriver.toggleCellState(row, col);
-      Platform.runLater(this::refreshViewFromSimulation);
-    });
+  public void setSlotCount(int desired) {
+    int count = clamp(desired, 1, MAX_SLOTS);
 
-    updateGenerationLabel();
+    while (mySlots.size() > count) {
+      SimulationSlot removed = mySlots.remove(mySlots.size() - 1);
+      removed.pause();
+    }
+
+    while (mySlots.size() < count) {
+      int index = mySlots.size();
+      SimulationPanel panel = new SimulationPanel(myBundle);
+      int slotIndex = index;
+      panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
+      panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
+      SimulationPresenter presenter = new SimulationPresenter(panel);
+      SimulationSlot slot = new SimulationSlot(index, panel, presenter);
+      mySlots.add(slot);
+    }
+    rebuildTileChildren();
   }
 
   /**
- * Re-renders the grid view and stack size label from the driver's current simulation.
- * No-op if no simulation is set. Call on the JavaFX thread (e.g. via Platform.runLater).
- */
-  private void refreshViewFromSimulation() {
-    if (!myDriver.hasSimulation()) return;
-    Simulation sim = myDriver.getSimulation();
-    mySimView.getMyGridView().render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
-    updateGenerationLabel();
-  }
-
-  /**
-   * Stores the initial configuration used for reset/save operations.
+   * Loads an XML config file into the given slot index.
    *
-   * <p>Purpose: enables resets to the original configuration snapshot.</p>
+   * <p>Purpose: instantiate and display a simulation for the selected slot.</p>
    *
-   * <p>Assumptions: {@code config} is non-null.</p>
+   * <p>Assumptions: {@code xmlFile} is non-null and readable.</p>
    *
-   * <p>Exceptions: none.</p>
+   * <p>Exceptions: may throw parsing/IO exceptions if loading fails.</p>
    *
-   * <p>Return value: none.</p>
-   *
-   * @param config initial configuration associated with the current simulation
+   * @param slotIndex zero-based slot index
+   * @param xmlFile configuration file to load
+   * @throws ParserConfigurationException if the XML parser cannot be configured
+   * @throws IOException if the file cannot be read
+   * @throws SAXException if the XML is malformed
+   * @throws IllegalArgumentException if the configuration is invalid
    */
-  public void setInitialConfig(SimulationConfig config) { this.initialConfig = config; }
+  public void loadConfigIntoSlot(int slotIndex, File xmlFile)
+      throws ParserConfigurationException, IOException, SAXException, IllegalArgumentException {
 
-  private void updateGenerationLabel() {
-    Simulation sim = myDriver.getSimulation();
-    if (sim == null) return;
+    checkIndex(slotIndex);
+    if (xmlFile == null) return;
 
-    int generation = sim.getGeneration();
+    SimulationConfig config = myConfigLoader.loadConfig(xmlFile);
+    Simulation sim = SimulationFactory.createSimulation(config);
 
-    mySimView.getMyButtons().getStateStackSizeLabel()
-        .setText(MessageFormat.format(mySimView.getMyBundle().getString("label.generation"), generation));
+    mySlots.get(slotIndex).setSimulation(sim);
+    mySlots.get(slotIndex).setConfig(config);
   }
 
-  /**
-   * Switches the center pane to the multi-simulation dashboard.
-   *
-   * <p>Purpose: allows users to view and control multiple simulations simultaneously.</p>
-   *
-   * <p>Assumptions: the multi-simulation controller is initialized.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * <p>Return value: none.</p>
-   */
-  public void openMultiSimDashboard() {
-    myMultiMode = true;
-    mySimView.setCenterContent(myMultiController.getNode());
+  private void handleLoadForSlot(int slotIndex) {
+    File xmlFile = mySimView.showOpenConfigDialog();
+    if (xmlFile == null) return;
+
+    try {
+      loadConfigIntoSlot(slotIndex, xmlFile);
+    } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
+      myErrorHandler.handle(ex);
+    }
   }
 
-  /**
-   * Indicates whether multi-sim mode is currently active.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return true if the multi-simulation dashboard is displayed
-   */
-  public boolean isMultiMode() {
-    return myMultiMode;
+  private void handleAboutForSlot(int slotIndex) {
+    try {
+      checkIndex(slotIndex);
+      SimulationSlot slot = mySlots.get(slotIndex);
+      if (!slot.hasSimulation()) {
+        throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+      }
+      mySimView.showAboutSplash(slot.getConfig());
+    } catch (IllegalStateException | IndexOutOfBoundsException ex) {
+      myErrorHandler.handle(ex);
+    }
   }
+
+  private void rebuildTileChildren() {
+    myTile.getChildren().clear();
+    for (SimulationSlot slot : mySlots) {
+      myTile.getChildren().add(slot.getNode());
+    }
+  }
+
+  private void checkIndex(int slotIndex) {
+    if (slotIndex < 0 || slotIndex >= mySlots.size()) {
+      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+    }
+  }
+
+  private int clamp(int value, int min, int max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  public void setMyBundle(ResourceBundle bundle){ myBundle = bundle; }
+}
+

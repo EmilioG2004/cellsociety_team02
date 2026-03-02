@@ -11,9 +11,10 @@ import cellsociety.Model.Creature.Shark;
  */
 public class WaTorCellState implements CellState {
 
-  private static final String WATER_COLOR = "WHITE";
-  private static final String FISH_COLOR = "GREEN";
-  private static final String SHARK_COLOR = "BLUE";
+  /** Int encoding for config and fromInt. */
+  public static final int WATER_INT = 0;
+  public static final int FISH_INT = 1;
+  public static final int SHARK_INT = 2;
 
   /** Representative instance for an empty (water) cell. */
   public static final WaTorCellState WATER = new WaTorCellState(null);
@@ -49,10 +50,17 @@ public class WaTorCellState implements CellState {
   }
 
   @Override
-  public String getColor() {
-    if (creature == null) return WATER_COLOR;
-    if (creature instanceof Fish) return FISH_COLOR;
-    return SHARK_COLOR;
+  public int toInt() {
+    if (creature == null) return WATER_INT;
+    if (creature instanceof Fish) return FISH_INT;
+    return SHARK_INT;
+  }
+
+  @Override
+  public CellState getNextInCycle() {
+    if (creature == null) return new WaTorCellState(new Fish());
+    if (creature instanceof Fish) return new WaTorCellState(new Shark(5));
+    return water();
   }
 
   /**

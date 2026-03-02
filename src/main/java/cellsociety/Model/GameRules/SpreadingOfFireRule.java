@@ -1,13 +1,14 @@
 package cellsociety.Model.GameRules;
+
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SpreadingOfFireState;
+import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
-import java.util.List;
 import java.util.Map;
 
-/** Spreading of Fire: TREE catches from BURNING (probCatch), BURNING→EMPTY, EMPTY→TREE (probTree). Cardinal neighbors. Params: probCatch (0.15), probTree (0.05). */
+/** Spreading of Fire: TREE catches from BURNING (probCatch), BURNING→EMPTY, EMPTY→TREE (probTree). Cardinal neighbors. */
 public class SpreadingOfFireRule extends GameRule {
 
   private static final double DEFAULT_PROB_CATCH = 0.15;
@@ -19,16 +20,11 @@ public class SpreadingOfFireRule extends GameRule {
   private static final int MIN_BURNING_NEIGHBORS_TO_CATCH = 1;
 
   public SpreadingOfFireRule() {
-    super(new CardinalNeighborStrategy());
+    super(Map.of());
   }
 
   public SpreadingOfFireRule(Map<String, Double> parameters) {
-    super(new CardinalNeighborStrategy(), parameters);
-    validateParameters(parameters);
-  }
-
-  public SpreadingOfFireRule(NeighborStrategy strategy, Map<String, Double> parameters) {
-    super(strategy, parameters);
+    super(parameters);
     validateParameters(parameters);
   }
 
@@ -41,59 +37,37 @@ public class SpreadingOfFireRule extends GameRule {
     }
   }
 
+  @Override
+  public NeighborStrategy getDefaultNeighborStrategy() {
+    return new CardinalNeighborStrategy();
+  }
 
   @Override
-  public CellState[][] getNextStates(CellState[][] currentStates) {
-    int rows = currentStates.length;
-    int cols = currentStates[0].length;
-    double probCatch = parameters == null || !parameters.containsKey(PARAM_PROB_CATCH)
-        ? DEFAULT_PROB_CATCH
-        : parameters.get(PARAM_PROB_CATCH);
-    double probTree = parameters == null || !parameters.containsKey(PARAM_PROB_TREE)
-        ? DEFAULT_PROB_TREE
-        : parameters.get(PARAM_PROB_TREE);
-    CellState[][] nextStates = new CellState[rows][cols];
-
+  public Grid getNextGrid(Grid currentGrid) {
+    int rows = currentGrid.getRows();
+    int cols = currentGrid.getCols();
+    double probCatch = parameters.containsKey(PARAM_PROB_CATCH) ? parameters.get(PARAM_PROB_CATCH) : DEFAULT_PROB_CATCH;
+    double probTree = parameters.containsKey(PARAM_PROB_TREE) ? parameters.get(PARAM_PROB_TREE) : DEFAULT_PROB_TREE;
+    Grid next = currentGrid.emptyCopy();
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        CellState currentState = currentStates[r][c];
+        CellState currentState = currentGrid.getCellState(r, c);
         if (currentState == SpreadingOfFireState.BURNING) {
-          nextStates[r][c] = SpreadingOfFireState.EMPTY;
+          next.setCellState(r, c, SpreadingOfFireState.EMPTY);
         } else if (currentState == SpreadingOfFireState.TREE) {
-          List<CellState> neighbors = getNeighbors(currentStates, r, c);
-          int burningNeighbors = countNeighborsWithState(neighbors, SpreadingOfFireState.BURNING);
-          if (burningNeighbors >= MIN_BURNING_NEIGHBORS_TO_CATCH && Math.random() < probCatch) {
-            nextStates[r][c] = SpreadingOfFireState.BURNING;
-          } else {
-            nextStates[r][c] = SpreadingOfFireState.TREE;
-          }
+          int burningNeighbors = currentGrid.countNeighborsWithState(r, c, SpreadingOfFireState.BURNING);
+          boolean catchFire = burningNeighbors >= MIN_BURNING_NEIGHBORS_TO_CATCH && Math.random() < probCatch;
+          next.setCellState(r, c, catchFire ? SpreadingOfFireState.BURNING : SpreadingOfFireState.TREE);
         } else {
-          nextStates[r][c] = Math.random() < probTree
-              ? SpreadingOfFireState.TREE  
-              : SpreadingOfFireState.EMPTY;
+          next.setCellState(r, c, Math.random() < probTree ? SpreadingOfFireState.TREE : SpreadingOfFireState.EMPTY);
         }
       }
     }
-    return nextStates;
-  }
-  @Override
-  public Map<CellState, String> getStateColors() {
-    return stateColorsFor(
-        SpreadingOfFireState.EMPTY,
-        SpreadingOfFireState.TREE,
-        SpreadingOfFireState.BURNING);
+    return next;
   }
 
   @Override
   public CellState fromInt(int value) {
     return SpreadingOfFireState.fromInt(value);
   }
-
-  @Override
-  public CellState getNextStateInCycle(CellState current) {
-    return SpreadingOfFireState.getNextStateInCycle(current);
-  }
-
-  @Override
-  public int fromState(CellState state){ return SpreadingOfFireState.fromState(state); }
 }

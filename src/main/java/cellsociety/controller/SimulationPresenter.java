@@ -74,6 +74,20 @@ public class SimulationPresenter {
   }
 
   /**
+   * Toggles the clicked cell and immediately refreshes the slot.
+   *
+   * @param row clicked row index
+   * @param col clicked column index
+   */
+  public void toggleCellState(int row, int col) {
+    if (!myDriver.hasSimulation()) {
+      throw new IllegalStateException("No simulation loaded.");
+    }
+    myDriver.toggleCellState(row, col);
+    refreshFromSimulation();
+  }
+
+  /**
    * Re-renders after a step. Safe to call repeatedly; no-op if no simulation.
    */
   private void refreshFromSimulation() {
