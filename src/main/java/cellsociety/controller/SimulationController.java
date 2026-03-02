@@ -12,6 +12,7 @@ import cellsociety.Model.Grid.GridViewData;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.SimulationConfig;
+import cellsociety.config.SimulationState;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,9 +20,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.TilePane;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
+import cellsociety.view.constants.ResourcePaths;
 
 /**
  * Primary controller that wires {@link SimulationView} to simulation logic.
@@ -50,16 +51,12 @@ public class SimulationController {
   private final SimulationView mySimView;
   private final Scene myScene;
   private final WiringManager myWires;
-
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
   private final ConfigSaver myConfigSaver;
   private final ErrorHandler myErrorHandler;
-
   private final List<SimulationSlot> mySlots;
 
-  private TilePane myTile;
-  private ChoiceBox<Integer> mySlotChoice;
 
   /**
    * Constructs a controller and wires all UI controls.
@@ -84,10 +81,9 @@ public class SimulationController {
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
     myScene = scene;
-    myWires = new WiringManager(mySimView, myScene, this::setMyBundle);
+    myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll);
 
-    myTile = mySimView.getMultiSimTile();
-    mySlotChoice = mySimView.getMultiSimSlotChoice();
+    ChoiceBox<Integer> mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
       mySlotChoice.getItems().add(i);
     }
@@ -213,6 +209,55 @@ public class SimulationController {
     }
   }
 
+  private void handleSaveAll() {
+    try {
+      SimulationState stateSnapshot = buildSimulationStateSnapshot();
+      File saveDestination = mySimView.showSaveConfigDialog();
+      if (saveDestination == null) return;
+      myConfigSaver.saveState(stateSnapshot, saveDestination);
+    } catch (RuntimeException ex) {
+      myErrorHandler.handle(ex);
+    }
+  }
+
+  private SimulationState buildSimulationStateSnapshot() {
+    List<SimulationConfig> active = new ArrayList<>();
+    for (SimulationSlot slot : mySlots) {
+      if (!slot.hasSimulation()) continue;
+      SimulationConfig base = slot.getConfig();
+      GridViewData grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+      int[][] states = GridViewData.produceIntArray(grid);
+      SimulationConfig snapshot = new SimulationConfig(
+          base.getSimulationType(),
+          base.getRuleClass(),
+          base.getNeighborStrategyClass(),
+          base.getTitle(),
+          base.getAuthor(),
+          base.getDescription(),
+          grid.getRows(),
+          grid.getCols(),
+          states,
+          base.getParameters()
+      );
+      active.add(snapshot);
+    }
+
+    int theme = mapThemeToCode(mySimView.getMySettings().getMyThemes().getValue());
+    double speed = mySimView.getMySpeedMultiplier();
+    String language = mySimView.getMySettings().getMyLanguages().getValue();
+    if (language == null || language.isBlank()) {
+      language = ResourcePaths.LANGUAGE_ENGLISH;
+    }
+
+    return new SimulationState(active, theme, speed, language);
+  }
+
+  private int mapThemeToCode(String themeChoice) {
+    if (ResourcePaths.THEME_DARK.equals(themeChoice)) return 1;
+    if (ResourcePaths.THEME_DUKE.equals(themeChoice)) return 2;
+    return 0;
+  }
+
   private void handleAboutForSlot(int slotIndex) {
     try {
       checkIndex(slotIndex);
@@ -227,9 +272,9 @@ public class SimulationController {
   }
 
   private void rebuildTileChildren() {
-    myTile.getChildren().clear();
+    mySimView.getMultiSimTile().getChildren().clear();
     for (SimulationSlot slot : mySlots) {
-      myTile.getChildren().add(slot.getNode());
+      mySimView.getMultiSimTile().getChildren().add(slot.getNode());
     }
   }
 
