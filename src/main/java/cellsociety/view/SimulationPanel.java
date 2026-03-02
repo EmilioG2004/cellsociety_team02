@@ -53,6 +53,7 @@ public class SimulationPanel implements SimulationRenderer {
   private final Button myRotateLeftButton;
   private final Button myRotateRightButton;
   private final Button myAboutButton;
+  private final Button mySaveButton;
 
   private final StackPane myGridContainer;
 
@@ -90,6 +91,7 @@ public class SimulationPanel implements SimulationRenderer {
     myRotateLeftButton = new Button(myBundle.getString(BUTTON_ROTATE_LEFT));
     myRotateRightButton = new Button(myBundle.getString(BUTTON_ROTATE_RIGHT));
     myAboutButton = new Button(myBundle.getString(BUTTON_ABOUT_CONFIG));
+    mySaveButton = new Button(myBundle.getString((BUTTON_SAVE_STATE)));
     myRotateLeftButton.setOnAction(e -> rotateLeft());
     myRotateRightButton.setOnAction(e -> rotateRight());
 
@@ -97,7 +99,7 @@ public class SimulationPanel implements SimulationRenderer {
     myGridContainer.setPadding(new Insets(SPACING_SMALL));
     myGridContainer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-    HBox header = new HBox(SPACING_SMALL, myGenerationLabel, myLoadButton, myAboutButton);
+    HBox header = new HBox(SPACING_SMALL, myGenerationLabel, myLoadButton,mySaveButton, myAboutButton);
     header.setAlignment(Pos.CENTER);
     HBox.setHgrow(myGenerationLabel, javafx.scene.layout.Priority.ALWAYS);
 
@@ -198,6 +200,8 @@ public class SimulationPanel implements SimulationRenderer {
   public void setOnAbout(Runnable action) {
     myAboutButton.setOnAction(e -> action.run());
   }
+
+  public void setOnSave(Runnable action) { mySaveButton.setOnAction(e -> action.run()); }
 
   /**
    * Registers a callback for clicks on this panel's grid cells.
