@@ -2,38 +2,26 @@ package cellsociety.config;
 
 import java.io.File;
 import java.util.Map;
-import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import static cellsociety.config.ConfigXmlConstants.*;
 
 /**
- * Writes a {@link SimulationState} to an XML file.
- * Contains global settings + a list of simulation configs.
+ * Writes a single {@link SimulationConfig} to an XML file.
+ * Output root is one <simulation> element (no SimulationState, no settings, no multi-sim list).
+ * @author Ixa Sigler
  */
 public class ConfigSaver {
 
-  public void saveState(SimulationState state, File outFile) {
-    if (state == null) throw new IllegalArgumentException("state cannot be null");
-    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
-
-    try {
-      Document doc = newDocument();
-      Element root = buildSimulationStateElement(doc, state);
-      doc.appendChild(root);
-      writeXml(doc, outFile);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to save state to " + outFile.getPath(), e);
-    }
-  }
-
+  /** Save exactly one simulation config to exactly one file. */
   public void saveConfig(SimulationConfig config, File outFile) {
     if (config == null) throw new IllegalArgumentException("config cannot be null");
     if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
@@ -47,56 +35,6 @@ public class ConfigSaver {
       writeXml(doc, outFile);
     } catch (Exception e) {
       throw new RuntimeException("Failed to save config to " + outFile.getPath(), e);
-    }
-  }
-
-  private Element buildSimulationStateElement(Document doc, SimulationState state) {
-    Element root = doc.createElement(CONFIG_SIMULATION_STATE);
-
-    // settings
-    root.appendChild(buildSettingsElement(doc, state));
-
-    // simulations
-    Element simsEl = doc.createElement(CONFIG_SIMULATIONS);
-    List<SimulationConfig> configs = state.getActiveSimulations();
-    for (SimulationConfig cfg : configs) {
-      if (cfg == null) throw new IllegalArgumentException("activeSimulations contains null config");
-      validateConfig(cfg);
-      simsEl.appendChild(buildSimulationElement(doc, cfg));
-    }
-    root.appendChild(simsEl);
-
-    return root;
-  }
-
-  private Element buildSettingsElement(Document doc, SimulationState state) {
-    Element settingsEl = doc.createElement(CONFIG_SETTINGS);
-
-    settingsEl.appendChild(textElement(doc, CONFIG_THEME, Integer.toString(state.getPreferences().getTheme())));
-    settingsEl.appendChild(textElement(doc, CONFIG_SIMULATION_SPEED, Double.toString(state.getPreferences().getSimulationSpeed())));
-    settingsEl.appendChild(textElement(doc, CONFIG_LANGUAGE, state.getPreferences().getLanguage()));
-
-    return settingsEl;
-  }
-
-  private void validateConfig(SimulationConfig config) {
-    if (trimmed(config.getSimulationType()).isEmpty())
-      throw new IllegalArgumentException("simulation type is blank");
-    if (trimmed(config.getRuleClass()).isEmpty())
-      throw new IllegalArgumentException("rule class is blank");
-
-    int rows = config.getRows();
-    int cols = config.getCols();
-    if (rows <= 0 || cols <= 0)
-      throw new IllegalArgumentException("rows/cols must be positive");
-
-    int[][] states = config.getInitialStates();
-    if (states == null || states.length != rows)
-      throw new IllegalArgumentException("initialStates row count does not match rows");
-
-    for (int r = 0; r < rows; r++) {
-      if (states[r] == null || states[r].length != cols)
-        throw new IllegalArgumentException("initialStates col count does not match cols at row " + r);
     }
   }
 
@@ -169,16 +107,30 @@ public class ConfigSaver {
   }
 
   private void writeXml(Document doc, File outFile) throws Exception {
-    Transformer transformer = TransformerFactory
-        .newInstance()
-        .newTransformer();
-
+    Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    transformer.transform(new DOMSource(doc), new StreamResult(outFile));
+  }
 
-    transformer.transform(
-        new DOMSource(doc),
-        new StreamResult(outFile)
-    );
+  private void validateConfig(SimulationConfig config) {
+    if (trimmed(config.getSimulationType()).isEmpty())
+      throw new IllegalArgumentException("simulation type is blank");
+    if (trimmed(config.getRuleClass()).isEmpty())
+      throw new IllegalArgumentException("rule class is blank");
+
+    int rows = config.getRows();
+    int cols = config.getCols();
+    if (rows <= 0 || cols <= 0)
+      throw new IllegalArgumentException("rows/cols must be positive");
+
+    int[][] states = config.getInitialStates();
+    if (states == null || states.length != rows)
+      throw new IllegalArgumentException("initialStates row count does not match rows");
+
+    for (int r = 0; r < rows; r++) {
+      if (states[r] == null || states[r].length != cols)
+        throw new IllegalArgumentException("initialStates col count does not match cols at row " + r);
+    }
   }
 
   private String toMultilineCsv(int[][] states, int rows, int cols) {
