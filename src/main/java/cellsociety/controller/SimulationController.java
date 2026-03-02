@@ -4,6 +4,8 @@ import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
 
 import cellsociety.config.ConfigSaver;
+import cellsociety.config.SimulationPreferences;
+import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationFactory;
@@ -16,6 +18,7 @@ import cellsociety.config.SimulationState;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
@@ -54,6 +57,7 @@ public class SimulationController {
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
   private final ConfigSaver myConfigSaver;
+  private final SimulationSaver mySimSaver;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
 
@@ -77,6 +81,7 @@ public class SimulationController {
     myBundle = bundle;
     myConfigLoader = new ConfigLoader();
     myConfigSaver = new ConfigSaver();
+    mySimSaver = new SimulationSaver();
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
@@ -215,16 +220,18 @@ public class SimulationController {
 
   private void handleSaveAll() {
     try {
-      SimulationState stateSnapshot = buildSimulationStateSnapshot();
+      List<SimulationConfig> stateSnapshots = buildSimulationSnapshots();
+      SimulationPreferences currentPreferences = getSimulationPreferences();
+      SimulationState currentState = new SimulationState(stateSnapshots, currentPreferences);
       File saveDestination = mySimView.showSaveConfigDialog();
       if (saveDestination == null) return;
-      myConfigSaver.saveState(stateSnapshot, saveDestination);
+      mySimSaver.saveState(currentState, saveDestination);
     } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
     }
   }
 
-  private SimulationState buildSimulationStateSnapshot() {
+  private List<SimulationConfig> buildSimulationSnapshots() {
     List<SimulationConfig> active = new ArrayList<>();
     for (SimulationSlot slot : mySlots) {
       if (!slot.hasSimulation()) continue;
@@ -245,7 +252,10 @@ public class SimulationController {
       );
       active.add(snapshot);
     }
+    return active;
+  }
 
+  private SimulationPreferences getSimulationPreferences() {
     int theme = mapThemeToCode(mySimView.getMySettings().getMyThemes().getValue());
     double speed = mySimView.getMySpeedMultiplier();
     String language = mySimView.getMySettings().getMyLanguages().getValue();
@@ -253,7 +263,9 @@ public class SimulationController {
       language = ResourcePaths.LANGUAGE_ENGLISH;
     }
 
-    return new SimulationState(active, theme, speed, language);
+    SimulationPreferences preferences = new SimulationPreferences(theme, language, speed, new HashMap<Integer,String>());
+
+    return preferences;
   }
 
   private int mapThemeToCode(String themeChoice) {
