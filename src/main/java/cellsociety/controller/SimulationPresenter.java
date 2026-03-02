@@ -69,7 +69,7 @@ public class SimulationPresenter {
     myDriver.setSimulation(sim);
 
     myRenderer.setGrid(rows, cols);
-    myRenderer.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    myRenderer.render(sim.getGridViewData());
     myRenderer.setGeneration(sim.getGeneration());
   }
 
@@ -94,7 +94,7 @@ public class SimulationPresenter {
     if (!myDriver.hasSimulation()) return;
 
     Simulation sim = myDriver.getSimulation();
-    myRenderer.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+    myRenderer.render(sim.getGridViewData());
     myRenderer.setGeneration(sim.getGeneration());
   }
 

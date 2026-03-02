@@ -105,7 +105,7 @@ public class SimulationSlot {
    * @param sim simulation to display
    */
   public void setSimulation(Simulation sim) {
-    myPresenter.setSimulation(sim, sim.getReadOnlyGrid().getRows(), sim.getReadOnlyGrid().getCols());
+    myPresenter.setSimulation(sim, sim.getGridViewData().getRows(), sim.getGridViewData().getCols());
   }
 
   /**
@@ -161,10 +161,7 @@ public class SimulationSlot {
    */
   public void toggleOutline() {
     if (!hasSimulation()) return;
-    myPanel.toggleOutline(
-        myPresenter.getDriver().getSimulation().getReadOnlyGrid(),
-        myPresenter.getDriver().getSimulation().getRule().getStateColors()
-    );
+    myPanel.toggleOutline(myPresenter.getDriver().getSimulation().getGridViewData());
   }
 
   /**
