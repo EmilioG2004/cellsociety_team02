@@ -5,7 +5,7 @@ import java.util.Stack;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.Grid;
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
 
 /**
@@ -72,7 +72,7 @@ public class Simulation {
     return myStateStack.size() - 1;
   }
 
-  public GridViewData getGridViewData() {
+  public ViewGrid getGridViewData() {
     return myGrid;
   }
 

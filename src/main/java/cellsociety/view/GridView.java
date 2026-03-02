@@ -1,6 +1,6 @@
 package cellsociety.view;
 
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
@@ -11,17 +11,17 @@ import javafx.scene.layout.Region;
  * allowing multiple implementations (e.g., GridPane, Canvas) without rewriting
  * controllers or views.</p>
  *
- * <p>Assumptions: the {@link GridViewData} dimensions match the implementation's
+ * <p>Assumptions: the {@link ViewGrid} dimensions match the implementation's
  * internal grid dimensions; implementers do not mutate the grid.</p>
  *
- * <p>Dependencies: {@link GridViewData} for state access, JavaFX {@link Node} and
+ * <p>Dependencies: {@link ViewGrid} for state access, JavaFX {@link Node} and
  * {@link Region} for embedding and sizing.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
  * GridView gridView = new GridPaneView(rows, cols);
  * container.getChildren().add(gridView.getNode());
- * gridView.render(sim.getGridViewData());
+ * gridView.render(sim.getViewGrid());
  * }</pre>
  *
  * <p>Other details: implementations should keep rendering fast and avoid allocating
@@ -46,7 +46,7 @@ public interface GridView {
    *
    * @param grid read-only view data of the simulation grid
    */
-  void render(GridViewData grid);
+  void render(ViewGrid grid);
 
   /**
    * Clears the visual grid.
@@ -102,7 +102,7 @@ public interface GridView {
    *
    * @param grid read-only grid used to re-apply outlines correctly
    */
-  void toggleOutline(GridViewData grid);
+  void toggleOutline(ViewGrid grid);
 
   /**
    * Rotates the grid 90 degrees counterclockwise.

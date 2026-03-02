@@ -1,4 +1,5 @@
 package cellsociety.Model.Grid;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 /**
  * Minimal grid data for the view: dimensions and per-cell state as an int.
@@ -6,13 +7,18 @@ package cellsociety.Model.Grid;
  *
  * @author Michael Lei
  */
-public interface GridViewData {
+public interface ViewGrid {
 
   int getRows();
 
   int getCols();
 
+  /** for the view to get the neighborstrategy attached to the grid */
+  NeighborStrategy getNeighborStrategy();
+  /** for the view to dynamically change the neighborstrategy used */
+  void setNeighborStrategy(NeighborStrategy strategy);
   /**
+   *
    * Integer code for the cell at (row, col), used for color lookup and serialization.
    */
   int getCellStateInt(int row, int col);
@@ -21,7 +27,7 @@ public interface GridViewData {
    * Produces an int matrix from this grid for config serialization (save).
    * Each element is the cell's state code at that position.
    */
-  static int[][] produceIntArray(GridViewData grid) {
+  static int[][] produceIntArray(ViewGrid grid) {
     int rows = grid.getRows();
     int cols = grid.getCols();
     int[][] out = new int[rows][cols];

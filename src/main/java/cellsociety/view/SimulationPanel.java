@@ -6,7 +6,7 @@ import static cellsociety.view.constants.SimulationUiConstants.*;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
  * {@link SimulationView} UI.</p>
  *
  * <p>Assumptions: the caller initializes the grid via {@link #setGrid(int, int)}
- * before calling {@link #render(GridViewData)}.</p>
+ * before calling {@link #render(ViewGrid)}.</p>
  *
  * <p>Dependencies: {@link GridView} implementations, JavaFX layout nodes, and
  * localized strings from {@link ResourceBundle}.</p>
@@ -34,7 +34,7 @@ import javafx.scene.layout.VBox;
  * <pre>{@code
  * SimulationPanel panel = new SimulationPanel(bundle);
  * panel.setGrid(rows, cols);
- * panel.render(sim.getGridViewData());
+ * panel.render(sim.getViewGrid());
  * }</pre>
  *
  * <p>Other details: this panel exposes controls for loading, viewing metadata, and rotating
@@ -164,7 +164,7 @@ public class SimulationPanel implements SimulationRenderer {
    * <p>Return value: none.</p>
    */
   @Override
-  public void render(GridViewData grid) {
+  public void render(ViewGrid grid) {
     if (myGridView == null) return;
     myGridView.render(grid);
   }
@@ -249,7 +249,7 @@ public class SimulationPanel implements SimulationRenderer {
    *
    * @param grid read-only grid used to update outlines
    */
-  public void toggleOutline(GridViewData grid) {
+  public void toggleOutline(ViewGrid grid) {
     if (myGridView == null) return;
     myGridView.toggleOutline(grid);
   }
