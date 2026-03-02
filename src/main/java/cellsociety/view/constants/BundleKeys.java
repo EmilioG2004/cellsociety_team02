@@ -8,7 +8,6 @@ public final class BundleKeys {
 
   // App
   public static final String APP_TITLE = "app.title";
-  public static final String APP_TITLE_SHORT = "app.title.short";
 
   // Buttons
   public static final String BUTTON_UPLOAD_CONFIG = "button.uploadConfig";
@@ -80,7 +79,4 @@ public final class BundleKeys {
   public static final String ERROR_INVALID_SLOT = "error.invalidSlot";
   public static final String ERROR_UNEXPECTED = "error.unexpected";
 
-  // Debug
-  public static final String DEBUG_START_PRESSED = "debug.startPressed";
-  public static final String DEBUG_CHANGING_DIRECTION = "debug.changingDirection";
 }

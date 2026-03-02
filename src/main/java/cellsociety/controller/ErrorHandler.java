@@ -1,5 +1,14 @@
 package cellsociety.controller;
 
+import static cellsociety.view.constants.BundleKeys.ERROR_FILE_READ;
+import static cellsociety.view.constants.BundleKeys.ERROR_INVALID_CONFIG;
+import static cellsociety.view.constants.BundleKeys.ERROR_INVALID_INPUT;
+import static cellsociety.view.constants.BundleKeys.ERROR_INVALID_SLOT;
+import static cellsociety.view.constants.BundleKeys.ERROR_INVALID_STATE;
+import static cellsociety.view.constants.BundleKeys.ERROR_INVALID_XML;
+import static cellsociety.view.constants.BundleKeys.ERROR_TITLE;
+import static cellsociety.view.constants.BundleKeys.ERROR_UNEXPECTED;
+
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 import javafx.scene.control.Alert;
@@ -36,7 +45,7 @@ public class ErrorHandler {
    */
   public void handle(Exception exception) {
     ResourceBundle bundle = myBundleSupplier.get();
-    String title = resolve(bundle, "error.title", FALLBACK_TITLE);
+    String title = resolve(bundle, ERROR_TITLE, FALLBACK_TITLE);
     String message = mapMessage(bundle, exception);
 
     Alert alert = new Alert(AlertType.ERROR);
@@ -48,24 +57,24 @@ public class ErrorHandler {
 
   private String mapMessage(ResourceBundle bundle, Exception exception) {
     if (exception instanceof ParserConfigurationException) {
-      return resolve(bundle, "error.invalidConfig", FALLBACK_INVALID_CONFIG);
+      return resolve(bundle, ERROR_INVALID_CONFIG, FALLBACK_INVALID_CONFIG);
     }
     if (exception instanceof SAXException) {
-      return resolve(bundle, "error.invalidXml", FALLBACK_INVALID_XML);
+      return resolve(bundle, ERROR_INVALID_XML, FALLBACK_INVALID_XML);
     }
     if (exception instanceof java.io.IOException) {
-      return resolve(bundle, "error.fileRead", FALLBACK_FILE_READ);
+      return resolve(bundle, ERROR_FILE_READ, FALLBACK_FILE_READ);
     }
     if (exception instanceof IndexOutOfBoundsException) {
-      return resolve(bundle, "error.invalidSlot", FALLBACK_INVALID_SLOT);
+      return resolve(bundle, ERROR_INVALID_SLOT, FALLBACK_INVALID_SLOT);
     }
     if (exception instanceof IllegalArgumentException) {
-      return resolve(bundle, "error.invalidInput", FALLBACK_INVALID_INPUT);
+      return resolve(bundle, ERROR_INVALID_INPUT, FALLBACK_INVALID_INPUT);
     }
     if (exception instanceof IllegalStateException) {
-      return resolve(bundle, "error.invalidState", FALLBACK_INVALID_STATE);
+      return resolve(bundle, ERROR_INVALID_STATE, FALLBACK_INVALID_STATE);
     }
-    return resolve(bundle, "error.unexpected", FALLBACK_UNEXPECTED);
+    return resolve(bundle, ERROR_UNEXPECTED, FALLBACK_UNEXPECTED);
   }
 
   private String resolve(ResourceBundle bundle, String key, String fallback) {

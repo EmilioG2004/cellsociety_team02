@@ -1,5 +1,7 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -70,7 +72,7 @@ public class ButtonManager {
   public ButtonManager(ResourceBundle bundle) {
     myBundle = bundle;
     applyLanguage(bundle);
-    myForwardButton.setText(myBundle.getString("button.stepForward"));
+    myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
 
   }
 
@@ -90,25 +92,25 @@ public class ButtonManager {
   public void applyLanguage(ResourceBundle bundle) {
     myBundle = bundle;
 
-    myTitle.setText(myBundle.getString("app.title"));
-    myUploadButton.setText(myBundle.getString("button.uploadConfig"));
-    myForwardButton.setText(myBundle.getString("button.stepForward"));
-    myBackButton.setText(myBundle.getString("button.stepBackward"));
-    myStartButton.setText(myBundle.getString("button.start"));
-    myPauseButton.setText(myBundle.getString("button.pause"));
-    mySpeedUpButton.setText(myBundle.getString("button.speedUp"));
-    mySlowDownButton.setText(myBundle.getString("button.slowDown"));
-    mySaveButton.setText(myBundle.getString("button.saveState"));
-    myResetButton.setText(myBundle.getString("button.resetGrid"));
-    myToggleOutlineButton.setText(myBundle.getString("button.toggleOutlines"));
-    mySettingsButton.setText(myBundle.getString("button.settings"));
-    myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
-    myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
-    myChangeDirectionButton.setText(myBundle.getString("button.changeDirection"));
-    myMultiSimButton.setText(myBundle.getString("button.multisim"));
+    myTitle.setText(myBundle.getString(APP_TITLE));
+    myUploadButton.setText(myBundle.getString(BUTTON_UPLOAD_CONFIG));
+    myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
+    myBackButton.setText(myBundle.getString(BUTTON_STEP_BACKWARD));
+    myStartButton.setText(myBundle.getString(BUTTON_START));
+    myPauseButton.setText(myBundle.getString(BUTTON_PAUSE));
+    mySpeedUpButton.setText(myBundle.getString(BUTTON_SPEED_UP));
+    mySlowDownButton.setText(myBundle.getString(BUTTON_SLOW_DOWN));
+    mySaveButton.setText(myBundle.getString(BUTTON_SAVE_STATE));
+    myResetButton.setText(myBundle.getString(BUTTON_RESET_GRID));
+    myToggleOutlineButton.setText(myBundle.getString(BUTTON_TOGGLE_OUTLINES));
+    mySettingsButton.setText(myBundle.getString(BUTTON_SETTINGS));
+    myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
+    myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
+    myChangeDirectionButton.setText(myBundle.getString(BUTTON_CHANGE_DIRECTION));
+    myMultiSimButton.setText(myBundle.getString(BUTTON_MULTI_SIM));
 
 
-    myStateStackSizeLabel.setText(myBundle.getString("label.generation.unset"));
+    myStateStackSizeLabel.setText(myBundle.getString(LABEL_GENERATION_UNSET));
   }
 
   /**
@@ -125,7 +127,7 @@ public class ButtonManager {
    * @param speedMultiplier current speed multiplier (e.g., 0.5, 1.0, 2.0)
    */
   public void setSpeedLabel(double speedMultiplier) {
-    String pattern = myBundle.getString("label.currentSpeed");
+    String pattern = myBundle.getString(LABEL_CURRENT_SPEED);
     mySpeedLabel.setText(MessageFormat.format(pattern, speedMultiplier));
   }
 

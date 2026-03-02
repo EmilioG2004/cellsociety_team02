@@ -1,5 +1,7 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+
 import cellsociety.config.SimulationConfig;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
@@ -188,7 +190,7 @@ public class SimulationView {
 
     mySlotChoice = new ChoiceBox<>();
 
-    mySlotLabel = new Label(myBundle.getString("label.slots"));
+    mySlotLabel = new Label(myBundle.getString(LABEL_SLOTS));
     HBox header = new HBox(8, mySlotLabel, mySlotChoice);
     header.setPadding(new Insets(4, 6, 8, 6));
 
@@ -228,10 +230,10 @@ public class SimulationView {
    */
   public File showOpenConfigDialog() {
     FileChooser chooser = new FileChooser();
-    chooser.setTitle("Open Simulation Configuration");
+    chooser.setTitle(myBundle.getString(FILE_OPEN_CONFIG_TITLE));
     chooser.setInitialDirectory(new File(DATA_FILE_FOLDER));
     chooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("XML Files", "*.xml")
+        new FileChooser.ExtensionFilter(myBundle.getString(FILE_FILTER_XML), "*.xml")
     );
 
     Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
@@ -251,9 +253,9 @@ public class SimulationView {
    */
   public File showSaveConfigDialog(){
     FileChooser chooser = new FileChooser();
-    chooser.setTitle("Open Simulation Configuration");
+    chooser.setTitle(myBundle.getString(FILE_SAVE_CONFIG_TITLE));
     chooser.getExtensionFilters().add(
-        new ExtensionFilter("XML Files", "*.xml")
+        new ExtensionFilter(myBundle.getString(FILE_FILTER_XML), "*.xml")
     );
 
     Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
@@ -419,7 +421,7 @@ public class SimulationView {
     myAboutDialog.applyLanguage(bundle);
     updateSpeedLabel();
     if (mySlotLabel != null) {
-      mySlotLabel.setText(bundle.getString("label.slots"));
+      mySlotLabel.setText(bundle.getString(LABEL_SLOTS));
     }
   }
 

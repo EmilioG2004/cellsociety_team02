@@ -1,5 +1,7 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.ReadOnlyGrid;
 import java.text.MessageFormat;
@@ -83,14 +85,14 @@ public class SimulationPanel implements SimulationRenderer {
     myRoot.setFillWidth(true);
 
     myGeneration = 0;
-    myGenerationLabel = new Label(myBundle.getString("label.generation.unset"));
+    myGenerationLabel = new Label(myBundle.getString(LABEL_GENERATION_UNSET));
     myGenerationLabel.setMaxWidth(Double.MAX_VALUE);
     myGenerationLabel.setAlignment(Pos.CENTER);
 
-    myLoadButton = new Button(myBundle.getString("button.loadsim"));
-    myRotateLeftButton = new Button(myBundle.getString("button.rotateLeft"));
-    myRotateRightButton = new Button(myBundle.getString("button.rotateRight"));
-    myAboutButton = new Button(myBundle.getString("button.aboutConfig"));
+    myLoadButton = new Button(myBundle.getString(BUTTON_LOAD_SIM));
+    myRotateLeftButton = new Button(myBundle.getString(BUTTON_ROTATE_LEFT));
+    myRotateRightButton = new Button(myBundle.getString(BUTTON_ROTATE_RIGHT));
+    myAboutButton = new Button(myBundle.getString(BUTTON_ABOUT_CONFIG));
     myRotateLeftButton.setOnAction(e -> rotateLeft());
     myRotateRightButton.setOnAction(e -> rotateRight());
 
@@ -157,7 +159,7 @@ public class SimulationPanel implements SimulationRenderer {
   public void setGeneration(int generation) {
     myGeneration = generation;
     myGenerationLabel.setText(MessageFormat.format(
-        myBundle.getString("label.generation"), generation));
+        myBundle.getString(LABEL_GENERATION), generation));
   }
 
   /**
@@ -248,10 +250,10 @@ public class SimulationPanel implements SimulationRenderer {
   public void applyLanguage(ResourceBundle bundle){
     myBundle = bundle;
     myGenerationLabel.setText(MessageFormat.format(
-        myBundle.getString("label.generation"), myGeneration));
-    myLoadButton.setText(myBundle.getString("button.loadsim"));
-    myAboutButton.setText(myBundle.getString("button.aboutConfig"));
-    myRotateLeftButton.setText(myBundle.getString("button.rotateLeft"));
-    myRotateRightButton.setText(myBundle.getString("button.rotateRight"));
+        myBundle.getString(LABEL_GENERATION), myGeneration));
+    myLoadButton.setText(myBundle.getString(BUTTON_LOAD_SIM));
+    myAboutButton.setText(myBundle.getString(BUTTON_ABOUT_CONFIG));
+    myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
+    myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
   }
 }

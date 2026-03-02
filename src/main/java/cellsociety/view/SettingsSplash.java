@@ -1,5 +1,7 @@
 package cellsociety.view;
 
+import static cellsociety.view.constants.BundleKeys.*;
+
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -109,21 +111,21 @@ public class SettingsSplash extends StackPane {
    * @param bundle localization bundle for UI strings
    */
   public void applyLanguage(ResourceBundle bundle){
-    myTitle.setText(bundle.getString("settings.dialog.title"));
-    mySubtitle.setText(bundle.getString("settings.title"));
-    myLanguage.setText(bundle.getString("settings.language"));
-    myTheme.setText(bundle.getString("settings.theme"));
-    myApplyChanges.setText(bundle.getString("button.applyChanges"));
-    myLoadButton.setText(bundle.getString("button.loadSimulation"));
+    myTitle.setText(bundle.getString(SETTINGS_DIALOG_TITLE));
+    mySubtitle.setText(bundle.getString(SETTINGS_TITLE));
+    myLanguage.setText(bundle.getString(SETTINGS_LANGUAGE));
+    myTheme.setText(bundle.getString(SETTINGS_THEME));
+    myApplyChanges.setText(bundle.getString(BUTTON_APPLY_CHANGES));
+    myLoadButton.setText(bundle.getString(BUTTON_LOAD_SIMULATION));
 
     myLanguages.setConverter(new StringConverter<>() {
       @Override
       public String toString(String value) {
         if (value == null) return "";
         return switch (value) {
-          case "English" -> bundle.getString("language.english");
-          case "Spanish" -> bundle.getString("language.spanish");
-          case "Portuguese" -> bundle.getString("language.portuguese");
+          case "English" -> bundle.getString(LANGUAGE_ENGLISH);
+          case "Spanish" -> bundle.getString(LANGUAGE_SPANISH);
+          case "Portuguese" -> bundle.getString(LANGUAGE_PORTUGUESE);
           default -> value;
         };
       }
@@ -139,9 +141,9 @@ public class SettingsSplash extends StackPane {
       public String toString(String value) {
         if (value == null) return "";
         return switch (value) {
-          case "Light" -> bundle.getString("theme.light");
-          case "Dark" -> bundle.getString("theme.dark");
-          case "Duke" -> bundle.getString("theme.duke");
+          case "Light" -> bundle.getString(THEME_LIGHT);
+          case "Dark" -> bundle.getString(THEME_DARK);
+          case "Duke" -> bundle.getString(THEME_DUKE);
           default -> value;
         };
       }

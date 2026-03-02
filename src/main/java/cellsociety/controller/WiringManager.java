@@ -1,5 +1,8 @@
 package cellsociety.controller;
 
+import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_BACKWARD;
+import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_FORWARD;
+
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.view.SimulationView;
@@ -128,7 +131,7 @@ public class WiringManager {
       }
 
       dirButton.setText(bundle.getString(
-          newDirection ? "button.direction.forward" : "button.direction.backward"
+          newDirection ? BUTTON_DIRECTION_FORWARD : BUTTON_DIRECTION_BACKWARD
       ));
     });
   }
