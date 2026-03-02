@@ -6,7 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cellsociety.Model.CellState.WaTorTurnResult;
+import cellsociety.Model.CellState.WaTor.Shark;
+import cellsociety.Model.CellState.WaTor.WaTorTurnResult;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;

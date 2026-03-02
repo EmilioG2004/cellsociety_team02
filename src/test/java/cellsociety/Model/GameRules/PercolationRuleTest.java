@@ -1,6 +1,8 @@
 package cellsociety.Model.GameRules;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.Grid.ArrayGrid;
+import cellsociety.Model.Grid.Grid;
 
 import static cellsociety.Model.CellState.PercolotionState.CLOSED;
 import static cellsociety.Model.CellState.PercolotionState.FULL;
@@ -15,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test class for PercolationRule. Organized by ZOMBIES acronym.
- * CLOSED stays CLOSED; OPEN becomes FULL when full neighbors >= threshold; FULL stays FULL.
  */
 class PercolationRuleTest {
 
@@ -28,178 +29,177 @@ class PercolationRuleTest {
     ruleThresholdTwo = new PercolationRule(Map.of("threshold", 2.0));
   }
 
+  private CellState[][] next(GameRule r, CellState[][] input) {
+    Grid g = new ArrayGrid(input, r.getDefaultNeighborStrategy());
+    Grid result = r.getNextGrid(g);
+    CellState[][] out = new CellState[input.length][input[0].length];
+    for (int row = 0; row < input.length; row++) {
+      for (int col = 0; col < input[0].length; col++) {
+        out[row][col] = result.getCellState(row, col);
+      }
+    }
+    return out;
+  }
+
   // ---------- Z (Zero): empty/minimal ----------
   @Test
-  void getNextStates_allClosed_remainsAllClosed() {
+  void getNextGrid_allClosed_remainsAllClosed() {
     CellState[][] grid = {
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = rule.getNextStates(grid);
+    CellState[][] n = next(rule, grid);
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
-        assertEquals(CLOSED, next[r][c]);
+        assertEquals(CLOSED, n[r][c]);
       }
     }
   }
 
   @Test
-  void getNextStates_1x1Closed_remainsClosed() {
+  void getNextGrid_1x1Closed_remainsClosed() {
     CellState[][] grid = {{CLOSED}};
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(CLOSED, next[0][0]);
+    assertEquals(CLOSED, next(rule, grid)[0][0]);
   }
 
   @Test
-  void getNextStates_1x1Open_noFullNeighbors_staysOpen() {
+  void getNextGrid_1x1Open_noFullNeighbors_staysOpen() {
     CellState[][] grid = {{OPEN}};
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(OPEN, next[0][0]);
+    assertEquals(OPEN, next(rule, grid)[0][0]);
   }
 
   @Test
-  void getNextStates_1x1Full_remainsFull() {
+  void getNextGrid_1x1Full_remainsFull() {
     CellState[][] grid = {{FULL}};
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[0][0]);
+    assertEquals(FULL, next(rule, grid)[0][0]);
   }
 
   // ---------- O (One): single element / one neighbor ----------
   @Test
-  void getNextStates_openWithOneFullNeighbor_defaultThreshold_becomesFull() {
+  void getNextGrid_openWithOneFullNeighbor_defaultThreshold_becomesFull() {
     CellState[][] grid = {
         {FULL, OPEN, CLOSED},
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[0][0]);
-    assertEquals(FULL, next[0][1], "OPEN next to FULL becomes FULL (threshold 1)");
+    CellState[][] n = next(rule, grid);
+    assertEquals(FULL, n[0][0]);
+    assertEquals(FULL, n[0][1], "OPEN next to FULL becomes FULL (threshold 1)");
   }
 
   @Test
-  void getNextStates_openWithNoFullNeighbors_staysOpen() {
+  void getNextGrid_openWithNoFullNeighbors_staysOpen() {
     CellState[][] grid = {
         {OPEN, OPEN, OPEN},
         {OPEN, OPEN, OPEN},
         {OPEN, OPEN, OPEN}
     };
-    CellState[][] next = rule.getNextStates(grid);
+    CellState[][] n = next(rule, grid);
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
-        assertEquals(OPEN, next[r][c]);
+        assertEquals(OPEN, n[r][c]);
       }
     }
   }
 
   @Test
-  void getNextStates_closedWithFullNeighbor_staysClosed() {
+  void getNextGrid_closedWithFullNeighbor_staysClosed() {
     CellState[][] grid = {
         {FULL, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[0][0]);
-    assertEquals(CLOSED, next[0][1]);
+    CellState[][] n = next(rule, grid);
+    assertEquals(FULL, n[0][0]);
+    assertEquals(CLOSED, n[0][1]);
   }
 
   // ---------- M (Many): threshold, multiple full neighbors ----------
   @Test
-  void getNextStates_openWithOneFullNeighbor_thresholdTwo_staysOpen() {
+  void getNextGrid_openWithOneFullNeighbor_thresholdTwo_staysOpen() {
     CellState[][] grid = {
         {FULL, OPEN, CLOSED},
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = ruleThresholdTwo.getNextStates(grid);
-    assertEquals(FULL, next[0][0]);
-    assertEquals(OPEN, next[0][1], "OPEN needs 2 FULL neighbors when threshold=2");
+    CellState[][] n = next(ruleThresholdTwo, grid);
+    assertEquals(FULL, n[0][0]);
+    assertEquals(OPEN, n[0][1], "OPEN needs 2 FULL neighbors when threshold=2");
   }
 
   @Test
-  void getNextStates_openWithTwoFullNeighbors_thresholdTwo_becomesFull() {
+  void getNextGrid_openWithTwoFullNeighbors_thresholdTwo_becomesFull() {
     CellState[][] grid = {
         {FULL, OPEN, FULL},
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = ruleThresholdTwo.getNextStates(grid);
-    assertEquals(FULL, next[0][0]);
-    assertEquals(FULL, next[0][1]);
-    assertEquals(FULL, next[0][2]);
+    CellState[][] n = next(ruleThresholdTwo, grid);
+    assertEquals(FULL, n[0][0]);
+    assertEquals(FULL, n[0][1]);
+    assertEquals(FULL, n[0][2]);
   }
 
   @Test
-  void getNextStates_allFull_remainsAllFull() {
+  void getNextGrid_allFull_remainsAllFull() {
     CellState[][] grid = {
         {FULL, FULL, FULL},
         {FULL, FULL, FULL},
         {FULL, FULL, FULL}
     };
-    CellState[][] next = rule.getNextStates(grid);
+    CellState[][] n = next(rule, grid);
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
-        assertEquals(FULL, next[r][c]);
+        assertEquals(FULL, n[r][c]);
       }
     }
   }
 
   @Test
-  void getNextStates_centerOpenSurroundedByFull_becomesFull() {
+  void getNextGrid_centerOpenSurroundedByFull_becomesFull() {
     CellState[][] grid = {
         {FULL, FULL, FULL},
         {FULL, OPEN, FULL},
         {FULL, FULL, FULL}
     };
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[1][1]);
+    CellState[][] n = next(rule, grid);
+    assertEquals(FULL, n[1][1]);
   }
 
   // ---------- B (Boundary): edges, corners ----------
   @Test
-  void getNextStates_cornerOpenWithFullNeighbor_becomesFull() {
+  void getNextGrid_cornerOpenWithFullNeighbor_becomesFull() {
     CellState[][] grid = {
         {OPEN, FULL, CLOSED},
         {FULL, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[0][0]);
+    CellState[][] n = next(rule, grid);
+    assertEquals(FULL, n[0][0]);
   }
 
   @Test
-  void getNextStates_edgeOpenWithFullNeighbor_becomesFull() {
+  void getNextGrid_edgeOpenWithFullNeighbor_becomesFull() {
     CellState[][] grid = {
         {CLOSED, FULL, CLOSED},
         {OPEN, OPEN, OPEN},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[1][0]);
-    assertEquals(FULL, next[1][1]);
-    assertEquals(FULL, next[1][2]);
+    CellState[][] n = next(rule, grid);
+    assertEquals(FULL, n[1][0]);
+    assertEquals(FULL, n[1][1]);
+    assertEquals(FULL, n[1][2]);
   }
 
   @Test
-  void getNextStates_singleRow_openBetweenTwoFull_becomesFull() {
+  void getNextGrid_singleRow_openBetweenTwoFull_becomesFull() {
     CellState[][] grid = {{FULL, OPEN, FULL}};
-    CellState[][] next = rule.getNextStates(grid);
-    assertEquals(FULL, next[0][1]);
+    CellState[][] n = next(rule, grid);
+    assertEquals(FULL, n[0][1]);
   }
 
-  // ---------- I (Interface): getStateColors, fromInt, getNextStateInCycle ----------
-  @Test
-  void getStateColors_containsAllThreeStates() {
-    Map<CellState, String> colors = rule.getStateColors();
-    assertNotNull(colors);
-    assertEquals(3, colors.size());
-    assertEquals("BLACK", colors.get(CLOSED));
-    assertEquals("WHITE", colors.get(OPEN));
-    assertEquals("BLUE", colors.get(FULL));
-  }
-
+  // ---------- I (Interface): fromInt, getDefaultNeighborStrategy ----------
   @Test
   void fromInt_zeroOneTwo_returnsClosedOpenFull() {
     assertEquals(CLOSED, rule.fromInt(0));
@@ -208,27 +208,12 @@ class PercolationRuleTest {
   }
 
   @Test
-  void getNeighborStrategy_returnsNonNull() {
-    assertNotNull(rule.getNeighborStrategy());
+  void getDefaultNeighborStrategy_returnsNonNull() {
+    assertNotNull(rule.getDefaultNeighborStrategy());
   }
 
   @Test
-  void getNextStateInCycle_closed_returnsOpen() {
-    assertEquals(OPEN, rule.getNextStateInCycle(CLOSED));
-  }
-
-  @Test
-  void getNextStateInCycle_open_returnsFull() {
-    assertEquals(FULL, rule.getNextStateInCycle(OPEN));
-  }
-
-  @Test
-  void getNextStateInCycle_full_returnsClosed() {
-    assertEquals(CLOSED, rule.getNextStateInCycle(FULL));
-  }
-
-  @Test
-  void getNextStates_doesNotMutateInput() {
+  void getNextGrid_doesNotMutateInput() {
     CellState[][] input = {
         {CLOSED, OPEN, FULL},
         {OPEN, OPEN, OPEN},
@@ -239,7 +224,7 @@ class PercolationRuleTest {
         {OPEN, OPEN, OPEN},
         {FULL, CLOSED, CLOSED}
     };
-    rule.getNextStates(input);
+    next(rule, input);
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
         assertEquals(copy[r][c], input[r][c]);
@@ -266,7 +251,7 @@ class PercolationRuleTest {
         {CLOSED, CLOSED, CLOSED},
         {CLOSED, CLOSED, CLOSED}
     };
-    CellState[][] next = ruleEmpty.getNextStates(grid);
-    assertEquals(FULL, next[0][1], "Default threshold 1: OPEN with 1 FULL neighbor becomes FULL");
+    CellState[][] n = next(ruleEmpty, grid);
+    assertEquals(FULL, n[0][1], "Default threshold 1: OPEN with 1 FULL neighbor becomes FULL");
   }
 }
