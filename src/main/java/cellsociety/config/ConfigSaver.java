@@ -72,9 +72,9 @@ public class ConfigSaver {
   private Element buildSettingsElement(Document doc, SimulationState state) {
     Element settingsEl = doc.createElement(CONFIG_SETTINGS);
 
-    settingsEl.appendChild(textElement(doc, CONFIG_THEME, Integer.toString(state.getTheme())));
-    settingsEl.appendChild(textElement(doc, CONFIG_SIMULATION_SPEED, Double.toString(state.getSimulationSpeed())));
-    settingsEl.appendChild(textElement(doc, CONFIG_LANGUAGE, state.getLanguage()));
+    settingsEl.appendChild(textElement(doc, CONFIG_THEME, Integer.toString(state.getPreferences().getTheme())));
+    settingsEl.appendChild(textElement(doc, CONFIG_SIMULATION_SPEED, Double.toString(state.getPreferences().getSimulationSpeed())));
+    settingsEl.appendChild(textElement(doc, CONFIG_LANGUAGE, state.getPreferences().getLanguage()));
 
     return settingsEl;
   }

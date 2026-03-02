@@ -1,99 +1,99 @@
 package cellsociety.Model.GameRules;
+
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SegregationState;
+import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
-/** Schelling Segregation: unhappy agents (same-type ratio below threshold) move to random EMPTY cells. Param: satisfactionThreshold in [0,1], default 0.3. */
+/** Schelling Segregation: unhappy agents move to random EMPTY cells. */
 public class SegregationRule extends GameRule {
 
   private static final double DEFAULT_THRESHOLD = 0.3;
   private static final String PARAM_SATISFACTION_THRESHOLD = "satisfactionThreshold";
   private static final double THRESHOLD_MIN = 0.0;
   private static final double THRESHOLD_MAX = 1.0;
-  private static final int NO_OCCUPIED_NEIGHBORS = 0;
-
-  public SegregationRule() {
-    super(new MooreNeighborStrategy());
-  }
 
   public SegregationRule(Map<String, Double> parameters) {
-    super(new MooreNeighborStrategy(), parameters);
-    validateParameters(parameters);
+    super(parameters);
+    validateParameters(this.parameters);
   }
 
-  public SegregationRule(NeighborStrategy strategy, Map<String, Double> parameters) {
-    super(strategy, parameters);
-    validateParameters(parameters);
+  public SegregationRule() {
+    this(Map.of());
   }
 
   private static void validateParameters(Map<String, Double> parameters) {
-    if (parameters.containsKey(PARAM_SATISFACTION_THRESHOLD) && (parameters.get(PARAM_SATISFACTION_THRESHOLD) < THRESHOLD_MIN || parameters.get(PARAM_SATISFACTION_THRESHOLD) > THRESHOLD_MAX)) {
+    if (parameters == null) return;
+    if (!parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)) return;
+
+    double t = parameters.get(PARAM_SATISFACTION_THRESHOLD);
+    if (t < THRESHOLD_MIN || t > THRESHOLD_MAX) {
       throw new IllegalArgumentException("satisfactionThreshold must be between 0 and 1");
     }
   }
 
   @Override
-  public CellState[][] getNextStates(CellState[][] currentStates) {
-    int rows = currentStates.length;
-    int cols = currentStates[0].length;
+  public Grid getNextGrid(Grid currentGrid) {
+    int rows = currentGrid.getRows();
+    int cols = currentGrid.getCols();
 
-    double threshold = parameters == null || !parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
-        ? DEFAULT_THRESHOLD
-        : parameters.get(PARAM_SATISFACTION_THRESHOLD);
+    double threshold = parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
+        ? parameters.get(PARAM_SATISFACTION_THRESHOLD)
+        : DEFAULT_THRESHOLD;
+
+    Grid nextGrid = currentGrid.deepCopy();
 
     List<int[]> emptyCells = new ArrayList<>();
     List<Mover> movers = new ArrayList<>();
 
-    CellState[][] nextStates = new CellState[rows][cols];
-
+    // identify empties and unhappy movers
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        CellState s = currentStates[r][c];
-        nextStates[r][c] = s;
+        CellState s = currentGrid.getCellState(r, c);
 
         if (s == SegregationState.EMPTY) {
-          emptyCells.add(new int[] {r, c});
+          emptyCells.add(new int[]{r, c});
         } else {
-          if (!isSatisfied(currentStates, r, c, s, threshold)) {
+          if (!isSatisfied(currentGrid, r, c, s, threshold)) {
             movers.add(new Mover(r, c, s));
           }
         }
       }
     }
 
-    // clear movers' original positions
+    // clear movers original positions
     for (Mover m : movers) {
-      nextStates[m.r][m.c] = SegregationState.EMPTY;
-      emptyCells.add(new int[] {m.r, m.c});
+      nextGrid.setCellState(m.r, m.c, SegregationState.EMPTY);
+      emptyCells.add(new int[]{m.r, m.c});
     }
 
+    // shuffle empties and relocate movers
     Collections.shuffle(emptyCells);
-
-    // relocate movers to available empty cells
     int moves = Math.min(movers.size(), emptyCells.size());
 
     for (int i = 0; i < moves; i++) {
       Mover m = movers.get(i);
       int[] dest = emptyCells.get(i);
-      nextStates[dest[0]][dest[1]] = m.state;
+      nextGrid.setCellState(dest[0], dest[1], m.state);
     }
 
-    // if movers > emptyCells, the extras should remain in their original location instead of disappearing
-    // put them back where they came from
+    // if movers > emptyCells, put the extras back
     for (int i = moves; i < movers.size(); i++) {
       Mover m = movers.get(i);
-      nextStates[m.r][m.c] = m.state;
+      nextGrid.setCellState(m.r, m.c, m.state);
     }
 
-    return nextStates;
+    return nextGrid;
   }
 
-  private boolean isSatisfied(CellState[][] grid, int r, int c, CellState self, double threshold) {
-    List<CellState> neighbors = getNeighbors(grid, r, c);
+  private boolean isSatisfied(Grid grid, int r, int c, CellState self, double threshold) {
+    List<CellState> neighbors = grid.getNeighbors(r, c);
 
     int occupied = 0;
     int same = 0;
@@ -104,7 +104,8 @@ public class SegregationRule extends GameRule {
       if (n == self) same++;
     }
 
-    if (occupied == NO_OCCUPIED_NEIGHBORS) return true;
+    // If no occupied neighbors, treat as satisfied
+    if (occupied == 0) return true;
 
     double fracSame = (double) same / occupied;
     return fracSame >= threshold;
@@ -123,19 +124,12 @@ public class SegregationRule extends GameRule {
   }
 
   @Override
-  public Map<CellState, String> getStateColors() {
-    return stateColorsFor(SegregationState.EMPTY, SegregationState.GROUP_A, SegregationState.GROUP_B);
+  public NeighborStrategy getDefaultNeighborStrategy() {
+    return new MooreNeighborStrategy();
   }
 
   @Override
   public CellState fromInt(int value) {
     return SegregationState.fromInt(value);
   }
-
-  @Override
-  public CellState getNextStateInCycle(CellState current) {
-    return SegregationState.getNextStateInCycle(current);
-  }
-
-  @Override public int fromState(CellState state) { return SegregationState.fromState(state); }
 }
