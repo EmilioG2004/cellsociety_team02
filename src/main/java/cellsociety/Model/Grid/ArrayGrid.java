@@ -90,6 +90,15 @@ public class ArrayGrid implements Grid {
   }
 
   @Override
+  public List<CellState> getNeighbors(int row, int col, int vision) {
+    List<CellState> neighbors = new ArrayList<>();
+    for (int[] pos : neighborStrategy.getNeighborPositions(getRows(), getCols(), row, col, vision)) {
+      neighbors.add(cells[pos[0]][pos[1]]);
+    }
+    return neighbors;
+  }
+
+  @Override
   public void setCellState(int row, int col, CellState state) {
     if (!isInBounds(row, col)) {
       throw new IndexOutOfBoundsException("Out of bounds: (" + row + ", " + col + ")");

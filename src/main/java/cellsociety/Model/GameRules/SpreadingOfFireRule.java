@@ -8,7 +8,12 @@ import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Map;
 
-/** Spreading of Fire: TREE catches from BURNING (probCatch), BURNING→EMPTY, EMPTY→TREE (probTree). Von Neumann neighbors. */
+/**
+ * Spreading of Fire: TREE catches from BURNING (probCatch), BURNING to EMPTY,
+ * EMPTY to TREE (probTree). Von Neumann neighbors.
+ *
+ * @author Michael Lei
+ */
 public class SpreadingOfFireRule extends GameRule {
 
   private static final double DEFAULT_PROB_CATCH = 0.15;

@@ -9,8 +9,10 @@ import java.util.Map;
 /**
  * Abstract base for cellular automaton rules. All neighbor logic lives in the grid;
  * the rule only takes the current grid and returns the next grid, plus parameters and cell-state factory.
+ *
+ * @author Michael Lei
  */
-public abstract class GameRule {
+public abstract class GameRule implements CellFactory {
 
   /** Simulation-specific parameters (e.g., probCatch for Fire, threshold for Segregation). */
   protected Map<String, Double> parameters;

@@ -3,6 +3,8 @@ package cellsociety.Model.Grid;
 /**
  * Minimal grid data for the view: dimensions and per-cell state as an int.
  * The view should depend only on this interface (not {@link ReadOnlyGrid} or {@link CellState}).
+ *
+ * @author Michael Lei
  */
 public interface GridViewData {
 

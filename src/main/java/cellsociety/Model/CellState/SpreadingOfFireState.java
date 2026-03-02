@@ -1,6 +1,10 @@
 package cellsociety.Model.CellState;
 
-/** Spreading of Fire cell states: EMPTY, TREE, BURNING. */
+/**
+ * Spreading of Fire cell states: EMPTY, TREE, BURNING.
+ *
+ * @author Michael Lei
+ */
 public enum SpreadingOfFireState implements CellState {
   EMPTY(0),
   TREE(1),
@@ -29,6 +33,7 @@ public enum SpreadingOfFireState implements CellState {
     return getNextStateInCycle(this);
   }
 
+  /** Returns the next state in the cycle: EMPTY -> TREE -> BURNING -> EMPTY. */
   public static SpreadingOfFireState getNextStateInCycle(CellState current) {
     return switch (current) {
       case SpreadingOfFireState.EMPTY -> SpreadingOfFireState.TREE;
@@ -38,6 +43,7 @@ public enum SpreadingOfFireState implements CellState {
     };
   }
 
+  /** Creates a state from its integer encoding. */
   public static SpreadingOfFireState fromInt(int value) {
     return switch (value) {
       case EMPTY_INT -> EMPTY;
@@ -47,6 +53,7 @@ public enum SpreadingOfFireState implements CellState {
     };
   }
 
+  /** Returns the integer encoding for the given CellState. */
   public static int fromState(CellState state) {
     if (state instanceof SpreadingOfFireState fs) {
       return fs.stateValue;

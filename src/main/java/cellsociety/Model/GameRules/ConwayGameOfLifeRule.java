@@ -8,7 +8,11 @@ import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Map;
 
-/** Conway's Game of Life: Moore neighborhood, birth on 3, survive on 2 or 3. */
+/**
+ * Conway's Game of Life: Moore neighborhood, birth on 3, survive on 2 or 3.
+ *
+ * @author Michael Lei
+ */
 public class ConwayGameOfLifeRule extends GameRule {
 
   private static final int SURVIVE_NEIGHBOR_COUNT_LOW = 2;

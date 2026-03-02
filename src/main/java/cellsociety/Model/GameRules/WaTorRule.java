@@ -1,10 +1,10 @@
 package cellsociety.Model.GameRules;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.CellState.WaTorCellState;
-import cellsociety.Model.CellState.WaTorTurnResult;
-import cellsociety.Model.Creature.Fish;
-import cellsociety.Model.Creature.Shark;
+import cellsociety.Model.CellState.WaTor.Fish;
+import cellsociety.Model.CellState.WaTor.Shark;
+import cellsociety.Model.CellState.WaTor.WaTorCellState;
+import cellsociety.Model.CellState.WaTor.WaTorTurnResult;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.Position;
 import cellsociety.Model.Grid.ReadOnlyGrid;
@@ -28,6 +28,8 @@ import java.util.function.Predicate;
  *
  * <p>Turn logic lives in {@link Fish#act} and {@link Shark#tryEat}/{@link Shark#move}; this rule
  * orchestrates (grid, neighbors, shuffle) and applies their {@link WaTorTurnResult}s.
+ *
+ * @author Michael Lei
  */
 public class WaTorRule extends GameRule {
 
