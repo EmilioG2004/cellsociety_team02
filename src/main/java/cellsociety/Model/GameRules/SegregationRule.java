@@ -15,7 +15,7 @@ import java.util.Map;
  * Schelling Segregation: unhappy agents (same-type ratio below threshold) move to random EMPTY
  * cells. Param: satisfactionThreshold in [0,1], default 0.3.
  *
- * @author Michael Lei
+ * @author Ixa Sigler
  */
 public class SegregationRule extends GameRule {
 
@@ -40,9 +40,11 @@ public class SegregationRule extends GameRule {
   }
 
   private static void validateParameters(Map<String, Double> parameters) {
-    if (parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)
-        && (parameters.get(PARAM_SATISFACTION_THRESHOLD) < THRESHOLD_MIN
-            || parameters.get(PARAM_SATISFACTION_THRESHOLD) > THRESHOLD_MAX)) {
+    if (parameters == null) return;
+    if (!parameters.containsKey(PARAM_SATISFACTION_THRESHOLD)) return;
+
+    double t = parameters.get(PARAM_SATISFACTION_THRESHOLD);
+    if (t < THRESHOLD_MIN || t > THRESHOLD_MAX) {
       throw new IllegalArgumentException("satisfactionThreshold must be between 0 and 1");
     }
   }
@@ -79,6 +81,7 @@ public class SegregationRule extends GameRule {
       emptyCells.add(new Position(m.r, m.c));
     }
 
+    // shuffle empties and relocate movers
     Collections.shuffle(emptyCells);
 
     for (int i = 0; i < movers.size(); i++) {
