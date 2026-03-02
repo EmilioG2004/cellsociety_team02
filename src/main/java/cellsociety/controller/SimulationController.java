@@ -2,14 +2,12 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
-import static cellsociety.view.constants.SimulationUiConstants.DOUBLE_VALUE;
+import static cellsociety.view.constants.ResourcePaths.BUNDLE_FOLDER;
 
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
-import cellsociety.view.AboutDialog;
-import cellsociety.view.SettingsSplash;
 import cellsociety.view.SimulationPanel;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationFactory;
@@ -93,7 +91,7 @@ public class SimulationController {
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
     myScene = scene;
-    myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll);
+    myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll, this::handleLoadState);
 
     ChoiceBox<Integer> mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
@@ -158,11 +156,22 @@ public class SimulationController {
 
   public void loadState(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
     SimulationState desiredState = mySimLoader.loadState(xmlFile);
-    SimulationPreferences desiredPreferences = mySimLoader.loadPreferences(xmlFile);
+    SimulationPreferences desiredPreferences = desiredState.getPreferences();
     loadSimulations(desiredState);
     loadPreferences(desiredPreferences);
+  }
 
+  private void handleLoadState(){
+    File xmlFile = mySimView.showOpenConfigDialog();
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
+
+    try{
+      loadState(xmlFile);
+    } catch (ParserConfigurationException | SAXException | IOException e) {
+      myErrorHandler.handle(e);
+    }
   }
 
   private void loadSimulations(SimulationState desiredState) {
@@ -180,11 +189,15 @@ public class SimulationController {
 
   private void loadPreferences(SimulationPreferences desiredPreferences){
     int theme = desiredPreferences.getTheme();
+    String themeChoice = mapThemeCodeToChoice(theme);
     String language = desiredPreferences.getLanguage();
+    String languageBundle = BUNDLE_FOLDER + language;
     double speed = desiredPreferences.getSimulationSpeed();
     Map<Integer, String> colors = desiredPreferences.getColorMap();
-    mySimView.applyTheme(myScene, String.valueOf(theme));
-    mySimView.applyLanguage(ResourceBundle.getBundle(language));
+    mySimView.applyTheme(myScene, themeChoice);
+    mySimView.getMySettings().getMyThemes().setValue(themeChoice);
+    mySimView.applyLanguage(ResourceBundle.getBundle(languageBundle));
+    mySimView.getMySettings().getMyLanguages().setValue(language);
     for (SimulationSlot currentSlot : mySlots){
       currentSlot.setSpeed(speed);
     }
@@ -211,8 +224,7 @@ public class SimulationController {
 
   private void handleLoadForSlot(int slotIndex) {
     File xmlFile = mySimView.showOpenConfigDialog();
-    if (xmlFile == null) return;
-
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
     try {
       loadConfigIntoSlot(slotIndex, xmlFile);
     } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
@@ -325,6 +337,12 @@ public class SimulationController {
     if (ResourcePaths.THEME_DARK.equals(themeChoice)) return 1;
     if (ResourcePaths.THEME_DUKE.equals(themeChoice)) return 2;
     return 0;
+  }
+
+  private String mapThemeCodeToChoice(int themeCode) {
+    if (themeCode == 1) return ResourcePaths.THEME_DARK;
+    if (themeCode == 2) return ResourcePaths.THEME_DUKE;
+    return ResourcePaths.THEME_LIGHT;
   }
 
   private void handleAboutForSlot(int slotIndex) {

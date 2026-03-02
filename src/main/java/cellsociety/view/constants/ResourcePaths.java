@@ -20,6 +20,7 @@ public final class ResourcePaths {
   public static final String BUNDLE_ENGLISH = "cellsociety.Languages.English";
   public static final String BUNDLE_SPANISH = "cellsociety.Languages.Spanish";
   public static final String BUNDLE_PORTUGUESE = "cellsociety.Languages.Portuguese";
+  public static final String BUNDLE_FOLDER = "cellsociety.Languages.";
 
   // Internal bundles
   public static final String BUNDLE_VERSION = "cellsociety.Version";

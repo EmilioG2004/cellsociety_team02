@@ -37,6 +37,7 @@ public class WiringManager {
   private final Scene myScene;
   private final Consumer<ResourceBundle> myBundleCallback;
   private final Runnable mySaveAllCallback;
+  private final Runnable myLoadCallback;
 
   /**
    * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
@@ -50,11 +51,12 @@ public class WiringManager {
    * @param simView view whose controls will be wired
    * @param scene scene used for applying themes
    */
-  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback, Runnable saveAllCallback) {
+  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback, Runnable saveAllCallback, Runnable loadCallback) {
     mySimView = simView;
     myScene = scene;
     myBundleCallback = bundleCallback;
     mySaveAllCallback = saveAllCallback;
+    myLoadCallback = loadCallback;
   }
 
   /**
@@ -74,6 +76,7 @@ public class WiringManager {
     wireApplyChanges(mySlots);
     wireSplashLoad(onSplashLoad);
     wireSettings();
+    wireLoadProgram();
     wireForward(mySlots);
     wireBackward(mySlots);
     wireChangeDirection(mySlots);
@@ -261,4 +264,11 @@ public class WiringManager {
   private void refreshSpeedLabel(List<SimulationSlot> mySlots) {
     mySimView.setSpeedLabel(getReferenceSpeed(mySlots));
   }
+
+  private void wireLoadProgram(){
+    mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
+      myLoadCallback.run();
+    });
+  }
+
 }
