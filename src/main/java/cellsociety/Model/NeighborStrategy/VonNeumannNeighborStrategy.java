@@ -2,7 +2,11 @@ package cellsociety.Model.NeighborStrategy;
 
 import java.util.List;
 
-/** Four neighbors: N, S, E, W only (Von Neumann neighborhood). */
+/**
+ * Four neighbors: N, S, E, W only (Von Neumann neighborhood).
+ *
+ * @author Michael Lei
+ */
 public class VonNeumannNeighborStrategy implements NeighborStrategy {
 
     private static final List<int[]> VON_NEUMANN_OFFSETS = List.of(
