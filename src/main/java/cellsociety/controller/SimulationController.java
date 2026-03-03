@@ -14,6 +14,8 @@ import cellsociety.controller.services.SimulationLoadingService;
 import cellsociety.controller.services.SimulationSavingService;
 import cellsociety.view.dialogs.PopulationGraphDialog;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
+import cellsociety.Model.Simulation.model.SimulationModel;
+import cellsociety.Model.Grid.ControllerGrid;
 import cellsociety.view.SimulationView;
 import java.io.File;
 import java.io.IOException;

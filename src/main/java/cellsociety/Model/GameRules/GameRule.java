@@ -2,6 +2,7 @@ package cellsociety.Model.GameRules;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Map;
@@ -25,7 +26,7 @@ public abstract class GameRule implements CellFactory {
    * Advances the simulation one step. Uses only the grid API (e.g. getCellState, getNeighbors);
    * neighbor semantics are entirely defined by the grid.
    */
-  public abstract Grid getNextGrid(Grid currentGrid);
+  public abstract Grid getNextGrid(RuleGrid currentGrid);
 
   /**
    * Default neighbor strategy for this rule type. Used by the factory when building the grid

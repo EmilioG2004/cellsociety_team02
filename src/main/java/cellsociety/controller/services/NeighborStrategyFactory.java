@@ -1,5 +1,6 @@
 package cellsociety.controller.services;
 
+import cellsociety.Model.Grid.ControllerGrid;
 import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
@@ -38,7 +39,7 @@ public class NeighborStrategyFactory {
     if (!slot.hasSimulation()) {
       return;
     }
-    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
+    ControllerGrid grid = slot.getPresenter().getDriver().getSimulation().getControllerGrid();
     NeighborStrategy updatedStrategy = create(selectedChoice, grid.getNeighborStrategy());
     grid.setNeighborStrategy(updatedStrategy);
   }

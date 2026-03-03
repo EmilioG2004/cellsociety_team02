@@ -3,6 +3,7 @@ package cellsociety.Model.GameRules;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SpreadingOfFireState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
@@ -48,7 +49,7 @@ public class SpreadingOfFireRule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
     double probCatch = parameters.containsKey(PARAM_PROB_CATCH) ? parameters.get(PARAM_PROB_CATCH) : DEFAULT_PROB_CATCH;
