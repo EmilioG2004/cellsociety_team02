@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * Immutable snapshot of a simulation configuration: rule class, metadata, grid size, initial states, and parameters.
- * Typically produced by {@link ConfigLoader} and consumed by {@link cellsociety.Model.Simulation.SimulationFactory}.
+ * Typically produced by {@link ConfigLoader} and consumed by {@link cellsociety.Model.Simulation.factory.SimulationFactory}.
  */
 public final class SimulationConfig {
 

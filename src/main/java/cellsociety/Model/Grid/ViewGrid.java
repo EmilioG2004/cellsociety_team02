@@ -13,12 +13,13 @@ public interface ViewGrid {
 
   int getCols();
 
-  /** for the view to get the neighborstrategy attached to the grid */
+  /** Returns the neighbor strategy attached to the grid (e.g. Moore, Von Neumann). */
   NeighborStrategy getNeighborStrategy();
-  /** for the view to dynamically change the neighborstrategy used */
+
+  /** Sets the neighbor strategy so the view can change neighborhood (e.g. Moore vs Von Neumann) dynamically. */
   void setNeighborStrategy(NeighborStrategy strategy);
+
   /**
-   *
    * Integer code for the cell at (row, col), used for color lookup and serialization.
    */
   int getCellStateInt(int row, int col);
