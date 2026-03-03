@@ -1,67 +1,34 @@
-package cellsociety.controller;
+package cellsociety.controller.services;
 
 import cellsociety.Model.Grid.ViewGrid;
-import cellsociety.Model.Simulation.factory.SimulationFactory;
-import cellsociety.Model.Simulation.model.SimulationModel;
-import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
-import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.config.SimulationState;
+import cellsociety.controller.multiview.SimulationSlot;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
 import cellsociety.view.constants.ResourcePaths;
 
 /**
- * Service-layer class for simulation persistence workflows (load/save config and full app state).
+ * Service-layer class for simulation saving workflows.
  */
-public class SimulationPersistenceService {
+public class SimulationSavingService {
 
-  private final ConfigLoader myConfigLoader;
   private final ConfigSaver myConfigSaver;
-  private final SimulationLoader mySimulationLoader;
   private final SimulationSaver mySimulationSaver;
 
-  public SimulationPersistenceService() {
-    myConfigLoader = new ConfigLoader();
+  public SimulationSavingService() {
     myConfigSaver = new ConfigSaver();
-    mySimulationLoader = new SimulationLoader();
     mySimulationSaver = new SimulationSaver();
   }
 
-  public SimulationPersistenceService(ConfigLoader configLoader, ConfigSaver configSaver,
-      SimulationLoader simulationLoader, SimulationSaver simulationSaver) {
-    myConfigLoader = configLoader;
+  public SimulationSavingService(ConfigSaver configSaver, SimulationSaver simulationSaver) {
     myConfigSaver = configSaver;
-    mySimulationLoader = simulationLoader;
     mySimulationSaver = simulationSaver;
-  }
-
-  public SimulationConfig loadConfig(File xmlFile)
-      throws ParserConfigurationException, IOException, SAXException {
-    if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
-    }
-    return myConfigLoader.loadConfig(xmlFile);
-  }
-
-  public SimulationState loadState(File xmlFile)
-      throws ParserConfigurationException, IOException, SAXException {
-    if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
-    }
-    return mySimulationLoader.loadState(xmlFile);
   }
 
   public void saveConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid, File saveDestination) {
@@ -78,46 +45,6 @@ public class SimulationPersistenceService {
     }
     SimulationState state = new SimulationState(snapshots, preferences);
     mySimulationSaver.saveState(state, saveDestination);
-  }
-
-  /**
-   * Loads one config file and installs it into the target slot.
-   */
-  public void loadConfigIntoSlot(int slotIndex, File xmlFile, List<SimulationSlot> slots,
-      Optional<String> selectedNeighborChoice, NeighborStrategyFactory neighborStrategyFactory)
-      throws ParserConfigurationException, IOException, SAXException {
-    checkSlotIndex(slots, slotIndex);
-    SimulationConfig config = loadConfig(xmlFile);
-    SimulationModel sim = SimulationFactory.createSimulation(config);
-    SimulationSlot slot = slots.get(slotIndex);
-    slot.setSimulation(sim);
-    slot.setConfig(config);
-    selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(slot, choice));
-  }
-
-  /**
-   * Loads full app state file and applies all contained simulations to slots.
-   *
-   * @return loaded simulation preferences from the state file
-   */
-  public SimulationPreferences loadStateIntoSlots(File xmlFile, List<SimulationSlot> slots,
-      IntConsumer setSlotCount, Consumer<Integer> setSlotChoice, Optional<String> selectedNeighborChoice,
-      NeighborStrategyFactory neighborStrategyFactory)
-      throws ParserConfigurationException, IOException, SAXException {
-    SimulationState desiredState = loadState(xmlFile);
-    int activeSims = desiredState.getActiveSimulations().size();
-    setSlotCount.accept(activeSims);
-    setSlotChoice.accept(activeSims);
-
-    for (int i = 0; i < slots.size(); i++) {
-      SimulationSlot currentSlot = slots.get(i);
-      SimulationConfig currentConfig = desiredState.getActiveSimulations().get(i);
-      SimulationModel currentSim = SimulationFactory.createSimulation(currentConfig);
-      currentSlot.setSimulation(currentSim);
-      currentSlot.setConfig(currentConfig);
-      selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(currentSlot, choice));
-    }
-    return desiredState.getPreferences();
   }
 
   /**

@@ -1,8 +1,11 @@
-package cellsociety.view;
+package cellsociety.view.multiview;
 
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
+import cellsociety.view.GridPaneView;
+import cellsociety.view.GridView;
+import cellsociety.view.SimulationView;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;

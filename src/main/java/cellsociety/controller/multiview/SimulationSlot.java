@@ -1,9 +1,9 @@
-package cellsociety.controller;
+package cellsociety.controller.multiview;
 
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.SimulationConfig;
-import cellsociety.view.SimulationPanel;
+import cellsociety.view.multiview.SimulationPanel;
 import javafx.scene.Node;
 
 /**

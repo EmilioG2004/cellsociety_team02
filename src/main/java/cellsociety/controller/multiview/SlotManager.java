@@ -1,6 +1,6 @@
-package cellsociety.controller;
+package cellsociety.controller.multiview;
 
-import cellsociety.view.SimulationPanel;
+import cellsociety.view.multiview.SimulationPanel;
 import cellsociety.view.SimulationView;
 import java.util.List;
 import java.util.ResourceBundle;

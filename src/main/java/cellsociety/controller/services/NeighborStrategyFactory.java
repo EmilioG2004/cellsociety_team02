@@ -1,4 +1,4 @@
-package cellsociety.controller;
+package cellsociety.controller.services;
 
 import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
@@ -7,6 +7,7 @@ import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
+import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.view.constants.ResourcePaths;
 import java.util.List;
 

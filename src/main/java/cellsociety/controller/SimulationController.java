@@ -5,7 +5,13 @@ import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
 import static cellsociety.view.constants.ResourcePaths.BUNDLE_FOLDER;
 
 import cellsociety.config.SimulationPreferences;
-import cellsociety.view.PopulationGraphDialog;
+import cellsociety.controller.multiview.SimulationSlot;
+import cellsociety.controller.multiview.SlotManager;
+import cellsociety.controller.services.ErrorHandler;
+import cellsociety.controller.services.NeighborStrategyFactory;
+import cellsociety.controller.services.SimulationLoadingService;
+import cellsociety.controller.services.SimulationSavingService;
+import cellsociety.view.dialogs.PopulationGraphDialog;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
 import cellsociety.view.SimulationView;
 import java.io.File;
@@ -49,7 +55,8 @@ public class SimulationController {
   private final Scene myScene;
   private final WiringManager myWires;
   private ResourceBundle myBundle;
-  private final SimulationPersistenceService myPersistenceService;
+  private final SimulationLoadingService myLoadingService;
+  private final SimulationSavingService mySavingService;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
   private final SlotManager mySlotManager;
@@ -75,7 +82,8 @@ public class SimulationController {
    */
   public SimulationController(SimulationView simView, Scene scene, ResourceBundle bundle) {
     myBundle = bundle;
-    myPersistenceService = new SimulationPersistenceService();
+    myLoadingService = new SimulationLoadingService();
+    mySavingService = new SimulationSavingService();
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
@@ -113,7 +121,7 @@ public class SimulationController {
     File xmlFile = mySimView.showOpenConfigDialog();
     if (xmlFile == null) return;
     try {
-      myPersistenceService.loadConfigIntoSlot(
+      myLoadingService.loadConfigIntoSlot(
           0, xmlFile, mySlots, mySelectedNeighborChoice, myNeighborStrategyFactory);
       handlePopulationDataChanged();
     } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
@@ -153,7 +161,7 @@ public class SimulationController {
     if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
 
     try{
-      SimulationPreferences desiredPreferences = myPersistenceService.loadStateIntoSlots(
+      SimulationPreferences desiredPreferences = myLoadingService.loadStateIntoSlots(
           xmlFile,
           mySlots,
           this::setSlotCount,
@@ -188,7 +196,7 @@ public class SimulationController {
     File xmlFile = mySimView.showOpenConfigDialog();
     if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
     try {
-      myPersistenceService.loadConfigIntoSlot(
+      myLoadingService.loadConfigIntoSlot(
           slotIndex, xmlFile, mySlots, mySelectedNeighborChoice, myNeighborStrategyFactory);
       handlePopulationDataChanged();
     } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
@@ -199,7 +207,7 @@ public class SimulationController {
   private void handleSaveForSlot(int slotIndex) {
     try {
       File saveDestination = mySimView.showSaveConfigDialog();
-      myPersistenceService.saveConfigForSlot(slotIndex, mySlots, saveDestination);
+      mySavingService.saveConfigForSlot(slotIndex, mySlots, saveDestination);
     } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
     }
@@ -209,7 +217,7 @@ public class SimulationController {
     try {
       File saveDestination = mySimView.showSaveConfigDialog();
       if (saveDestination == null) return;
-      myPersistenceService.saveAllState(
+      mySavingService.saveAllState(
           mySlots,
           mySimView.getMySettings().getMyThemes().getValue(),
           mySimView.getMySettings().getMyLanguages().getValue(),

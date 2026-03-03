@@ -1,6 +1,6 @@
-package cellsociety.view;
+package cellsociety.view.dialogs;
 
-import cellsociety.controller.SimulationPresenter.PopulationSnapshot;
+import cellsociety.controller.multiview.SimulationPresenter.PopulationSnapshot;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
