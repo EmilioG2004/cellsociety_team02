@@ -1,8 +1,12 @@
 package cellsociety.controller;
 
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationDriver;
+import cellsociety.Model.Simulation.driver.DefaultSimulationDriver;
+import cellsociety.Model.Simulation.driver.SimulationDriver;
+import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.view.SimulationRenderer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javafx.application.Platform;
 
 /**
@@ -29,6 +33,7 @@ public class SimulationPresenter {
 
   private final SimulationRenderer myRenderer;
   private final SimulationDriver myDriver;
+  private final List<PopulationSnapshot> myPopulationHistory;
 
   /**
    * Creates a presenter for the given renderer.
@@ -45,7 +50,8 @@ public class SimulationPresenter {
    */
   public SimulationPresenter(SimulationRenderer renderer) {
     myRenderer = renderer;
-    myDriver = new SimulationDriver();
+    myDriver = new DefaultSimulationDriver();
+    myPopulationHistory = new ArrayList<>();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshFromSimulation));
   }
@@ -65,12 +71,13 @@ public class SimulationPresenter {
    * @param rows number of grid rows
    * @param cols number of grid columns
    */
-  public void setSimulation(Simulation sim, int rows, int cols) {
+  public void setSimulation(SimulationModel sim, int rows, int cols) {
     myDriver.setSimulation(sim);
 
     myRenderer.setGrid(rows, cols);
-    myRenderer.render(sim.getGridViewData());
+    myRenderer.render(sim.getViewGrid());
     myRenderer.setGeneration(sim.getGeneration());
+    syncPopulationAtCurrentGeneration();
   }
 
   /**
@@ -93,9 +100,60 @@ public class SimulationPresenter {
   private void refreshFromSimulation() {
     if (!myDriver.hasSimulation()) return;
 
-    Simulation sim = myDriver.getSimulation();
-    myRenderer.render(sim.getGridViewData());
+    SimulationModel sim = myDriver.getSimulation();
+    myRenderer.render(sim.getViewGrid());
     myRenderer.setGeneration(sim.getGeneration());
+    syncPopulationAtCurrentGeneration();
+  }
+
+  public Map<Integer, Integer> getCurrentStateCounts() {
+    if (!myDriver.hasSimulation()) {
+      throw new IllegalStateException("No simulation loaded.");
+    }
+    return Map.copyOf(myDriver.getSimulation().getStateCounts());
+  }
+
+  public List<PopulationSnapshot> getPopulationHistory() {
+    return List.copyOf(myPopulationHistory);
+  }
+
+  public void syncPopulationAtCurrentGeneration() {
+    if (!myDriver.hasSimulation()) {
+      throw new IllegalStateException("No simulation loaded.");
+    }
+
+    SimulationModel sim = myDriver.getSimulation();
+    int generation = sim.getGeneration();
+    Map<Integer, Integer> counts = sim.getStateCounts();
+    PopulationSnapshot snapshot = new PopulationSnapshot(generation, counts);
+
+    if (myPopulationHistory.isEmpty()) {
+      myPopulationHistory.add(snapshot);
+      return;
+    }
+
+    int lastIndex = myPopulationHistory.size() - 1;
+    PopulationSnapshot last = myPopulationHistory.get(lastIndex);
+    if (last.getGeneration() == generation) {
+      myPopulationHistory.set(lastIndex, snapshot);
+      return;
+    }
+
+    if (last.getGeneration() > generation) {
+      while (!myPopulationHistory.isEmpty()
+          && myPopulationHistory.getLast().getGeneration() > generation) {
+        myPopulationHistory.removeLast();
+      }
+      if (!myPopulationHistory.isEmpty()
+          && myPopulationHistory.getLast().getGeneration() == generation) {
+        myPopulationHistory.set(myPopulationHistory.size() - 1, snapshot);
+      } else {
+        myPopulationHistory.add(snapshot);
+      }
+      return;
+    }
+
+    myPopulationHistory.add(snapshot);
   }
 
   /**
@@ -109,5 +167,23 @@ public class SimulationPresenter {
    */
   public SimulationDriver getDriver() {
     return myDriver;
+  }
+
+  public static final class PopulationSnapshot {
+    private final int myGeneration;
+    private final Map<Integer, Integer> myCounts;
+
+    public PopulationSnapshot(int generation, Map<Integer, Integer> counts) {
+      myGeneration = generation;
+      myCounts = Map.copyOf(counts);
+    }
+
+    public int getGeneration() {
+      return myGeneration;
+    }
+
+    public Map<Integer, Integer> getCounts() {
+      return myCounts;
+    }
   }
 }

@@ -1,7 +1,7 @@
-package cellsociety.Model.Simulation;
+package cellsociety.Model.Simulation.driver;
 
-import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Simulation.model.SimulationModel;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -9,12 +9,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Controls run state (start/pause), speed, and drives periodic stepping. Invoked by the controller
- * when the user presses Start, Pause, or changes speed. Notifies a callback after each step so
- * the view can refresh. Does not depend on JavaFX or file format.
+ * Default implementation of {@link SimulationDriver}: controls run state (start/pause), speed,
+ * direction, and drives periodic stepping. Does not depend on JavaFX or file format.
+ *
+ * @author Michael Lei
  */
-public class SimulationDriver {
-  private Simulation simulation;
+public class DefaultSimulationDriver implements SimulationDriver {
+
+  private SimulationModel simulation;
   private boolean isRunning;
   private boolean isForward = true;
   private double stepsPerSecond;
@@ -29,7 +31,7 @@ public class SimulationDriver {
   private static final double NANOS_PER_SECOND = 1_000_000_000.0;
   private static final String ERROR_NO_SIMULATION = "No simulation set";
 
-  public SimulationDriver() {
+  public DefaultSimulationDriver() {
     this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
       Thread t = new Thread(r, THREAD_NAME);
       t.setDaemon(true);
@@ -38,73 +40,54 @@ public class SimulationDriver {
     this.stepsPerSecond = DEFAULT_SPEED;
   }
 
-  /**
-   * Sets the current simulation. If the driver is running, the next tick will use this simulation.
-   */
-  public void setSimulation(Simulation simulation) {
+  @Override
+  public void setSimulation(SimulationModel simulation) {
     this.simulation = simulation;
   }
 
-  /**
-   * Sets the simulation's grid to the given state and updates its undo stack. Use this instead of
-   * setting cell state on the grid directly so stepBack() stays correct. No-op if no simulation set.
-   */
+  @Override
   public void setState(Grid state) {
     if (simulation != null) {
       simulation.setState(state);
     }
   }
 
-  /**
-   * Toggles the cell at (row, col) to the next state in this simulation's cycle.
-   */
+  @Override
   public void toggleCellState(int row, int col) {
     if (simulation != null) {
       simulation.toggleCellState(row, col);
     }
   }
 
-  /** Returns true if a simulation has been set. */
+  @Override
   public boolean hasSimulation() {
     return simulation != null;
   }
 
-  /**
-   * Returns the current simulation.
-   * @throws IllegalStateException if no simulation has been set
-   */
-  public Simulation getSimulation() {
+  @Override
+  public SimulationModel getSimulation() {
     if (simulation == null) {
       throw new IllegalStateException(ERROR_NO_SIMULATION);
     }
     return simulation;
   }
 
-  /**
-   * Registers a callback invoked after each step. The view can use this to refresh the display.
-   * May be called from the driver's thread; the view should use Platform.runLater if updating UI.
-   */
+  @Override
   public void setOnStepCallback(Runnable onStepCallback) {
     this.onStepCallback = onStepCallback;
   }
 
-  /**
-   * Returns true if the driver is currently running (stepping periodically).
-   */
+  @Override
   public boolean isRunning() {
     return isRunning;
   }
 
-  /**
-   * Returns the current stepping rate in steps per second.
-   */
+  @Override
   public double getStepsPerSecond() {
     return stepsPerSecond;
   }
 
-  /**
-   * Starts periodic stepping at the current speed. No-op if already running or no simulation set.
-   */
+  @Override
   public void start() {
     if (isRunning || simulation == null) {
       return;
@@ -113,9 +96,7 @@ public class SimulationDriver {
     scheduleNextStep();
   }
 
-  /**
-   * Stops periodic stepping. Single-step via {@link #step()} still works when paused.
-   */
+  @Override
   public void pause() {
     if (!isRunning) {
       return;
@@ -127,9 +108,7 @@ public class SimulationDriver {
     }
   }
 
-  /**
-   * Sets the stepping rate in steps per second. If running, reschedules at the new rate immediately.
-   */
+  @Override
   public void setSpeed(double stepsPerSecond) {
     if (stepsPerSecond <= SPEED_FLOOR) {
       stepsPerSecond = DEFAULT_SPEED;
@@ -144,10 +123,7 @@ public class SimulationDriver {
     }
   }
 
-  /**
-   * Advances the current simulation by one generation and notifies the step callback. Use when
-   * paused for single-step. No-op if no simulation set.
-   */
+  @Override
   public void step() {
     if (simulation == null) {
       return;
@@ -157,19 +133,21 @@ public class SimulationDriver {
       onStepCallback.run();
     }
   }
+
+  @Override
   public void setDirection(boolean forward) {
     if (forward == isForward) {
       return;
     }
     this.isForward = forward;
-    
   }
+
+  @Override
   public boolean isForwardDirection() {
     return isForward;
   }
-  /**
-   * Goes back one generation and notifies the step callback. Use when paused for single-step back. No-op if no simulation set.
-   */
+
+  @Override
   public boolean stepBack() {
     if (simulation == null) {
       return false;
@@ -184,9 +162,7 @@ public class SimulationDriver {
     }
     return true;
   }
-    /**
-   * Schedules steps to occur at the current speed.
-   */
+
   private void scheduleNextStep() {
     if (!isRunning || simulation == null) {
       return;

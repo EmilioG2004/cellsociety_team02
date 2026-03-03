@@ -5,8 +5,8 @@ import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ReadOnlyGrid;
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationFactory;
+import cellsociety.Model.Simulation.model.SimulationModel;
+import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.config.SimulationConfig;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
@@ -28,7 +28,7 @@ public class SimulationFactoryTest {
   void createSimulation_emptyGrid_returnsSimulation() {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 0, 0, new int[][]{}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
     assertEquals(0, sim.getReadOnlyGrid().getRows());
     assertEquals(0, sim.getReadOnlyGrid().getCols());
@@ -39,7 +39,7 @@ public class SimulationFactoryTest {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
     ReadOnlyGrid grid = sim.getReadOnlyGrid();
     for (int r = 0; r < 3; r++) {
@@ -55,7 +55,7 @@ public class SimulationFactoryTest {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 1, 1,
         new int[][]{{1}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
     assertEquals(1, sim.getReadOnlyGrid().getRows());
     assertEquals(1, sim.getReadOnlyGrid().getCols());
@@ -68,7 +68,7 @@ public class SimulationFactoryTest {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 1, 0}, {0, 1, 0}, {0, 1, 0}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
     ReadOnlyGrid grid = sim.getReadOnlyGrid();
     assertEquals(3, grid.getRows());
@@ -89,7 +89,7 @@ public class SimulationFactoryTest {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 2, 2,
         new int[][]{{1, 1}, {1, 1}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     ReadOnlyGrid grid = sim.getReadOnlyGrid();
     for (int r = 0; r < 2; r++) {
       for (int c = 0; c < 2; c++) {
@@ -121,7 +121,7 @@ public class SimulationFactoryTest {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
     assertNotNull(sim.getReadOnlyGrid());
     assertNotNull(sim.getRule());
@@ -134,7 +134,7 @@ public class SimulationFactoryTest {
     SimulationConfig config = new SimulationConfig(
         "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 1, 1,
         new int[][]{{0}}, new HashMap<>());
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
     assertEquals(ConwayGameOfLifeRule.class, sim.getRule().getClass());
   }
 

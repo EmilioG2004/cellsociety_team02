@@ -6,7 +6,7 @@ import static cellsociety.view.constants.SimulationUiConstants.*;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.Model.Grid.ViewGrid;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
  * {@link SimulationView} UI.</p>
  *
  * <p>Assumptions: the caller initializes the grid via {@link #setGrid(int, int)}
- * before calling {@link #render(GridViewData)}.</p>
+ * before calling {@link #render(ViewGrid)}.</p>
  *
  * <p>Dependencies: {@link GridView} implementations, JavaFX layout nodes, and
  * localized strings from {@link ResourceBundle}.</p>
@@ -34,7 +34,7 @@ import javafx.scene.layout.VBox;
  * <pre>{@code
  * SimulationPanel panel = new SimulationPanel(bundle);
  * panel.setGrid(rows, cols);
- * panel.render(sim.getGridViewData());
+ * panel.render(sim.getViewGrid());
  * }</pre>
  *
  * <p>Other details: this panel exposes controls for loading, viewing metadata, and rotating
@@ -54,6 +54,7 @@ public class SimulationPanel implements SimulationRenderer {
   private final Button myRotateRightButton;
   private final Button myAboutButton;
   private final Button mySaveButton;
+  private final Button myViewGraphButton;
 
   private final StackPane myGridContainer;
 
@@ -84,6 +85,7 @@ public class SimulationPanel implements SimulationRenderer {
     myRotateRightButton = buildButton(BUTTON_ROTATE_RIGHT);
     myAboutButton = buildButton(BUTTON_ABOUT_CONFIG);
     mySaveButton = buildButton(BUTTON_SAVE_STATE);
+    myViewGraphButton = buildButton(BUTTON_VIEW_GRAPH);
     myGridContainer = buildGridContainer();
 
     configureHandlers();
@@ -130,8 +132,10 @@ public class SimulationPanel implements SimulationRenderer {
   }
 
   private HBox buildRotationRow() {
-    HBox lower = new HBox(SPACING_SMALL, myRotateLeftButton, myRotateRightButton);
-    lower.setAlignment(Pos.CENTER);
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+    HBox lower = new HBox(SPACING_SMALL, myViewGraphButton, spacer, myRotateLeftButton, myRotateRightButton);
+    lower.setAlignment(Pos.CENTER_LEFT);
     return lower;
   }
 
@@ -164,7 +168,7 @@ public class SimulationPanel implements SimulationRenderer {
    * <p>Return value: none.</p>
    */
   @Override
-  public void render(GridViewData grid) {
+  public void render(ViewGrid grid) {
     if (myGridView == null) return;
     myGridView.render(grid);
   }
@@ -227,6 +231,8 @@ public class SimulationPanel implements SimulationRenderer {
 
   public void setOnSave(Runnable action) { mySaveButton.setOnAction(e -> action.run()); }
 
+  public void setOnViewGraph(Runnable action) { myViewGraphButton.setOnAction(e -> action.run()); }
+
   /**
    * Registers a callback for clicks on this panel's grid cells.
    *
@@ -249,7 +255,7 @@ public class SimulationPanel implements SimulationRenderer {
    *
    * @param grid read-only grid used to update outlines
    */
-  public void toggleOutline(GridViewData grid) {
+  public void toggleOutline(ViewGrid grid) {
     if (myGridView == null) return;
     myGridView.toggleOutline(grid);
   }
@@ -277,6 +283,7 @@ public class SimulationPanel implements SimulationRenderer {
     myLoadButton.setText(myBundle.getString(BUTTON_LOAD_SIM));
     mySaveButton.setText(myBundle.getString(BUTTON_SAVE_STATE));
     myAboutButton.setText(myBundle.getString(BUTTON_ABOUT_CONFIG));
+    myViewGraphButton.setText(myBundle.getString(BUTTON_VIEW_GRAPH));
     myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
     myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
   }

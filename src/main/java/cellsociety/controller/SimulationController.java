@@ -2,13 +2,24 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+import static cellsociety.view.constants.ResourcePaths.BUNDLE_FOLDER;
 
 import cellsociety.config.ConfigSaver;
+import cellsociety.config.SimulationLoader;
+import cellsociety.config.SimulationPreferences;
+import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationFactory;
-import cellsociety.Model.Simulation.SimulationDriver;
-import cellsociety.Model.Grid.GridViewData;
+import cellsociety.view.PopulationGraphDialog;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
+import cellsociety.Model.Simulation.factory.SimulationFactory;
+import cellsociety.Model.Simulation.driver.SimulationDriver;
+import cellsociety.Model.Simulation.model.SimulationModel;
+import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.SimulationConfig;
@@ -16,7 +27,10 @@ import cellsociety.config.SimulationState;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
@@ -54,8 +68,12 @@ public class SimulationController {
   private ResourceBundle myBundle;
   private final ConfigLoader myConfigLoader;
   private final ConfigSaver myConfigSaver;
+  private final SimulationSaver mySimSaver;
+  private final SimulationLoader mySimLoader;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
+  private final PopulationGraphDialog myPopulationGraphDialog;
+  private Optional<String> mySelectedNeighborChoice = Optional.empty();
 
 
   /**
@@ -77,11 +95,21 @@ public class SimulationController {
     myBundle = bundle;
     myConfigLoader = new ConfigLoader();
     myConfigSaver = new ConfigSaver();
+    mySimSaver = new SimulationSaver();
+    mySimLoader = new SimulationLoader();
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
+    myPopulationGraphDialog = new PopulationGraphDialog();
     myScene = scene;
-    myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll);
+    myWires = new WiringManager(
+        mySimView,
+        myScene,
+        this::setMyBundle,
+        this::handleSaveAll,
+        this::handleLoadState,
+        this::handlePopulationDataChanged
+    );
 
     ChoiceBox<Integer> mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
@@ -92,7 +120,22 @@ public class SimulationController {
 
     setSlotCount(DEFAULT_SLOTS);
 
-    myWires.wireAll(mySlots);
+    myWires.wireAll(mySlots, this::handleSplashLoad);
+    wireNeighborSelection();
+  }
+
+  /**
+   * Shows the file chooser and loads the selected config into slot 0.
+   * Called when the user clicks "Load Simulation" in the settings/splash panel.
+   */
+  private void handleSplashLoad() {
+    File xmlFile = mySimView.showOpenConfigDialog();
+    if (xmlFile == null) return;
+    try {
+      loadConfigIntoSlot(0, xmlFile);
+    } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
+      myErrorHandler.handle(ex);
+    }
   }
 
   /**
@@ -123,6 +166,7 @@ public class SimulationController {
       panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
       panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
       panel.setOnSave(() -> handleSaveForSlot(slotIndex));
+      panel.setOnViewGraph(() -> handleViewGraphForSlot(slotIndex));
       SimulationPresenter presenter = new SimulationPresenter(panel);
       SimulationSlot slot = new SimulationSlot(index, panel, presenter);
       mySlots.add(slot);
@@ -130,21 +174,62 @@ public class SimulationController {
     rebuildTileChildren();
   }
 
+  public void loadState(File xmlFile)
+      throws ParserConfigurationException, IOException, SAXException {
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
+    SimulationState desiredState = mySimLoader.loadState(xmlFile);
+    SimulationPreferences desiredPreferences = desiredState.getPreferences();
+    loadSimulations(desiredState);
+    loadPreferences(desiredPreferences);
+  }
+
+  private void handleLoadState(){
+    File xmlFile = mySimView.showOpenConfigDialog();
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
+
+    try{
+      loadState(xmlFile);
+    } catch (ParserConfigurationException | SAXException | IOException e) {
+      myErrorHandler.handle(e);
+    }
+  }
+
+  private void loadSimulations(SimulationState desiredState) {
+    int activeSims = desiredState.getActiveSimulations().size();
+    setSlotCount(activeSims);
+    mySimView.getMultiSimSlotChoice().setValue(activeSims);
+    for (int i = 0; i < mySlots.size(); i++){
+      SimulationSlot currentSlot = mySlots.get(i);
+      SimulationConfig currentConfig = desiredState.getActiveSimulations().get(i);
+      SimulationModel currentSim = SimulationFactory.createSimulation(currentConfig);
+      currentSlot.setSimulation(currentSim);
+      currentSlot.setConfig(currentConfig);
+      mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(currentSlot, choice));
+    }
+    handlePopulationDataChanged();
+  }
+
+  private void loadPreferences(SimulationPreferences desiredPreferences){
+    int theme = desiredPreferences.getTheme();
+    String themeChoice = mapThemeCodeToChoice(theme);
+    String language = desiredPreferences.getLanguage();
+    String languageBundle = BUNDLE_FOLDER + language;
+    double speed = desiredPreferences.getSimulationSpeed();
+    Map<Integer, String> colors = desiredPreferences.getColorMap();
+    mySimView.applyTheme(myScene, themeChoice);
+    mySimView.getMySettings().getMyThemes().setValue(themeChoice);
+    mySimView.applyLanguage(ResourceBundle.getBundle(languageBundle));
+    mySimView.getMySettings().getMyLanguages().setValue(language);
+    for (SimulationSlot currentSlot : mySlots){
+      currentSlot.setSpeed(speed);
+    }
+  }
+
   /**
    * Loads an XML config file into the given slot index.
    *
-   * <p>Purpose: instantiate and display a simulation for the selected slot.</p>
-   *
-   * <p>Assumptions: {@code xmlFile} is non-null and readable.</p>
-   *
-   * <p>Exceptions: may throw parsing/IO exceptions if loading fails.</p>
-   *
    * @param slotIndex zero-based slot index
    * @param xmlFile configuration file to load
-   * @throws ParserConfigurationException if the XML parser cannot be configured
-   * @throws IOException if the file cannot be read
-   * @throws SAXException if the XML is malformed
-   * @throws IllegalArgumentException if the configuration is invalid
    */
   public void loadConfigIntoSlot(int slotIndex, File xmlFile)
       throws ParserConfigurationException, IOException, SAXException, IllegalArgumentException {
@@ -153,16 +238,17 @@ public class SimulationController {
     if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
 
     SimulationConfig config = myConfigLoader.loadConfig(xmlFile);
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
 
     mySlots.get(slotIndex).setSimulation(sim);
     mySlots.get(slotIndex).setConfig(config);
+    mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(mySlots.get(slotIndex), choice));
+    handlePopulationDataChanged();
   }
 
   private void handleLoadForSlot(int slotIndex) {
     File xmlFile = mySimView.showOpenConfigDialog();
-    if (xmlFile == null) return;
-
+    if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
     try {
       loadConfigIntoSlot(slotIndex, xmlFile);
     } catch (ParserConfigurationException | SAXException | IOException | IllegalArgumentException ex) {
@@ -179,8 +265,8 @@ public class SimulationController {
     }
 
     SimulationConfig initialConfig = slot.getConfig();
-    GridViewData grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
-    int[][] intSnapshot = GridViewData.produceIntArray(grid);
+    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
+    int[][] intSnapshot = ViewGrid.produceIntArray(grid);
 
     SimulationConfig configSnapshot = new SimulationConfig(
         initialConfig.getSimulationType(),
@@ -196,7 +282,7 @@ public class SimulationController {
     );
 
     File saveDestination = mySimView.showSaveConfigDialog();
-    if (saveDestination == null) return;
+    if (saveDestination == null) throw new IllegalArgumentException("No Save Destination Selected.");
 
     myConfigSaver.saveConfig(configSnapshot, saveDestination);
   }
@@ -211,22 +297,24 @@ public class SimulationController {
 
   private void handleSaveAll() {
     try {
-      SimulationState stateSnapshot = buildSimulationStateSnapshot();
+      List<SimulationConfig> stateSnapshots = buildSimulationSnapshots();
+      SimulationPreferences currentPreferences = getSimulationPreferences();
+      SimulationState currentState = new SimulationState(stateSnapshots, currentPreferences);
       File saveDestination = mySimView.showSaveConfigDialog();
       if (saveDestination == null) return;
-      myConfigSaver.saveState(stateSnapshot, saveDestination);
+      mySimSaver.saveState(currentState, saveDestination);
     } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
     }
   }
 
-  private SimulationState buildSimulationStateSnapshot() {
+  private List<SimulationConfig> buildSimulationSnapshots() {
     List<SimulationConfig> active = new ArrayList<>();
     for (SimulationSlot slot : mySlots) {
       if (!slot.hasSimulation()) continue;
       SimulationConfig base = slot.getConfig();
-      GridViewData grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
-      int[][] states = GridViewData.produceIntArray(grid);
+      ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
+      int[][] states = ViewGrid.produceIntArray(grid);
       SimulationConfig snapshot = new SimulationConfig(
           base.getSimulationType(),
           base.getRuleClass(),
@@ -241,21 +329,44 @@ public class SimulationController {
       );
       active.add(snapshot);
     }
+    return active;
+  }
 
+  private SimulationPreferences getSimulationPreferences() {
     int theme = mapThemeToCode(mySimView.getMySettings().getMyThemes().getValue());
-    double speed = mySimView.getMySpeedMultiplier();
+    double speed = getReferenceSpeed();
     String language = mySimView.getMySettings().getMyLanguages().getValue();
     if (language == null || language.isBlank()) {
       language = ResourcePaths.LANGUAGE_ENGLISH;
     }
 
-    return new SimulationState(active, theme, speed, language);
+    SimulationPreferences preferences = new SimulationPreferences(theme, language, speed, new HashMap<Integer,String>());
+
+    return preferences;
+  }
+
+  private double getReferenceSpeed() {
+    if (!mySlots.isEmpty() && mySlots.get(0).hasSimulation()) {
+      return mySlots.get(0).getStepsPerSecond();
+    }
+    for (SimulationSlot slot : mySlots) {
+      if (slot.hasSimulation()) {
+        return slot.getStepsPerSecond();
+      }
+    }
+    return 1.0;
   }
 
   private int mapThemeToCode(String themeChoice) {
     if (ResourcePaths.THEME_DARK.equals(themeChoice)) return 1;
     if (ResourcePaths.THEME_DUKE.equals(themeChoice)) return 2;
     return 0;
+  }
+
+  private String mapThemeCodeToChoice(int themeCode) {
+    if (themeCode == 1) return ResourcePaths.THEME_DARK;
+    if (themeCode == 2) return ResourcePaths.THEME_DUKE;
+    return ResourcePaths.THEME_LIGHT;
   }
 
   private void handleAboutForSlot(int slotIndex) {
@@ -271,11 +382,73 @@ public class SimulationController {
     }
   }
 
+  private void handleViewGraphForSlot(int slotIndex) {
+    try {
+      checkIndex(slotIndex);
+      SimulationSlot slot = mySlots.get(slotIndex);
+      if (!slot.hasSimulation()) {
+        throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+      }
+      for (SimulationSlot current : mySlots) {
+        current.pause();
+      }
+      myPopulationGraphDialog.showForSlot(slotIndex, slot.getPresenter().getPopulationHistory());
+    } catch (RuntimeException ex) {
+      myErrorHandler.handle(ex);
+    }
+  }
+
   private void rebuildTileChildren() {
     mySimView.getMultiSimTile().getChildren().clear();
     for (SimulationSlot slot : mySlots) {
       mySimView.getMultiSimTile().getChildren().add(slot.getNode());
     }
+  }
+
+  private void wireNeighborSelection() {
+    ChoiceBox<String> neighborChoices = mySimView.getMyButtons().getNeighborChoices();
+    neighborChoices.setOnAction(e -> {
+      String selected = neighborChoices.getValue();
+      if (selected == null) throw new IllegalArgumentException("No neighborhood strategy selected.");
+      mySelectedNeighborChoice = Optional.of(selected);
+      applyNeighborChoiceToLoadedSimulations(selected);
+    });
+  }
+
+  private void applyNeighborChoiceToLoadedSimulations(String selectedChoice) {
+    for (SimulationSlot slot : mySlots) {
+      applyNeighborChoiceToSlot(slot, selectedChoice);
+    }
+    handlePopulationDataChanged();
+  }
+
+  private void applyNeighborChoiceToSlot(SimulationSlot slot, String selectedChoice) {
+    if (!slot.hasSimulation()) return;
+    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
+    NeighborStrategy updatedStrategy = buildNeighborStrategy(selectedChoice, grid.getNeighborStrategy());
+    grid.setNeighborStrategy(updatedStrategy);
+  }
+
+  private NeighborStrategy buildNeighborStrategy(String selectedChoice, NeighborStrategy currentStrategy) {
+    if (ResourcePaths.VON_NEUMANN.equals(selectedChoice)) {
+      return new VonNeumannNeighborStrategy();
+    }
+    if (ResourcePaths.DIAGONAL.equals(selectedChoice)) {
+      return new DiagonalNeighborStrategy();
+    }
+    if (ResourcePaths.MOORE_RADIUS_2.equals(selectedChoice)) {
+      return new MooreNeighborStrategyRadius2();
+    }
+    if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
+      NeighborStrategy base = chooseToroidalBase(currentStrategy);
+      return new WrappingNeighborStrategy(base);
+    }
+    return new MooreNeighborStrategy();
+  }
+
+  private NeighborStrategy chooseToroidalBase(NeighborStrategy currentStrategy) {
+    int neighborCount = currentStrategy.getNeighborOffsets().size();
+    return neighborCount <= 4 ? new VonNeumannNeighborStrategy() : new MooreNeighborStrategy();
   }
 
   private void checkIndex(int slotIndex) {
@@ -288,5 +461,12 @@ public class SimulationController {
     return Math.max(min, Math.min(max, value));
   }
 
-  public void setMyBundle(ResourceBundle bundle){ myBundle = bundle; }
+  private void handlePopulationDataChanged() {
+    for (SimulationSlot slot : mySlots) {
+      if (!slot.hasSimulation()) continue;
+      slot.getPresenter().syncPopulationAtCurrentGeneration();
+    }
+  }
+
+  public void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
 }

@@ -8,7 +8,12 @@ import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Map;
 
-/** Percolation: OPEN cells become FULL when they have enough FULL neighbors (Moore). Optional param: threshold (default 1). */
+/**
+ * Percolation: OPEN cells become FULL when they have enough FULL neighbors (Moore).
+ * Optional param: threshold (default 1).
+ *
+ * @author Michael Lei
+ */
 public class PercolationRule extends GameRule {
 
   private static final int DEFAULT_THRESHOLD = 1;

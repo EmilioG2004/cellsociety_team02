@@ -1,6 +1,10 @@
 package cellsociety.Model.CellState;
 
-/** Game of Life cell states: DEAD, ALIVE. */
+/**
+ * Game of Life cell states: DEAD, ALIVE.
+ *
+ * @author Michael Lei
+ */
 public enum GameOfLifeState implements CellState {
   DEAD(0),
   ALIVE(1);

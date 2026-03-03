@@ -5,12 +5,18 @@ import cellsociety.Model.CellState.SegregationState;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/** Schelling Segregation: unhappy agents move to random EMPTY cells. */
+/**
+ * Schelling Segregation: unhappy agents (same-type ratio below threshold) move to random EMPTY
+ * cells. Param: satisfactionThreshold in [0,1], default 0.3.
+ *
+ * @author Ixa Sigler
+ */
 public class SegregationRule extends GameRule {
 
   private static final double DEFAULT_THRESHOLD = 0.3;
@@ -24,11 +30,6 @@ public class SegregationRule extends GameRule {
   }
 
   public SegregationRule(Map<String, Double> parameters) {
-    super(parameters);
-    validateParameters(parameters);
-  }
-
-  public SegregationRule(NeighborStrategy strategy, Map<String, Double> parameters) {
     super(parameters);
     validateParameters(parameters);
   }
@@ -97,15 +98,12 @@ public class SegregationRule extends GameRule {
 
     int occupied = 0;
     int same = 0;
-
     for (CellState n : neighbors) {
       if (n == SegregationState.EMPTY) continue;
       occupied++;
       if (n == self) same++;
     }
-
-    // If no occupied neighbors, treat as satisfied
-    if (occupied == 0) return true;
+    if (occupied == NO_OCCUPIED_NEIGHBORS) return true;
 
     double fracSame = (double) same / occupied;
     return fracSame >= threshold;

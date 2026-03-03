@@ -1,4 +1,4 @@
-package cellsociety.Model.CellState;
+package cellsociety.Model.CellState.WaTor;
 
 /**
  * Result of a fish or shark taking one turn: what to write at the current cell
@@ -7,7 +7,9 @@ package cellsociety.Model.CellState;
  * @param atCurrent state to write at the creature's current position
  * @param destR     row of destination cell
  * @param destC     column of destination cell 
- * @param atDest    state to write at destination 
+ * @param atDest    state to write at destination
+ *
+ * @author Michael Lei
  */
 public record WaTorTurnResult(WaTorCellState atCurrent, int destR, int destC, WaTorCellState atDest) {
 
