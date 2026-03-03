@@ -1,5 +1,19 @@
 package cellsociety.view.dialogs;
 
+import static cellsociety.view.constants.PopulationGraphUiConstants.AXIS_LABEL_GENERATION;
+import static cellsociety.view.constants.PopulationGraphUiConstants.AXIS_LABEL_POPULATION;
+import static cellsociety.view.constants.PopulationGraphUiConstants.CLOSE_BUTTON_TEXT;
+import static cellsociety.view.constants.PopulationGraphUiConstants.DIALOG_HEIGHT;
+import static cellsociety.view.constants.PopulationGraphUiConstants.DIALOG_WIDTH;
+import static cellsociety.view.constants.PopulationGraphUiConstants.FOOTER_PADDING_BOTTOM;
+import static cellsociety.view.constants.PopulationGraphUiConstants.FOOTER_PADDING_LEFT;
+import static cellsociety.view.constants.PopulationGraphUiConstants.FOOTER_PADDING_RIGHT;
+import static cellsociety.view.constants.PopulationGraphUiConstants.FOOTER_PADDING_TOP;
+import static cellsociety.view.constants.PopulationGraphUiConstants.NO_HISTORY_PREFIX;
+import static cellsociety.view.constants.PopulationGraphUiConstants.ROOT_PADDING;
+import static cellsociety.view.constants.PopulationGraphUiConstants.STATE_SERIES_PREFIX;
+import static cellsociety.view.constants.PopulationGraphUiConstants.TITLE_PREFIX;
+
 import cellsociety.controller.multiview.SimulationPresenter.PopulationSnapshot;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,9 +37,6 @@ import javafx.stage.Stage;
  */
 public class PopulationGraphDialog {
 
-  private static final int DIALOG_WIDTH = 540;
-  private static final int DIALOG_HEIGHT = 360;
-
   private final Stage myStage;
   private final NumberAxis myGenerationAxis;
   private final NumberAxis myPopulationAxis;
@@ -36,35 +47,40 @@ public class PopulationGraphDialog {
     myStage.initModality(Modality.APPLICATION_MODAL);
 
     myGenerationAxis = new NumberAxis();
-    myGenerationAxis.setLabel("Generation");
+    myGenerationAxis.setLabel(AXIS_LABEL_GENERATION);
     myPopulationAxis = new NumberAxis();
-    myPopulationAxis.setLabel("Population");
+    myPopulationAxis.setLabel(AXIS_LABEL_POPULATION);
 
     myChart = new LineChart<>(myGenerationAxis, myPopulationAxis);
     myChart.setAnimated(false);
     myChart.setCreateSymbols(false);
 
-    Button closeButton = new Button("Close");
+    Button closeButton = new Button(CLOSE_BUTTON_TEXT);
     closeButton.setOnAction(e -> myStage.close());
     HBox footer = new HBox(closeButton);
     footer.setAlignment(Pos.CENTER_RIGHT);
-    footer.setPadding(new Insets(8, 12, 8, 12));
+    footer.setPadding(new Insets(
+        FOOTER_PADDING_TOP,
+        FOOTER_PADDING_RIGHT,
+        FOOTER_PADDING_BOTTOM,
+        FOOTER_PADDING_LEFT
+    ));
 
     BorderPane root = new BorderPane();
     root.setCenter(myChart);
     root.setBottom(footer);
-    root.setPadding(new Insets(8));
+    root.setPadding(new Insets(ROOT_PADDING));
 
     myStage.setScene(new Scene(root, DIALOG_WIDTH, DIALOG_HEIGHT));
   }
 
   public void showForSlot(int slotIndex, List<PopulationSnapshot> history) {
     if (history == null || history.isEmpty()) {
-      throw new IllegalStateException("No population history available for slot " + slotIndex);
+      throw new IllegalStateException(NO_HISTORY_PREFIX + slotIndex);
     }
 
     myChart.getData().clear();
-    myStage.setTitle("Population Graph - Slot " + (slotIndex + 1));
+    myStage.setTitle(TITLE_PREFIX + (slotIndex + 1));
 
     Set<Integer> allStates = new TreeSet<>();
     for (PopulationSnapshot snapshot : history) {
@@ -74,7 +90,7 @@ public class PopulationGraphDialog {
     Map<Integer, XYChart.Series<Number, Number>> seriesByState = new LinkedHashMap<>();
     for (Integer state : allStates) {
       XYChart.Series<Number, Number> series = new XYChart.Series<>();
-      series.setName("State " + state);
+      series.setName(STATE_SERIES_PREFIX + state);
       seriesByState.put(state, series);
     }
 

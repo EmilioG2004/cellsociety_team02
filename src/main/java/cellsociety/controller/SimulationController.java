@@ -27,7 +27,7 @@ import javafx.scene.control.ChoiceBox;
  * <p>Assumptions: {@link SimulationView} is fully initialized before wiring; configuration
  * files are valid and compatible with {@link cellsociety.config.ConfigLoader}.</p>
  *
- * <p>Dependencies: {@link SimulationView}, {@link SimulationDriver}, configuration loaders/savers,
+ * <p>Dependencies: {@link SimulationView}, configuration loaders/savers,
  * and JavaFX for UI thread updates.</p>
  *
  * <p>Example usage:</p>
