@@ -9,6 +9,7 @@ import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.controller.multiview.SlotManager;
 import cellsociety.controller.services.ErrorHandler;
 import cellsociety.controller.services.NeighborStrategyFactory;
+import cellsociety.controller.services.PopulationSyncService;
 import cellsociety.controller.services.SimulationLoadingService;
 import cellsociety.controller.services.SimulationSavingService;
 import cellsociety.view.dialogs.PopulationGraphDialog;
@@ -61,6 +62,7 @@ public class SimulationController {
   private final List<SimulationSlot> mySlots;
   private final SlotManager mySlotManager;
   private final NeighborStrategyFactory myNeighborStrategyFactory;
+  private final PopulationSyncService myPopulationSyncService;
   private final PopulationGraphDialog myPopulationGraphDialog;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
 
@@ -89,6 +91,7 @@ public class SimulationController {
     mySlots = new ArrayList<>();
     mySlotManager = new SlotManager(mySimView);
     myNeighborStrategyFactory = new NeighborStrategyFactory();
+    myPopulationSyncService = new PopulationSyncService();
     myPopulationGraphDialog = new PopulationGraphDialog();
     myScene = scene;
     myWires = new WiringManager(
@@ -279,10 +282,7 @@ public class SimulationController {
   }
 
   private void handlePopulationDataChanged() {
-    for (SimulationSlot slot : mySlots) {
-      if (!slot.hasSimulation()) continue;
-      slot.getPresenter().syncPopulationAtCurrentGeneration();
-    }
+    myPopulationSyncService.syncLoadedSlots(mySlots);
   }
 
   public void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
