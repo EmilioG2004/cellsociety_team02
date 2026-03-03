@@ -10,9 +10,9 @@ import cellsociety.controller.multiview.SlotManager;
 import cellsociety.controller.services.ErrorHandler;
 import cellsociety.controller.services.NeighborStrategyFactory;
 import cellsociety.controller.services.PopulationSyncService;
+import cellsociety.controller.services.SimulationDialogService;
 import cellsociety.controller.services.SimulationLoadingService;
 import cellsociety.controller.services.SimulationSavingService;
-import cellsociety.view.dialogs.PopulationGraphDialog;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
 import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.Model.Grid.ControllerGrid;
@@ -65,7 +65,7 @@ public class SimulationController {
   private final SlotManager mySlotManager;
   private final NeighborStrategyFactory myNeighborStrategyFactory;
   private final PopulationSyncService myPopulationSyncService;
-  private final PopulationGraphDialog myPopulationGraphDialog;
+  private final SimulationDialogService myDialogService;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
 
 
@@ -94,28 +94,24 @@ public class SimulationController {
     mySlotManager = new SlotManager(mySimView);
     myNeighborStrategyFactory = new NeighborStrategyFactory();
     myPopulationSyncService = new PopulationSyncService();
-    myPopulationGraphDialog = new PopulationGraphDialog();
+    myDialogService = new SimulationDialogService(mySimView);
     myScene = scene;
-    myWires = new WiringManager(
-        mySimView,
-        myScene,
-        this::setMyBundle,
-        this::handleSaveAll,
-        this::handleLoadState,
-        this::handlePopulationDataChanged
-    );
+    myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll, this::handleLoadState, this::handlePopulationDataChanged);
 
+    buildSlotChoices();
+    setSlotCount(DEFAULT_SLOTS);
+
+    myWires.wireAll(mySlots, this::handleSplashLoad);
+    wireNeighborSelection();
+  }
+
+  private void buildSlotChoices() {
     ChoiceBox<Integer> mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
       mySlotChoice.getItems().add(i);
     }
     mySlotChoice.setValue(DEFAULT_SLOTS);
     mySlotChoice.setOnAction(e -> setSlotCount(mySlotChoice.getValue()));
-
-    setSlotCount(DEFAULT_SLOTS);
-
-    myWires.wireAll(mySlots, this::handleSplashLoad);
-    wireNeighborSelection();
   }
 
   /**
@@ -241,12 +237,7 @@ public class SimulationController {
 
   private void handleAboutForSlot(int slotIndex) {
     try {
-      mySlotManager.checkIndex(mySlots, slotIndex);
-      SimulationSlot slot = mySlots.get(slotIndex);
-      if (!slot.hasSimulation()) {
-        throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
-      }
-      mySimView.showAboutSplash(slot.getConfig());
+      myDialogService.showAboutForSlot(mySlots, slotIndex);
     } catch (IllegalStateException | IndexOutOfBoundsException ex) {
       myErrorHandler.handle(ex);
     }
@@ -254,15 +245,7 @@ public class SimulationController {
 
   private void handleViewGraphForSlot(int slotIndex) {
     try {
-      mySlotManager.checkIndex(mySlots, slotIndex);
-      SimulationSlot slot = mySlots.get(slotIndex);
-      if (!slot.hasSimulation()) {
-        throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
-      }
-      for (SimulationSlot current : mySlots) {
-        current.pause();
-      }
-      myPopulationGraphDialog.showForSlot(slotIndex, slot.getPresenter().getPopulationHistory());
+      myDialogService.showPopulationGraphForSlot(mySlots, slotIndex);
     } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
     }
