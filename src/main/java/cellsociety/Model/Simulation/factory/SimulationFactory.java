@@ -1,4 +1,4 @@
-package cellsociety.Model.Simulation;
+package cellsociety.Model.Simulation.factory;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.CellFactory;
@@ -6,13 +6,16 @@ import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import cellsociety.Model.Simulation.model.Simulation;
+import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.SimulationConfig;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
- * Builds a Simulation from a SimulationConfig (rule class, dimensions, initial states, parameters).
+ * Builds a {@link Simulation} from {@link SimulationConfig} using reflection for rule and
+ * neighbor strategy classes.
  *
  * @author Michael Lei
  */
@@ -22,14 +25,30 @@ public class SimulationFactory {
   private static final String ERROR_RULE_CLASS_BLANK = "Rule class name is blank";
 
   /**
-   * Instantiates a NeighborStrategy from its fully qualified class name using reflection.
-   * The class must have a public no-arg constructor.
+   * Creates a simulation from a configuration.
    *
-   * @param strategyClassName fully qualified name of a class that implements NeighborStrategy
-   * @return the constructed NeighborStrategy instance
-   * @throws IllegalArgumentException if the class cannot be loaded, has no no-arg constructor,
-   *                                   construction fails, or the class does not implement NeighborStrategy
+   * @param config simulation config; must not be null
+   * @return a new {@link SimulationModel} with the configured grid and rule
+   * @throws IllegalArgumentException if config is null, or rule/grid/state data is invalid
    */
+  public static SimulationModel createSimulation(SimulationConfig config) {
+    if (config == null) {
+      throw new IllegalArgumentException("config cannot be null");
+    }
+    try {
+      String ruleClassName = config.getRuleClass();
+      Map<String, Double> params =
+          config.getParameters() != null ? config.getParameters() : Map.of();
+      GameRule rule = createRuleFromClass(ruleClassName, params);
+      Grid grid = createGrid(config, rule, rule.getDefaultNeighborStrategy());
+      return new Simulation(grid, rule);
+    } catch (IllegalArgumentException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_CONFIG + e.getMessage(), e);
+    }
+  }
+
   private static NeighborStrategy createNeighborStrategyFromClass(String strategyClassName) {
     String trimmed = strategyClassName.trim();
     try {
@@ -54,14 +73,6 @@ public class SimulationFactory {
     }
   }
 
-  /**
-   * Instantiates a GameRule from its fully qualified class name using reflection.
-   * The rule must have a public constructor (Map&lt;String, Double&gt;) or ().
-   *
-   * @param ruleClassName fully qualified name of a class that extends GameRule
-   * @param params        parameters to pass to the rule constructor (may be empty)
-   * @return the constructed GameRule instance
-   */
   private static GameRule createRuleFromClass(String ruleClassName, Map<String, Double> params) {
     if (ruleClassName == null || ruleClassName.isBlank()) {
       throw new IllegalArgumentException(ERROR_RULE_CLASS_BLANK);
@@ -93,11 +104,7 @@ public class SimulationFactory {
     }
   }
 
-  /**
-   * Builds a grid from config dimensions and initial states, using the cell factory to convert int states to cell states.
-   * Neighbor strategy comes from config if specified, otherwise the given default strategy.
-   */
-  public static Grid createGrid(SimulationConfig config, CellFactory cellFactory, NeighborStrategy defaultStrategy) {
+  private static Grid createGrid(SimulationConfig config, CellFactory cellFactory, NeighborStrategy defaultStrategy) {
     int rows = config.getRows();
     int cols = config.getCols();
     NeighborStrategy strategy = (config.getNeighborStrategyClass() != null && !config.getNeighborStrategyClass().isBlank())
@@ -111,30 +118,5 @@ public class SimulationFactory {
       }
     }
     return new ArrayGrid(states, strategy);
-  }
-  /**
-   * Creates a simulation from a configuration by loading the rule class via reflection and building the grid.
-   *
-   * @param config simulation config containing rule class name, dimensions, initial states, and parameters
-   * @return a new {@link Simulation} with the configured grid and rule
-   * @throws IllegalArgumentException if config is null, rule class cannot be loaded or instantiated,
-   *                                   or grid/state data is invalid
-   */
-  public static Simulation createSimulation(SimulationConfig config) throws IllegalArgumentException {
-    if (config == null) {
-      throw new IllegalArgumentException("config cannot be null");
-    }
-    try {
-      String ruleClassName = config.getRuleClass();
-      Map<String, Double> params =
-          config.getParameters() != null ? config.getParameters() : Map.of();
-      GameRule rule = createRuleFromClass(ruleClassName, params);
-      Grid grid = createGrid(config, rule, rule.getDefaultNeighborStrategy());
-      return new Simulation(grid, rule);
-    } catch (IllegalArgumentException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new IllegalArgumentException(ERROR_MESSAGE_INVALID_CONFIG + e.getMessage(), e);
-    }
   }
 }

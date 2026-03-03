@@ -9,9 +9,9 @@ import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationFactory;
-import cellsociety.Model.Simulation.SimulationDriver;
+import cellsociety.Model.Simulation.factory.SimulationFactory;
+import cellsociety.Model.Simulation.driver.SimulationDriver;
+import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
@@ -181,7 +181,7 @@ public class SimulationController {
     for (int i = 0; i < mySlots.size(); i++){
       SimulationSlot currentSlot = mySlots.get(i);
       SimulationConfig currentConfig = desiredState.getActiveSimulations().get(i);
-      Simulation currentSim = SimulationFactory.createSimulation(currentConfig);
+      SimulationModel currentSim = SimulationFactory.createSimulation(currentConfig);
       currentSlot.setSimulation(currentSim);
       currentSlot.setConfig(currentConfig);
     }
@@ -216,7 +216,7 @@ public class SimulationController {
     if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
 
     SimulationConfig config = myConfigLoader.loadConfig(xmlFile);
-    Simulation sim = SimulationFactory.createSimulation(config);
+    SimulationModel sim = SimulationFactory.createSimulation(config);
 
     mySlots.get(slotIndex).setSimulation(sim);
     mySlots.get(slotIndex).setConfig(config);
@@ -241,7 +241,7 @@ public class SimulationController {
     }
 
     SimulationConfig initialConfig = slot.getConfig();
-    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
     int[][] intSnapshot = ViewGrid.produceIntArray(grid);
 
     SimulationConfig configSnapshot = new SimulationConfig(
@@ -289,7 +289,7 @@ public class SimulationController {
     for (SimulationSlot slot : mySlots) {
       if (!slot.hasSimulation()) continue;
       SimulationConfig base = slot.getConfig();
-      ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+      ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
       int[][] states = ViewGrid.produceIntArray(grid);
       SimulationConfig snapshot = new SimulationConfig(
           base.getSimulationType(),

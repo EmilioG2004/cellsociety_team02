@@ -1,7 +1,8 @@
 package cellsociety.controller;
 
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationDriver;
+import cellsociety.Model.Simulation.driver.DefaultSimulationDriver;
+import cellsociety.Model.Simulation.driver.SimulationDriver;
+import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.view.SimulationRenderer;
 import javafx.application.Platform;
 
@@ -45,7 +46,7 @@ public class SimulationPresenter {
    */
   public SimulationPresenter(SimulationRenderer renderer) {
     myRenderer = renderer;
-    myDriver = new SimulationDriver();
+    myDriver = new DefaultSimulationDriver();
 
     myDriver.setOnStepCallback(() -> Platform.runLater(this::refreshFromSimulation));
   }
@@ -65,11 +66,11 @@ public class SimulationPresenter {
    * @param rows number of grid rows
    * @param cols number of grid columns
    */
-  public void setSimulation(Simulation sim, int rows, int cols) {
+  public void setSimulation(SimulationModel sim, int rows, int cols) {
     myDriver.setSimulation(sim);
 
     myRenderer.setGrid(rows, cols);
-    myRenderer.render(sim.getGridViewData());
+    myRenderer.render(sim.getViewGrid());
     myRenderer.setGeneration(sim.getGeneration());
   }
 
@@ -93,8 +94,8 @@ public class SimulationPresenter {
   private void refreshFromSimulation() {
     if (!myDriver.hasSimulation()) return;
 
-    Simulation sim = myDriver.getSimulation();
-    myRenderer.render(sim.getGridViewData());
+    SimulationModel sim = myDriver.getSimulation();
+    myRenderer.render(sim.getViewGrid());
     myRenderer.setGeneration(sim.getGeneration());
   }
 

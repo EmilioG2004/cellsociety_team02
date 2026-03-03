@@ -6,7 +6,7 @@ import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
-import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.model.Simulation;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
