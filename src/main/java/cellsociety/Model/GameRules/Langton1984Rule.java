@@ -4,7 +4,7 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.Langton1984State;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
-import cellsociety.Model.NeighborStrategy.CardinalNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class Langton1984Rule extends GameRule {
 
   @Override
   public NeighborStrategy getDefaultNeighborStrategy() {
-    return new CardinalNeighborStrategy();
+    return new VonNeumannNeighborStrategy();
   }
 
   @Override
