@@ -1,7 +1,7 @@
 package cellsociety.controller;
 
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationFactory;
+import cellsociety.Model.Simulation.factory.SimulationFactory;
+import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.SimulationPanel;
 import javafx.scene.Node;
@@ -104,8 +104,8 @@ public class SimulationSlot {
    *
    * @param sim simulation to display
    */
-  public void setSimulation(Simulation sim) {
-    myPresenter.setSimulation(sim, sim.getGridViewData().getRows(), sim.getGridViewData().getCols());
+  public void setSimulation(SimulationModel sim) {
+    myPresenter.setSimulation(sim, sim.getViewGrid().getRows(), sim.getViewGrid().getCols());
   }
 
   /**
@@ -146,7 +146,7 @@ public class SimulationSlot {
    */
   public void reset() {
     if (myConfig == null) throw new IllegalArgumentException("No configuration set.");
-    Simulation sim = SimulationFactory.createSimulation(myConfig);
+    SimulationModel sim = SimulationFactory.createSimulation(myConfig);
     setSimulation(sim);
   }
 
@@ -161,7 +161,7 @@ public class SimulationSlot {
    */
   public void toggleOutline() {
     if (!hasSimulation()) return;
-    myPanel.toggleOutline(myPresenter.getDriver().getSimulation().getGridViewData());
+    myPanel.toggleOutline(myPresenter.getDriver().getSimulation().getViewGrid());
   }
 
   /**
