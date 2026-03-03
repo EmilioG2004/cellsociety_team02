@@ -42,8 +42,9 @@ final class ConfigXmlConstants {
   static final String CONFIG_SIMULATION_SPEED = "simulationSpeed";
 
   static final String CONFIG_COLOR_MAP = "colorMap";
+  static final String CONFIG_COLOR_MAPS = "colorMaps";
   static final String CONFIG_COLOR_ENTRY = "colorEntry";
-
+  static final String CONFIG_COLOR_MAP_TYPE_ATTR = "type";
   static final String CONFIG_COLOR_STATE_ATTR = "state";
   static final String CONFIG_COLOR_VALUE_ATTR = "color";
 

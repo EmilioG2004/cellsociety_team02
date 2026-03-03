@@ -1,5 +1,7 @@
 package cellsociety.config;
 
+import javafx.scene.paint.Color;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import static cellsociety.config.ConfigXmlConstants.*;
  *  - SimulationState (preferences + active simulations)
  *
  * Delegates simulation XML building to ConfigSaver.
+ * Uses ColorMapProvider as the sole source of truth for color maps.
  * @author Ixa Sigler
  */
 public class SimulationSaver {
@@ -85,7 +88,6 @@ public class SimulationSaver {
     }
   }
 
-
   private Element buildPreferencesElement(Document doc, SimulationPreferences prefs) {
     Element root = doc.createElement(CONFIG_PREFERENCES);
 
@@ -98,36 +100,73 @@ public class SimulationSaver {
     root.appendChild(textElement(doc, CONFIG_LANGUAGE,
         prefs.getLanguage()));
 
-    appendColorMapIfAny(doc, root, prefs.getColorMap());
+    appendColorMapsIfAny(doc, root, ColorMapProvider.getAllColorMaps());
 
     return root;
   }
 
-  private void appendColorMapIfAny(Document doc,
+  /**
+   * Writes:
+   * <colorMaps>
+   *   <colorMap type="...">
+   *     <colorEntry state="0" value="#RRGGBB"/>
+   *   </colorMap>
+   * </colorMaps>
+   *
+   * Uses ColorMapProvider's structure: Map<String, Map<Integer, Color>>
+   * and serializes colors as #RRGGBB.
+   */
+  private void appendColorMapsIfAny(
+      Document doc,
       Element preferencesEl,
-      Map<Integer, String> colorMap) {
-    if (colorMap == null || colorMap.isEmpty()) return;
+      Map<String, Map<Integer, String>> colorMapsByType
+  ) {
+    if (colorMapsByType == null || colorMapsByType.isEmpty()) return;
 
+    Element colorMapsEl = doc.createElement(CONFIG_COLOR_MAPS);
+
+    for (Map.Entry<String, Map<Integer, String>> typeEntry : colorMapsByType.entrySet()) {
+      String type = trimmed(typeEntry.getKey());
+      if (type.isEmpty()) {
+        throw new IllegalArgumentException("ColorMapProvider contains blank simulationType key");
+      }
+
+      Map<Integer, String> map = typeEntry.getValue();
+      if (map == null || map.isEmpty()) continue;
+
+      colorMapsEl.appendChild(buildColorMapElement(doc, type, map));
+    }
+
+    if (colorMapsEl.getChildNodes().getLength() > 0) {
+      preferencesEl.appendChild(colorMapsEl);
+    }
+  }
+
+  private Element buildColorMapElement(Document doc, String type, Map<Integer, String> map) {
     Element colorMapEl = doc.createElement(CONFIG_COLOR_MAP);
+    colorMapEl.setAttribute(CONFIG_COLOR_MAP_TYPE_ATTR, type);
 
-    for (Map.Entry<Integer, String> entry : colorMap.entrySet()) {
-      if (entry.getKey() == null)
-        throw new IllegalArgumentException("colorMap contains null key");
+    for (Map.Entry<Integer, String> entry : map.entrySet()) {
+      Integer state = entry.getKey();
+      if (state == null) {
+        throw new IllegalArgumentException("color map for type '" + type + "' contains null state key");
+      }
 
-      String color = trimmed(entry.getValue());
-      if (color.isEmpty())
-        throw new IllegalArgumentException("colorMap has blank value for key " + entry.getKey());
+      String c = entry.getValue();
+      if (c == null) {
+        throw new IllegalArgumentException("color map for type '" + type + "' has null color for state " + state);
+      }
 
       Element entryEl = doc.createElement(CONFIG_COLOR_ENTRY);
-      entryEl.setAttribute(CONFIG_COLOR_STATE_ATTR,
-          String.valueOf(entry.getKey()));
-      entryEl.setAttribute(CONFIG_COLOR_VALUE_ATTR, color);
+      entryEl.setAttribute(CONFIG_COLOR_STATE_ATTR, String.valueOf(state));
+      entryEl.setAttribute(CONFIG_COLOR_VALUE_ATTR, c);
 
       colorMapEl.appendChild(entryEl);
     }
 
-    preferencesEl.appendChild(colorMapEl);
+    return colorMapEl;
   }
+
 
   private void validatePreferences(SimulationPreferences prefs) {
     if (prefs.getTheme() == null)

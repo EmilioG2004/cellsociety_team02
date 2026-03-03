@@ -3,6 +3,7 @@ package cellsociety.Model.GameRules;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.Langton1984State;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 
@@ -31,7 +32,7 @@ public class Langton1984Rule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     Grid next = currentGrid.deepCopy();
 
     int rows = currentGrid.getRows();

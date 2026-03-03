@@ -4,6 +4,7 @@ import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
 import static cellsociety.view.constants.ResourcePaths.BUNDLE_FOLDER;
 
+import cellsociety.config.ColorMapProvider;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
@@ -216,7 +217,7 @@ public class SimulationController {
     String language = desiredPreferences.getLanguage();
     String languageBundle = BUNDLE_FOLDER + language;
     double speed = desiredPreferences.getSimulationSpeed();
-    Map<Integer, String> colors = desiredPreferences.getColorMap();
+    Map<Integer, String> colors = ColorMapProvider.getColorMap(ColorMapProvider.DEFAULT_KEY);
     mySimView.applyTheme(myScene, themeChoice);
     mySimView.getMySettings().getMyThemes().setValue(themeChoice);
     mySimView.applyLanguage(ResourceBundle.getBundle(languageBundle));
@@ -341,7 +342,7 @@ public class SimulationController {
       language = ResourcePaths.LANGUAGE_ENGLISH;
     }
 
-    SimulationPreferences preferences = new SimulationPreferences(theme, language, speed, new HashMap<Integer,String>());
+    SimulationPreferences preferences = new SimulationPreferences(theme, language, speed);
 
     return preferences;
   }
