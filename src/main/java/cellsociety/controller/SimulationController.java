@@ -9,6 +9,7 @@ import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
+import cellsociety.view.PopulationGraphDialog;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
@@ -71,6 +72,7 @@ public class SimulationController {
   private final SimulationLoader mySimLoader;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
+  private final PopulationGraphDialog myPopulationGraphDialog;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
 
 
@@ -98,6 +100,7 @@ public class SimulationController {
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
+    myPopulationGraphDialog = new PopulationGraphDialog();
     myScene = scene;
     myWires = new WiringManager(
         mySimView,
@@ -163,6 +166,7 @@ public class SimulationController {
       panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
       panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
       panel.setOnSave(() -> handleSaveForSlot(slotIndex));
+      panel.setOnViewGraph(() -> handleViewGraphForSlot(slotIndex));
       SimulationPresenter presenter = new SimulationPresenter(panel);
       SimulationSlot slot = new SimulationSlot(index, panel, presenter);
       mySlots.add(slot);
@@ -374,6 +378,22 @@ public class SimulationController {
       }
       mySimView.showAboutSplash(slot.getConfig());
     } catch (IllegalStateException | IndexOutOfBoundsException ex) {
+      myErrorHandler.handle(ex);
+    }
+  }
+
+  private void handleViewGraphForSlot(int slotIndex) {
+    try {
+      checkIndex(slotIndex);
+      SimulationSlot slot = mySlots.get(slotIndex);
+      if (!slot.hasSimulation()) {
+        throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+      }
+      for (SimulationSlot current : mySlots) {
+        current.pause();
+      }
+      myPopulationGraphDialog.showForSlot(slotIndex, slot.getPresenter().getPopulationHistory());
+    } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
     }
   }
