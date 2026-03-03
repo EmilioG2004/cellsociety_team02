@@ -8,7 +8,6 @@ import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
-import cellsociety.view.SimulationPanel;
 import cellsociety.view.PopulationGraphDialog;
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
@@ -66,6 +65,7 @@ public class SimulationController {
   private final SimulationLoader mySimLoader;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
+  private final SlotManager mySlotManager;
   private final NeighborStrategyFactory myNeighborStrategyFactory;
   private final PopulationGraphDialog myPopulationGraphDialog;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
@@ -95,6 +95,7 @@ public class SimulationController {
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
+    mySlotManager = new SlotManager(mySimView);
     myNeighborStrategyFactory = new NeighborStrategyFactory();
     myPopulationGraphDialog = new PopulationGraphDialog();
     myScene = scene;
@@ -148,26 +149,17 @@ public class SimulationController {
    * @param desired requested number of slots
    */
   public void setSlotCount(int desired) {
-    int count = clamp(desired, 1, MAX_SLOTS);
-
-    while (mySlots.size() > count) {
-      SimulationSlot removed = mySlots.remove(mySlots.size() - 1);
-      removed.pause();
-    }
-
-    while (mySlots.size() < count) {
-      int index = mySlots.size();
-      SimulationPanel panel = new SimulationPanel(myBundle);
-      int slotIndex = index;
-      panel.setOnLoad(() -> handleLoadForSlot(slotIndex));
-      panel.setOnAbout(() -> handleAboutForSlot(slotIndex));
-      panel.setOnSave(() -> handleSaveForSlot(slotIndex));
-      panel.setOnViewGraph(() -> handleViewGraphForSlot(slotIndex));
-      SimulationPresenter presenter = new SimulationPresenter(panel);
-      SimulationSlot slot = new SimulationSlot(index, panel, presenter);
-      mySlots.add(slot);
-    }
-    rebuildTileChildren();
+    mySlotManager.setSlotCount(
+        mySlots,
+        desired,
+        1,
+        MAX_SLOTS,
+        myBundle,
+        this::handleLoadForSlot,
+        this::handleAboutForSlot,
+        this::handleSaveForSlot,
+        this::handleViewGraphForSlot
+    );
   }
 
   public void loadState(File xmlFile)
@@ -230,7 +222,7 @@ public class SimulationController {
   public void loadConfigIntoSlot(int slotIndex, File xmlFile)
       throws ParserConfigurationException, IOException, SAXException, IllegalArgumentException {
 
-    checkIndex(slotIndex);
+    mySlotManager.checkIndex(mySlots, slotIndex);
     if (xmlFile == null) throw new IllegalArgumentException("No file selected.");
 
     SimulationConfig config = myConfigLoader.loadConfig(xmlFile);
@@ -253,7 +245,7 @@ public class SimulationController {
   }
 
   private void saveConfigInSlot(int slotIndex) {
-    checkIndex(slotIndex);
+    mySlotManager.checkIndex(mySlots, slotIndex);
     SimulationSlot slot = mySlots.get(slotIndex);
 
     if (!slot.hasSimulation()) {
@@ -367,7 +359,7 @@ public class SimulationController {
 
   private void handleAboutForSlot(int slotIndex) {
     try {
-      checkIndex(slotIndex);
+      mySlotManager.checkIndex(mySlots, slotIndex);
       SimulationSlot slot = mySlots.get(slotIndex);
       if (!slot.hasSimulation()) {
         throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
@@ -380,7 +372,7 @@ public class SimulationController {
 
   private void handleViewGraphForSlot(int slotIndex) {
     try {
-      checkIndex(slotIndex);
+      mySlotManager.checkIndex(mySlots, slotIndex);
       SimulationSlot slot = mySlots.get(slotIndex);
       if (!slot.hasSimulation()) {
         throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
@@ -391,13 +383,6 @@ public class SimulationController {
       myPopulationGraphDialog.showForSlot(slotIndex, slot.getPresenter().getPopulationHistory());
     } catch (RuntimeException ex) {
       myErrorHandler.handle(ex);
-    }
-  }
-
-  private void rebuildTileChildren() {
-    mySimView.getMultiSimTile().getChildren().clear();
-    for (SimulationSlot slot : mySlots) {
-      mySimView.getMultiSimTile().getChildren().add(slot.getNode());
     }
   }
 
@@ -414,16 +399,6 @@ public class SimulationController {
   private void applyNeighborChoiceToLoadedSimulations(String selectedChoice) {
     myNeighborStrategyFactory.applyToLoadedSimulations(mySlots, selectedChoice);
     handlePopulationDataChanged();
-  }
-
-  private void checkIndex(int slotIndex) {
-    if (slotIndex < 0 || slotIndex >= mySlots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
-    }
-  }
-
-  private int clamp(int value, int min, int max) {
-    return Math.max(min, Math.min(max, value));
   }
 
   private void handlePopulationDataChanged() {
