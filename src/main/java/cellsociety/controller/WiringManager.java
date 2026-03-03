@@ -38,6 +38,7 @@ public class WiringManager {
   private final Consumer<ResourceBundle> myBundleCallback;
   private final Runnable mySaveAllCallback;
   private final Runnable myLoadCallback;
+  private final Runnable myPopulationChangedCallback;
 
   /**
    * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
@@ -51,12 +52,14 @@ public class WiringManager {
    * @param simView view whose controls will be wired
    * @param scene scene used for applying themes
    */
-  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback, Runnable saveAllCallback, Runnable loadCallback) {
+  public WiringManager(SimulationView simView, Scene scene, Consumer<ResourceBundle> bundleCallback,
+      Runnable saveAllCallback, Runnable loadCallback, Runnable populationChangedCallback) {
     mySimView = simView;
     myScene = scene;
     myBundleCallback = bundleCallback;
     mySaveAllCallback = saveAllCallback;
     myLoadCallback = loadCallback;
+    myPopulationChangedCallback = populationChangedCallback;
   }
 
   /**
@@ -105,6 +108,7 @@ public class WiringManager {
           slot.step();
         }
       }
+      notifyPopulationChanged();
     });
   }
 
@@ -115,6 +119,7 @@ public class WiringManager {
           slot.stepBack();
         }
       }
+      notifyPopulationChanged();
     });
   }
 
@@ -196,6 +201,7 @@ public class WiringManager {
           slot.reset();
         }
       }
+      notifyPopulationChanged();
     });
   }
 
@@ -268,7 +274,14 @@ public class WiringManager {
   private void wireLoadProgram(){
     mySimView.getMySettings().getMyLoadButton().setOnAction(e -> {
       myLoadCallback.run();
+      notifyPopulationChanged();
     });
+  }
+
+  private void notifyPopulationChanged() {
+    if (myPopulationChangedCallback != null) {
+      myPopulationChangedCallback.run();
+    }
   }
 
 }

@@ -99,7 +99,14 @@ public class SimulationController {
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
     myScene = scene;
-    myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll, this::handleLoadState);
+    myWires = new WiringManager(
+        mySimView,
+        myScene,
+        this::setMyBundle,
+        this::handleSaveAll,
+        this::handleLoadState,
+        this::handlePopulationDataChanged
+    );
 
     ChoiceBox<Integer> mySlotChoice = mySimView.getMultiSimSlotChoice();
     for (int i = 1; i <= MAX_SLOTS; i++) {
@@ -195,6 +202,7 @@ public class SimulationController {
       currentSlot.setConfig(currentConfig);
       mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(currentSlot, choice));
     }
+    handlePopulationDataChanged();
   }
 
   private void loadPreferences(SimulationPreferences desiredPreferences){
@@ -231,6 +239,7 @@ public class SimulationController {
     mySlots.get(slotIndex).setSimulation(sim);
     mySlots.get(slotIndex).setConfig(config);
     mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(mySlots.get(slotIndex), choice));
+    handlePopulationDataChanged();
   }
 
   private void handleLoadForSlot(int slotIndex) {
@@ -390,6 +399,7 @@ public class SimulationController {
     for (SimulationSlot slot : mySlots) {
       applyNeighborChoiceToSlot(slot, selectedChoice);
     }
+    handlePopulationDataChanged();
   }
 
   private void applyNeighborChoiceToSlot(SimulationSlot slot, String selectedChoice) {
@@ -429,6 +439,13 @@ public class SimulationController {
 
   private int clamp(int value, int min, int max) {
     return Math.max(min, Math.min(max, value));
+  }
+
+  private void handlePopulationDataChanged() {
+    for (SimulationSlot slot : mySlots) {
+      if (!slot.hasSimulation()) continue;
+      slot.getPresenter().syncPopulationAtCurrentGeneration();
+    }
   }
 
   public void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
