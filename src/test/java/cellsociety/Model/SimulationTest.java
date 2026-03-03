@@ -4,8 +4,9 @@ import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ArrayGrid;
+import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
-import cellsociety.Model.Simulation.Simulation;
+import cellsociety.Model.Simulation.model.Simulation;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -29,15 +30,22 @@ class SimulationTest {
 
   @BeforeEach
   void setUp() {
-    grid = new ArrayGrid(3, 3);
     CellState[][] initial = {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
     rules = new ConwayGameOfLifeRule();
-    grid.setCellsState(initial, rules);
+    grid = new ArrayGrid(initial, rules.getDefaultNeighborStrategy());
     simulation = new Simulation(grid, rules);
+  }
+
+  private Grid makeGrid(CellState[][] states) {
+    return new ArrayGrid(states, rules.getDefaultNeighborStrategy());
+  }
+
+  private ReadOnlyGrid currentGrid() {
+    return simulation.getReadOnlyGrid();
   }
 
   // Z - Zero: empty/minimal state
@@ -48,9 +56,9 @@ class SimulationTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(allDead);
+    simulation.setState(makeGrid(allDead));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
+    CellState[][] result = ReadOnlyGrid.copyToArray(currentGrid());
     assertAll(
         () -> assertEquals(DEAD, result[0][0]),
         () -> assertEquals(DEAD, result[0][1]),
@@ -72,9 +80,9 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     simulation.step();
-    assertEquals(DEAD, grid.getCellStates()[1][1], "Single cell should die (underpopulation)");
+    assertEquals(DEAD, currentGrid().getCellState(1, 1), "Single cell should die (underpopulation)");
   }
   @Test
   void step_singleAliveCell_dies_thenBack_returnsToOriginal() {
@@ -84,12 +92,12 @@ class SimulationTest {
         {DEAD, DEAD, DEAD}
     };
 
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     simulation.step();
-    assertEquals(DEAD, grid.getCellStates()[1][1], "Single cell should die (underpopulation)");
+    assertEquals(DEAD, currentGrid().getCellState(1, 1), "Single cell should die (underpopulation)");
     simulation.stepBack();
 
-    assertEquals(ALIVE, grid.getCellStates()[1][1], "Single cell should return to alive");
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1), "Single cell should return to alive");
   }
 
   @Test
@@ -105,14 +113,14 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     simulation.step();
     simulation.step();
     simulation.step();
     simulation.stepBack();
     simulation.stepBack();
     simulation.stepBack();
-    CellState[][] result = grid.getCellStates();
+    CellState[][] result = ReadOnlyGrid.copyToArray(currentGrid());
     assertEquals(ALIVE, result[1][1], "After 3 stepBack should restore single live cell");
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
@@ -130,12 +138,12 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    simulation.setState(verticalBlinker);
+    simulation.setState(makeGrid(verticalBlinker));
     simulation.step(); // -> horizontal
     simulation.step(); // -> vertical again
     simulation.stepBack();
     simulation.stepBack();
-    CellState[][] result = grid.getCellStates();
+    CellState[][] result = ReadOnlyGrid.copyToArray(currentGrid());
     assertAll(
         () -> assertEquals(ALIVE, result[0][1]),
         () -> assertEquals(ALIVE, result[1][1]),
@@ -153,10 +161,10 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     simulation.step(); // cell dies
     simulation.stepBack();
-    assertEquals(ALIVE, grid.getCellStates()[1][1], "stepBack after setState should restore to setState snapshot");
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1), "stepBack after setState should restore to setState snapshot");
   }
 
   @Test
@@ -166,7 +174,7 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     simulation.step();
     simulation.step();
     CellState[][] other = {
@@ -174,10 +182,10 @@ class SimulationTest {
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, ALIVE}
     };
-    simulation.setState(other);
+    simulation.setState(makeGrid(other));
     simulation.step(); // corner cell dies
     simulation.stepBack();
-    assertEquals(ALIVE, grid.getCellStates()[2][2], "stepBack should restore to last setState (other), not earlier");
+    assertEquals(ALIVE, currentGrid().getCellState(2, 2), "stepBack should restore to last setState (other), not earlier");
   }
 
   @Test
@@ -187,7 +195,7 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     assertThrows(IllegalStateException.class, () -> simulation.stepBack(),
         "Cannot step back when only one state on stack (current)");
   }
@@ -200,9 +208,9 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    simulation.setState(verticalBlinker);
+    simulation.setState(makeGrid(verticalBlinker));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
+    CellState[][] result = ReadOnlyGrid.copyToArray(currentGrid());
     // Should become horizontal
     assertEquals(DEAD, result[0][0]);
     assertEquals(DEAD, result[0][1]);
@@ -222,10 +230,10 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    simulation.setState(verticalBlinker);
+    simulation.setState(makeGrid(verticalBlinker));
     simulation.step();
     simulation.step();
-    CellState[][] result = grid.getCellStates();
+    CellState[][] result = ReadOnlyGrid.copyToArray(currentGrid());
     // Should return to vertical
     assertEquals(DEAD, result[0][0]);
     assertEquals(ALIVE, result[0][1]);
@@ -240,23 +248,22 @@ class SimulationTest {
 
   @Test
   void step_blockPattern_remainsStable() {
-    ArrayGrid blockGrid = new ArrayGrid(4, 4);
     CellState[][] block = {
         {DEAD, DEAD, DEAD, DEAD},
         {DEAD, ALIVE, ALIVE, DEAD},
         {DEAD, ALIVE, ALIVE, DEAD},
         {DEAD, DEAD, DEAD, DEAD}
     };
-    blockGrid.setCellsState(block, rules);
+    ArrayGrid blockGrid = new ArrayGrid(block, rules.getDefaultNeighborStrategy());
     Simulation blockSim = new Simulation(blockGrid, rules);
     blockSim.step();
-    CellState[][] result = blockGrid.getCellStates();
-    assertEquals(ALIVE, result[1][1]);
-    assertEquals(ALIVE, result[1][2]);
-    assertEquals(ALIVE, result[2][1]);
-    assertEquals(ALIVE, result[2][2]);
-    assertEquals(DEAD, result[0][0]);
-    assertEquals(DEAD, result[3][3]);
+    ReadOnlyGrid resultGrid = blockSim.getReadOnlyGrid();
+    assertEquals(ALIVE, resultGrid.getCellState(1, 1));
+    assertEquals(ALIVE, resultGrid.getCellState(1, 2));
+    assertEquals(ALIVE, resultGrid.getCellState(2, 1));
+    assertEquals(ALIVE, resultGrid.getCellState(2, 2));
+    assertEquals(DEAD, resultGrid.getCellState(0, 0));
+    assertEquals(DEAD, resultGrid.getCellState(3, 3));
   }
 
   @Test
@@ -266,21 +273,21 @@ class SimulationTest {
         {ALIVE, ALIVE, ALIVE},
         {ALIVE, ALIVE, ALIVE}
     };
-    simulation.setState(allAlive);
+    simulation.setState(makeGrid(allAlive));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
+    ReadOnlyGrid resultGrid = currentGrid();
     // Corners have 3 neighbors -> survive
-    assertEquals(ALIVE, result[0][0]);
-    assertEquals(ALIVE, result[0][2]);
-    assertEquals(ALIVE, result[2][0]);
-    assertEquals(ALIVE, result[2][2]);
+    assertEquals(ALIVE, resultGrid.getCellState(0, 0));
+    assertEquals(ALIVE, resultGrid.getCellState(0, 2));
+    assertEquals(ALIVE, resultGrid.getCellState(2, 0));
+    assertEquals(ALIVE, resultGrid.getCellState(2, 2));
     // Edges have 5 neighbors -> die (overpopulation)
-    assertEquals(DEAD, result[0][1]);
-    assertEquals(DEAD, result[1][0]);
-    assertEquals(DEAD, result[1][2]);
-    assertEquals(DEAD, result[2][1]);
+    assertEquals(DEAD, resultGrid.getCellState(0, 1));
+    assertEquals(DEAD, resultGrid.getCellState(1, 0));
+    assertEquals(DEAD, resultGrid.getCellState(1, 2));
+    assertEquals(DEAD, resultGrid.getCellState(2, 1));
     // Center has 8 neighbors -> dies (overpopulation)
-    assertEquals(DEAD, result[1][1]);
+    assertEquals(DEAD, resultGrid.getCellState(1, 1));
   }
 
   // B - Boundary: corner and edge cell behavior
@@ -291,11 +298,10 @@ class SimulationTest {
         {ALIVE, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(cornerCell);
+    simulation.setState(makeGrid(cornerCell));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
     // Corner (0,0) has 2 alive neighbors -> survives
-    assertEquals(ALIVE, result[0][0]);
+    assertEquals(ALIVE, currentGrid().getCellState(0, 0));
   }
 
   @Test
@@ -305,48 +311,44 @@ class SimulationTest {
         {ALIVE, ALIVE, ALIVE},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(edgeCell);
+    simulation.setState(makeGrid(edgeCell));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
     // (0,1) has 3 alive neighbors -> survives
-    assertEquals(ALIVE, result[0][1]);
+    assertEquals(ALIVE, currentGrid().getCellState(0, 1));
   }
 
   @Test
   void step_1x1Grid_aliveCellDies() {
-    ArrayGrid tinyGrid = new ArrayGrid(1, 1);
     CellState[][] single = {{ALIVE}};
-    tinyGrid.setCellsState(single, rules);
+    ArrayGrid tinyGrid = new ArrayGrid(single, rules.getDefaultNeighborStrategy());
     Simulation tinySim = new Simulation(tinyGrid, rules);
     tinySim.step();
-    assertEquals(DEAD, tinyGrid.getCellStates()[0][0], "Alone cell should die");
+    assertEquals(DEAD, tinySim.getReadOnlyGrid().getCellState(0, 0), "Alone cell should die");
   }
 
   @Test
   void step_1x2Grid_bothAlive_bothDie() {
-    ArrayGrid thinGrid = new ArrayGrid(1, 2);
     CellState[][] twoAlive = {{ALIVE, ALIVE}};
-    thinGrid.setCellsState(twoAlive, rules);
+    ArrayGrid thinGrid = new ArrayGrid(twoAlive, rules.getDefaultNeighborStrategy());
     Simulation thinSim = new Simulation(thinGrid, rules);
     thinSim.step();
-    CellState[][] result = thinGrid.getCellStates();
-    assertEquals(DEAD, result[0][0], "Each has 1 neighbor -> underpopulation");
-    assertEquals(DEAD, result[0][1]);
+    ReadOnlyGrid resultGrid = thinSim.getReadOnlyGrid();
+    assertEquals(DEAD, resultGrid.getCellState(0, 0), "Each has 1 neighbor -> underpopulation");
+    assertEquals(DEAD, resultGrid.getCellState(0, 1));
   }
 
   @Test
   void step_2x2Grid_blockStaysStable() {
-    ArrayGrid smallGrid = new ArrayGrid(2, 2);
     CellState[][] block = {{ALIVE, ALIVE}, {ALIVE, ALIVE}};
-    smallGrid.setCellsState(block, rules);
+    ArrayGrid smallGrid = new ArrayGrid(block, rules.getDefaultNeighborStrategy());
     Simulation smallSim = new Simulation(smallGrid, rules);
     smallSim.step();
-    CellState[][] result = smallGrid.getCellStates();
+    ReadOnlyGrid resultGrid = smallSim.getReadOnlyGrid();
     assertAll(
-        () -> assertEquals(ALIVE, result[0][0]),
-        () -> assertEquals(ALIVE, result[0][1]),
-        () -> assertEquals(ALIVE, result[1][0]),
-        () -> assertEquals(ALIVE, result[1][1])
+        () -> assertEquals(ALIVE, resultGrid.getCellState(0, 0)),
+        () -> assertEquals(ALIVE, resultGrid.getCellState(0, 1)),
+        () -> assertEquals(ALIVE, resultGrid.getCellState(1, 0)),
+        () -> assertEquals(ALIVE, resultGrid.getCellState(1, 1))
     );
   }
 
@@ -357,82 +359,81 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(oneLive);
+    simulation.setState(makeGrid(oneLive));
     simulation.step();       // cell dies
     simulation.stepBack();    // back to one live
     simulation.step();        // cell dies again
-    assertEquals(DEAD, grid.getCellStates()[1][1], "Step after stepBack should match normal step from same state");
+    assertEquals(DEAD, currentGrid().getCellState(1, 1), "Step after stepBack should match normal step from same state");
   }
 
   // Toggle cell state (click-to-cycle)
   @Test
   void toggleCellState_dead_becomesAlive() {
-    simulation.setState(new CellState[][]{
+    simulation.setState(makeGrid(new CellState[][]{
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
-    });
+    }));
     simulation.toggleCellState(1, 1);
-    assertEquals(ALIVE, grid.getCellState(1, 1));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1));
   }
 
   @Test
   void toggleCellState_alive_becomesDead() {
-    simulation.setState(new CellState[][]{
+    simulation.setState(makeGrid(new CellState[][]{
         {DEAD, DEAD, DEAD},
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
-    });
+    }));
     simulation.toggleCellState(1, 1);
-    assertEquals(DEAD, grid.getCellState(1, 1));
+    assertEquals(DEAD, currentGrid().getCellState(1, 1));
   }
 
   @Test
   void toggleCellState_twice_returnsToOriginal() {
-    simulation.setState(new CellState[][]{
+    simulation.setState(makeGrid(new CellState[][]{
         {DEAD, DEAD, DEAD},
         {DEAD, ALIVE, DEAD},
         {DEAD, DEAD, DEAD}
-    });
+    }));
     simulation.toggleCellState(1, 1);
     simulation.toggleCellState(1, 1);
-    assertEquals(ALIVE, grid.getCellState(1, 1));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1));
   }
 
   @Test
   void toggleCellState_updatesStackTopSoStepBackRestores() {
-    simulation.setState(new CellState[][]{
+    simulation.setState(makeGrid(new CellState[][]{
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
-    });
+    }));
     simulation.toggleCellState(1, 1);
-    assertEquals(ALIVE, grid.getCellState(1, 1));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1));
     simulation.step(); // now we have history
     simulation.stepBack(); // should show toggled state (one alive at center)
-    assertEquals(ALIVE, grid.getCellState(1, 1));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1));
   }
 
   @Test
   void toggleCellState_otherCellsUnchanged() {
-    simulation.setState(new CellState[][]{
+    simulation.setState(makeGrid(new CellState[][]{
         {ALIVE, DEAD, ALIVE},
         {DEAD, DEAD, DEAD},
         {ALIVE, DEAD, ALIVE}
-    });
+    }));
     simulation.toggleCellState(1, 1);
-    assertEquals(ALIVE, grid.getCellState(0, 0));
-    assertEquals(DEAD, grid.getCellState(0, 1));
-    assertEquals(ALIVE, grid.getCellState(2, 2));
-    assertEquals(ALIVE, grid.getCellState(1, 1)); // toggled from DEAD
+    assertEquals(ALIVE, currentGrid().getCellState(0, 0));
+    assertEquals(DEAD, currentGrid().getCellState(0, 1));
+    assertEquals(ALIVE, currentGrid().getCellState(2, 2));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1)); // toggled from DEAD
   }
 
   // I - Interface: getReadOnlyGrid and getRule contracts
   @Test
   void getReadOnlyGrid_returnsNonNullWithCorrectDimensions() {
     CellState[][] initial = {{DEAD, ALIVE}, {ALIVE, DEAD}};
-    ArrayGrid g = new ArrayGrid(2, 2);
-    g.setCellsState(initial, rules);
+    ArrayGrid g = new ArrayGrid(initial, rules.getDefaultNeighborStrategy());
     Simulation sim = new Simulation(g, rules);
     ReadOnlyGrid readOnlyGrid = sim.getReadOnlyGrid();
     assertNotNull(readOnlyGrid);
@@ -443,8 +444,8 @@ class SimulationTest {
   @Test
   void getReadOnlyGrid_dimensionsMatchGrid() {
     ReadOnlyGrid readOnlyGrid = simulation.getReadOnlyGrid();
-    assertEquals(grid.getRows(), readOnlyGrid.getRows());
-    assertEquals(grid.getCols(), readOnlyGrid.getCols());
+    assertEquals(currentGrid().getRows(), readOnlyGrid.getRows());
+    assertEquals(currentGrid().getCols(), readOnlyGrid.getCols());
   }
 
   @Test
@@ -461,11 +462,10 @@ class SimulationTest {
         {ALIVE, DEAD, DEAD},
         {DEAD, DEAD, DEAD}
     };
-    simulation.setState(lShape);
+    simulation.setState(makeGrid(lShape));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
     // (1,1) is dead but has exactly 3 alive neighbors -> becomes alive
-    assertEquals(ALIVE, result[1][1]);
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1));
   }
 
   // S - Simple: typical use case
@@ -476,12 +476,11 @@ class SimulationTest {
         {DEAD, ALIVE, DEAD},
         {DEAD, ALIVE, DEAD}
     };
-    simulation.setState(initial);
+    simulation.setState(makeGrid(initial));
     simulation.step();
-    CellState[][] result = grid.getCellStates();
     // Verify blinker rotated
-    assertEquals(ALIVE, result[1][0]);
-    assertEquals(ALIVE, result[1][1]);
-    assertEquals(ALIVE, result[1][2]);
+    assertEquals(ALIVE, currentGrid().getCellState(1, 0));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 1));
+    assertEquals(ALIVE, currentGrid().getCellState(1, 2));
   }
 }

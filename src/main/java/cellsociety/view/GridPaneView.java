@@ -1,9 +1,6 @@
 package cellsociety.view;
 
-import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.Grid.ReadOnlyGrid;
-
-import java.util.Map;
+import cellsociety.Model.Grid.ViewGrid;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
@@ -15,7 +12,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 /**
@@ -25,15 +21,14 @@ import javafx.scene.shape.Rectangle;
  * while remaining compatible with the {@link GridView} interface.</p>
  *
  * <p>Assumptions: grid dimensions are fixed for the lifetime of the view; the
- * provided {@link ReadOnlyGrid} matches those dimensions; {@code stateColors}
- * contains entries for every possible cell state.</p>
+ * provided {@link ViewGrid} matches those dimensions.</p>
  *
  * <p>Dependencies: JavaFX {@link GridPane}, {@link Rectangle}, and binding APIs.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
  * GridView gridView = new GridPaneView(20, 20);
- * gridView.render(sim.getReadOnlyGrid(), sim.getRule().getStateColors());
+ * gridView.render(sim.getViewGrid());
  * }</pre>
  *
  * <p>Other details: rotation is implemented by rotating the underlying GridPane
@@ -52,7 +47,6 @@ public class GridPaneView implements GridView {
   private boolean isOutlined;
   private final IntegerProperty myRotationSteps = new SimpleIntegerProperty(0);
 
-  // rotate the GridPane, but return a layout-friendly wrapper
   private final Group myRotator;
   private final StackPane myWrapper = new StackPane();
 
@@ -168,16 +162,15 @@ public class GridPaneView implements GridView {
    * <p>Return value: none.</p>
    */
   @Override
-  public void render(ReadOnlyGrid grid, Map<CellState, String> stateColors) {
+  public void render(ViewGrid grid) {
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {
-        CellState cellState = grid.getCellState(r, c);
-        myCells[r][c].setFill(Paint.valueOf(stateColors.get(cellState)));
+        myCells[r][c].setFill(stateToColor(grid.getCellStateInt(r, c)));
 
         if (isOutlined){
           myCells[r][c].setStroke(Color.BLACK);
         } else {
-          myCells[r][c].setStroke(Paint.valueOf(stateColors.get(cellState)));
+          myCells[r][c].setStroke(stateToColor(grid.getCellStateInt(r, c)));
         }
       }
     }
@@ -206,18 +199,28 @@ public class GridPaneView implements GridView {
    * <p>Return value: none.</p>
    */
   @Override
-  public void toggleOutline(ReadOnlyGrid grid, Map<CellState, String> stateColors){
+  public void toggleOutline(ViewGrid grid){
     isOutlined = !isOutlined;
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {
-        CellState cellState = grid.getCellState(r, c);
         if (isOutlined){
           myCells[r][c].setStroke(Color.BLACK);
         } else {
-          myCells[r][c].setStroke(Paint.valueOf(stateColors.get(cellState)));
+          myCells[r][c].setStroke(stateToColor(grid.getCellStateInt(r, c)));
         }
       }
     }
+  }
+
+  private Color stateToColor(int stateValue) {
+    return switch (stateValue) {
+      case 0 -> Color.WHITE;
+      case 1 -> Color.BLACK;
+      case 2 -> Color.DARKORANGE;
+      case 3 -> Color.DODGERBLUE;
+      case 4 -> Color.FORESTGREEN;
+      default -> Color.GRAY;
+    };
   }
 
   /**

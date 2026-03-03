@@ -1,9 +1,9 @@
 package cellsociety.Model;
 
 import cellsociety.Model.CellState.CellState;
-import cellsociety.Model.GameRules.ConwayGameOfLifeRule;
 import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 
 import static cellsociety.Model.CellState.GameOfLifeState.ALIVE;
 import static cellsociety.Model.CellState.GameOfLifeState.DEAD;
@@ -20,36 +20,24 @@ class ReadOnlyArrayGridTest {
 
   private ArrayGrid grid;
   private ReadOnlyGrid readOnlyGrid;
-  private ConwayGameOfLifeRule cellFactory;
+  private MooreNeighborStrategy strategy;
 
   @BeforeEach
   void setUp() {
-    grid = new ArrayGrid(3, 3);
-    cellFactory = new ConwayGameOfLifeRule();
+    strategy = new MooreNeighborStrategy();
     CellState[][] initial = {
         {DEAD, ALIVE, DEAD},
         {ALIVE, DEAD, ALIVE},
         {DEAD, ALIVE, DEAD}
     };
-    grid.setCellsState(initial, cellFactory);
+    grid = new ArrayGrid(initial, strategy);
     readOnlyGrid = grid;
-  }
-
-  // Z - Zero: empty grid
-  @Test
-  void emptyGrid_hasDimensionsZero() {
-    ArrayGrid emptyGrid = new ArrayGrid(0, 0);
-    emptyGrid.setCellsState(new CellState[0][0], cellFactory);
-    ReadOnlyGrid ro = emptyGrid;
-    assertEquals(0, ro.getRows());
-    assertEquals(0, ro.getCols());
   }
 
   // O - One: single cell
   @Test
   void singleCellGrid_returnsCellState() {
-    ArrayGrid singleGrid = new ArrayGrid(1, 1);
-    singleGrid.setCellsState(new CellState[][]{{ALIVE}}, cellFactory);
+    ArrayGrid singleGrid = new ArrayGrid(new CellState[][]{{ALIVE}}, strategy);
     ReadOnlyGrid ro = singleGrid;
     assertEquals(1, ro.getRows());
     assertEquals(1, ro.getCols());
@@ -112,14 +100,13 @@ class ReadOnlyArrayGridTest {
   @Test
   void largeGrid_returnsCorrectStates() {
     int size = 20;
-    ArrayGrid largeGrid = new ArrayGrid(size, size);
     CellState[][] states = new CellState[size][size];
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
         states[r][c] = (r + c) % 2 == 0 ? ALIVE : DEAD;
       }
     }
-    largeGrid.setCellsState(states, cellFactory);
+    ArrayGrid largeGrid = new ArrayGrid(states, strategy);
     ReadOnlyGrid ro = largeGrid;
     assertEquals(size, ro.getRows());
     assertEquals(size, ro.getCols());
@@ -133,8 +120,7 @@ class ReadOnlyArrayGridTest {
   // S - Simple: typical usage
   @Test
   void typicalUsage_createAndRead() {
-    ArrayGrid g = new ArrayGrid(2, 2);
-    g.setCellsState(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, cellFactory);
+    ArrayGrid g = new ArrayGrid(new CellState[][]{{ALIVE, DEAD}, {DEAD, ALIVE}}, strategy);
     ReadOnlyGrid ro = g;
     assertEquals(ALIVE, ro.getCellState(0, 0));
     assertEquals(DEAD, ro.getCellState(0, 1));

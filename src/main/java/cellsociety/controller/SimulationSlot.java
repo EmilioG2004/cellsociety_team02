@@ -1,7 +1,7 @@
 package cellsociety.controller;
 
-import cellsociety.Model.Simulation.Simulation;
-import cellsociety.Model.Simulation.SimulationFactory;
+import cellsociety.Model.Simulation.factory.SimulationFactory;
+import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.SimulationPanel;
 import javafx.scene.Node;
@@ -9,7 +9,7 @@ import javafx.scene.Node;
 /**
  * Container for a single multi-simulation slot (panel + presenter/driver).
  *
- * <p>Purpose: provides a uniform interface for {@link MultiSimController} to
+ * <p>Purpose: provides a uniform interface for to
  * manage multiple panels and their simulations.</p>
  *
  * <p>Assumptions: {@link SimulationPresenter} is non-null and manages its own
@@ -104,8 +104,8 @@ public class SimulationSlot {
    *
    * @param sim simulation to display
    */
-  public void setSimulation(Simulation sim) {
-    myPresenter.setSimulation(sim, sim.getReadOnlyGrid().getRows(), sim.getReadOnlyGrid().getCols());
+  public void setSimulation(SimulationModel sim) {
+    myPresenter.setSimulation(sim, sim.getViewGrid().getRows(), sim.getViewGrid().getCols());
   }
 
   /**
@@ -146,7 +146,7 @@ public class SimulationSlot {
    */
   public void reset() {
     if (myConfig == null) throw new IllegalArgumentException("No configuration set.");
-    Simulation sim = SimulationFactory.createSimulation(myConfig);
+    SimulationModel sim = SimulationFactory.createSimulation(myConfig);
     setSimulation(sim);
   }
 
@@ -161,10 +161,7 @@ public class SimulationSlot {
    */
   public void toggleOutline() {
     if (!hasSimulation()) return;
-    myPanel.toggleOutline(
-        myPresenter.getDriver().getSimulation().getReadOnlyGrid(),
-        myPresenter.getDriver().getSimulation().getRule().getStateColors()
-    );
+    myPanel.toggleOutline(myPresenter.getDriver().getSimulation().getViewGrid());
   }
 
   /**
@@ -274,6 +271,8 @@ public class SimulationSlot {
   public void setSpeed(double stepsPerSecond) {
     myPresenter.getDriver().setSpeed(stepsPerSecond);
   }
+
+  public double getSpeed() { return myPresenter.getDriver().getStepsPerSecond(); }
 
   /**
    * Returns the current stepping speed for this slot.

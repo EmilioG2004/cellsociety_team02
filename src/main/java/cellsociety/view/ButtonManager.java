@@ -2,10 +2,13 @@ package cellsociety.view;
 
 import static cellsociety.view.constants.BundleKeys.*;
 
+import cellsociety.view.constants.ResourcePaths;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 
 /**
@@ -23,7 +26,7 @@ import javafx.scene.control.Label;
  * <p>Example usage:</p>
  * <pre>{@code
  * ButtonManager buttons = new ButtonManager(bundle);
- * HBox uploadRow = new HBox(buttons.getUploadRowButtons());
+ * HBox uploadRow = new HBox(buttons.getUploadRowNodes());
  * }</pre>
  *
  * <p>Other details: this class does not wire event handlers; controllers do that.</p>
@@ -38,6 +41,7 @@ public class ButtonManager {
   private final Label myTitle = new Label();
   private final Label mySpeedLabel = new Label();
   private final Label myStateStackSizeLabel = new Label();
+  private final Label myNeighborStrategy = new Label();
 
   // Buttons
   private final Button myUploadButton = new Button();
@@ -55,6 +59,7 @@ public class ButtonManager {
   private final Button myRotateLeftButton = new Button();
   private final Button myRotateRightButton = new Button();
   private final Button myMultiSimButton = new Button();
+  private final ChoiceBox<String> myNeighborChoices = new ChoiceBox<>();
 
   /**
    * Creates a button manager and applies the initial language.
@@ -73,6 +78,7 @@ public class ButtonManager {
     myBundle = bundle;
     applyLanguage(bundle);
     myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
+    buildNeighborChoices();
 
   }
 
@@ -111,6 +117,7 @@ public class ButtonManager {
 
 
     myStateStackSizeLabel.setText(myBundle.getString(LABEL_GENERATION_UNSET));
+    myNeighborStrategy.setText(myBundle.getString(LABEL_NEIGHBOR));
   }
 
   /**
@@ -142,8 +149,18 @@ public class ButtonManager {
    *
    * @return ordered list of upload-row buttons
    */
-  public List<Button> getUploadRowButtons() {
-    return List.of(mySaveButton, mySettingsButton);
+  public List<Node> getUploadRowNodes() {
+    return List.of(mySaveButton, mySettingsButton, myNeighborStrategy, myNeighborChoices);
+  }
+
+  private void buildNeighborChoices(){
+    myNeighborChoices.getItems().addAll(
+        ResourcePaths.VON_NEUMANN,
+        ResourcePaths.MOORE,
+        ResourcePaths.MOORE_RADIUS_2,
+        ResourcePaths.DIAGONAL,
+        ResourcePaths.TOROIDAL
+    );
   }
 
   /**
@@ -206,17 +223,6 @@ public class ButtonManager {
    * @return label displaying the current generation/stack size
    */
   public Label getStateStackSizeLabel() { return myStateStackSizeLabel; }
-
-  /**
-   * Returns the upload button.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return button that opens the config chooser
-   */
-  public Button getUploadButton() { return myUploadButton; }
   /**
    * Returns the step-forward button.
    *
@@ -347,4 +353,6 @@ public class ButtonManager {
    * @return button that rotates grid right
    */
   public Button getRotateRightButton() { return myRotateRightButton; }
+
+  public ChoiceBox<String> getNeighborChoices() { return myNeighborChoices; }
 }

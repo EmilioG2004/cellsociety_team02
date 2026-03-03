@@ -14,6 +14,7 @@ public final class SimulationUiConstants {
   // Simulation controller defaults
   public static final int MAX_SLOTS = 9;
   public static final int DEFAULT_SLOTS = 1;
+  public static final int DOUBLE_VALUE = 2;
 
   // SimulationView layout
   public static final double TITLE_FONT_SIZE = 28;
@@ -44,4 +45,5 @@ public final class SimulationUiConstants {
   public static final double SPACING_SMALL = 8;
   public static final double SPACING_MEDIUM = 12;
   public static final double PADDING_STANDARD = 12;
+  public static final double PADDING_SETTINGS = 20;
 }

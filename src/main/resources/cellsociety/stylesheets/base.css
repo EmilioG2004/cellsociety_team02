@@ -21,7 +21,7 @@
 
 /* Font sizing */
 .root, .label, .button, .text {
-  -fx-font-size: -app-font-size;
+  -fx-font-size: 14px;
 }
 
 /* =========================================================
@@ -161,13 +161,4 @@
 .choice-box .context-menu .menu-item:hover .text,
 .context-menu .menu-item:hover .text {
   -fx-fill: black;
-}
-
-/* =========================================================
-   FOCUS RING
-   ========================================================= */
-.choice-box:focused,
-.button:focused {
-  -fx-faint-focus-color: transparent;
-  -fx-focus-color: -app-accent;
 }
