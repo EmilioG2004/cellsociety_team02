@@ -1,5 +1,7 @@
 package cellsociety.config;
 
+import javafx.scene.paint.Color;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,12 +55,11 @@ public class SimulationLoader {
     List<SimulationConfig> configs = new ArrayList<>();
     for (int i = 0; i < simNodes.getLength(); i++) {
       Element simEl = (Element) simNodes.item(i);
-      configs.add(configLoader.loadConfig(simEl)); // <-- NO duplicated simulation parsing
+      configs.add(configLoader.loadConfig(simEl));
     }
 
     return new SimulationState(configs, prefs);
   }
-
 
   private SimulationPreferences parsePreferencesElement(Element preferencesEl) {
     Integer theme = tryParseInt(getChildText(preferencesEl, CONFIG_THEME), CONFIG_THEME);
@@ -72,16 +73,55 @@ public class SimulationLoader {
       throw new IllegalArgumentException("<" + CONFIG_SIMULATION_SPEED + "> must be > 0");
     }
 
-    Map<Integer, String> colorMap = parseColorMap(preferencesEl);
+    // parse many color maps keyed by simulation type (including default), then register in ColorMapProvider
+    Map<String, Map<Integer, String>> colorMapsByType = parseColorMaps(preferencesEl);
+    registerColorMaps(colorMapsByType);
 
-    return new SimulationPreferences(theme, language, speed, colorMap);
+    // preferences stores all maps
+    return new SimulationPreferences(theme, language, speed);
   }
 
-  private Map<Integer, String> parseColorMap(Element preferencesEl) {
-    Map<Integer, String> map = new HashMap<>();
+  /**
+   * Parses multiple color maps.
+   *
+   * Expected structure:
+   * <colorMaps>
+   *   <colorMap type="__DEFAULT__">
+   *     <colorEntry state="0" value="#FFFFFF"/>
+   *   </colorMap>
+   * </colorMaps>
+   */
+  private Map<String, Map<Integer, String>> parseColorMaps(Element preferencesEl) {
+    Map<String, Map<Integer, String>> maps = new HashMap<>();
 
-    Element colorMapEl = getOptionalFirstChildElementByTag(preferencesEl, CONFIG_COLOR_MAP);
-    if (colorMapEl == null) return map;
+    Element colorMapsEl = getOptionalFirstChildElementByTag(preferencesEl, CONFIG_COLOR_MAPS);
+    if (colorMapsEl != null) {
+      NodeList colorMapNodes = colorMapsEl.getElementsByTagName(CONFIG_COLOR_MAP);
+      for (int i = 0; i < colorMapNodes.getLength(); i++) {
+        Element colorMapEl = (Element) colorMapNodes.item(i);
+
+        String type = colorMapEl.getAttribute(CONFIG_COLOR_MAP_TYPE_ATTR).trim();
+        if (type.isEmpty()) {
+          throw new IllegalArgumentException("<" + CONFIG_COLOR_MAP + "> missing '" + CONFIG_COLOR_MAP_TYPE_ATTR + "'");
+        }
+
+        maps.put(type, parseSingleColorMap(colorMapEl));
+      }
+      return maps;
+    }
+
+    // if only one map, use default
+    Element singleOldColorMapEl = getOptionalFirstChildElementByTag(preferencesEl, CONFIG_COLOR_MAP);
+    if (singleOldColorMapEl != null) {
+      maps.put(ColorMapProvider.DEFAULT_KEY, parseSingleColorMap(singleOldColorMapEl));
+    }
+
+    return maps;
+  }
+
+  /** Parses one <colorMap> element into state -> colorString. */
+  private Map<Integer, String> parseSingleColorMap(Element colorMapEl) {
+    Map<Integer, String> map = new HashMap<>();
 
     NodeList entries = colorMapEl.getElementsByTagName(CONFIG_COLOR_ENTRY);
     for (int i = 0; i < entries.getLength(); i++) {
@@ -104,6 +144,27 @@ public class SimulationLoader {
     return map;
   }
 
+  private void registerColorMaps(Map<String, Map<Integer, String>> mapsByType) {
+    for (Map.Entry<String, Map<Integer, String>> e : mapsByType.entrySet()) {
+      String simType = e.getKey();
+      Map<Integer, String> raw = e.getValue();
+
+      Map<Integer, String> fxMap = new HashMap<>();
+      for (Map.Entry<Integer, String> entry : raw.entrySet()) {
+        try {
+          fxMap.put(entry.getKey(), entry.getValue());
+        } catch (IllegalArgumentException ex) {
+          throw new IllegalArgumentException(
+              "Invalid color value '" + entry.getValue() + "' for state " + entry.getKey()
+                  + " in colorMap type='" + simType + "'"
+          );
+        }
+      }
+
+      // replace any existing map for that type (including DEFAULT_KEY)
+      ColorMapProvider.addOrReplaceColorMap(simType, fxMap);
+    }
+  }
 
   private Document parse(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
@@ -131,7 +192,6 @@ public class SimulationLoader {
     Element child = (Element) nodes.item(0);
     return child == null ? "" : child.getTextContent().trim();
   }
-
 
   private int tryParseInt(String text, String fieldName) {
     if (text == null || text.trim().isEmpty()) {

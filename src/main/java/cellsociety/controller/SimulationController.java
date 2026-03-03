@@ -2,6 +2,7 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
 import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.controller.multiview.SlotManager;
 import cellsociety.controller.services.ErrorHandler;
