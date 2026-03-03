@@ -10,12 +10,6 @@ import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
 import cellsociety.view.PopulationGraphDialog;
-import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
-import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
-import cellsociety.Model.NeighborStrategy.NeighborStrategy;
-import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
-import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
-import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
 import cellsociety.Model.Simulation.model.SimulationModel;
@@ -72,6 +66,7 @@ public class SimulationController {
   private final SimulationLoader mySimLoader;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
+  private final NeighborStrategyFactory myNeighborStrategyFactory;
   private final PopulationGraphDialog myPopulationGraphDialog;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
 
@@ -100,6 +95,7 @@ public class SimulationController {
     mySimView = simView;
     myErrorHandler = new ErrorHandler(mySimView::getMyBundle);
     mySlots = new ArrayList<>();
+    myNeighborStrategyFactory = new NeighborStrategyFactory();
     myPopulationGraphDialog = new PopulationGraphDialog();
     myScene = scene;
     myWires = new WiringManager(
@@ -204,7 +200,7 @@ public class SimulationController {
       SimulationModel currentSim = SimulationFactory.createSimulation(currentConfig);
       currentSlot.setSimulation(currentSim);
       currentSlot.setConfig(currentConfig);
-      mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(currentSlot, choice));
+      mySelectedNeighborChoice.ifPresent(choice -> myNeighborStrategyFactory.applyToSlot(currentSlot, choice));
     }
     handlePopulationDataChanged();
   }
@@ -242,7 +238,7 @@ public class SimulationController {
 
     mySlots.get(slotIndex).setSimulation(sim);
     mySlots.get(slotIndex).setConfig(config);
-    mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(mySlots.get(slotIndex), choice));
+    mySelectedNeighborChoice.ifPresent(choice -> myNeighborStrategyFactory.applyToSlot(mySlots.get(slotIndex), choice));
     handlePopulationDataChanged();
   }
 
@@ -416,39 +412,8 @@ public class SimulationController {
   }
 
   private void applyNeighborChoiceToLoadedSimulations(String selectedChoice) {
-    for (SimulationSlot slot : mySlots) {
-      applyNeighborChoiceToSlot(slot, selectedChoice);
-    }
+    myNeighborStrategyFactory.applyToLoadedSimulations(mySlots, selectedChoice);
     handlePopulationDataChanged();
-  }
-
-  private void applyNeighborChoiceToSlot(SimulationSlot slot, String selectedChoice) {
-    if (!slot.hasSimulation()) return;
-    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
-    NeighborStrategy updatedStrategy = buildNeighborStrategy(selectedChoice, grid.getNeighborStrategy());
-    grid.setNeighborStrategy(updatedStrategy);
-  }
-
-  private NeighborStrategy buildNeighborStrategy(String selectedChoice, NeighborStrategy currentStrategy) {
-    if (ResourcePaths.VON_NEUMANN.equals(selectedChoice)) {
-      return new VonNeumannNeighborStrategy();
-    }
-    if (ResourcePaths.DIAGONAL.equals(selectedChoice)) {
-      return new DiagonalNeighborStrategy();
-    }
-    if (ResourcePaths.MOORE_RADIUS_2.equals(selectedChoice)) {
-      return new MooreNeighborStrategyRadius2();
-    }
-    if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
-      NeighborStrategy base = chooseToroidalBase(currentStrategy);
-      return new WrappingNeighborStrategy(base);
-    }
-    return new MooreNeighborStrategy();
-  }
-
-  private NeighborStrategy chooseToroidalBase(NeighborStrategy currentStrategy) {
-    int neighborCount = currentStrategy.getNeighborOffsets().size();
-    return neighborCount <= 4 ? new VonNeumannNeighborStrategy() : new MooreNeighborStrategy();
   }
 
   private void checkIndex(int slotIndex) {
