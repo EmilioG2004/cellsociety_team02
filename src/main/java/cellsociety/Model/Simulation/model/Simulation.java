@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.Grid.ControllerGrid;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
 import cellsociety.Model.Grid.ViewGrid;
@@ -77,6 +78,11 @@ public class Simulation implements SimulationModel {
 
   @Override
   public ReadOnlyGrid getReadOnlyGrid() {
+    return myGrid;
+  }
+
+  @Override
+  public ControllerGrid getControllerGrid() {
     return myGrid;
   }
 

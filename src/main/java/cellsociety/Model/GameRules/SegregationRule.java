@@ -3,6 +3,8 @@ package cellsociety.Model.GameRules;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.SegregationState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
@@ -50,7 +52,7 @@ public class SegregationRule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
     Grid nextGrid = currentGrid.deepCopy();
@@ -93,7 +95,7 @@ public class SegregationRule extends GameRule {
     return nextGrid;
   }
 
-  private boolean isSatisfied(Grid grid, int r, int c, CellState self, double threshold) {
+  private boolean isSatisfied(ReadOnlyGrid grid, int r, int c, CellState self, double threshold) {
     List<CellState> neighbors = grid.getNeighbors(r, c);
 
     int occupied = 0;

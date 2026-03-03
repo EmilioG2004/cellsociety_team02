@@ -19,6 +19,7 @@ import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
 import cellsociety.Model.Simulation.model.SimulationModel;
+import cellsociety.Model.Grid.ControllerGrid;
 import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.view.SimulationView;
 import cellsociety.config.ConfigLoader;
@@ -424,7 +425,7 @@ public class SimulationController {
 
   private void applyNeighborChoiceToSlot(SimulationSlot slot, String selectedChoice) {
     if (!slot.hasSimulation()) return;
-    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
+    ControllerGrid grid = slot.getPresenter().getDriver().getSimulation().getControllerGrid();
     NeighborStrategy updatedStrategy = buildNeighborStrategy(selectedChoice, grid.getNeighborStrategy());
     grid.setNeighborStrategy(updatedStrategy);
   }
