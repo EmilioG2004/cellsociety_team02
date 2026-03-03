@@ -1,5 +1,7 @@
 package cellsociety.Model.Simulation.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import cellsociety.Model.CellState.CellState;
@@ -81,5 +83,17 @@ public class Simulation implements SimulationModel {
   @Override
   public GameRule getRule() {
     return myRule;
+  }
+
+  @Override
+  public Map<Integer, Integer> getStateCounts() {
+    Map<Integer, Integer> counts = new HashMap<>();
+    for (int row = 0; row < myGrid.getRows(); row++) {
+      for (int col = 0; col < myGrid.getCols(); col++) {
+        int state = myGrid.getCellState(row, col).toInt();
+        counts.put(state, counts.getOrDefault(state, 0) + 1);
+      }
+    }
+    return counts;
   }
 }
