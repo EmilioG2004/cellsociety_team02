@@ -9,6 +9,10 @@ import cellsociety.config.SimulationLoader;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 import cellsociety.Model.Simulation.Simulation;
 import cellsociety.Model.Simulation.SimulationFactory;
 import cellsociety.Model.Simulation.SimulationDriver;
@@ -23,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
@@ -64,6 +69,7 @@ public class SimulationController {
   private final SimulationLoader mySimLoader;
   private final ErrorHandler myErrorHandler;
   private final List<SimulationSlot> mySlots;
+  private Optional<String> mySelectedNeighborChoice = Optional.empty();
 
 
   /**
@@ -103,6 +109,7 @@ public class SimulationController {
     setSlotCount(DEFAULT_SLOTS);
 
     myWires.wireAll(mySlots, this::handleSplashLoad);
+    wireNeighborSelection();
   }
 
   /**
@@ -184,6 +191,7 @@ public class SimulationController {
       Simulation currentSim = SimulationFactory.createSimulation(currentConfig);
       currentSlot.setSimulation(currentSim);
       currentSlot.setConfig(currentConfig);
+      mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(currentSlot, choice));
     }
   }
 
@@ -220,6 +228,7 @@ public class SimulationController {
 
     mySlots.get(slotIndex).setSimulation(sim);
     mySlots.get(slotIndex).setConfig(config);
+    mySelectedNeighborChoice.ifPresent(choice -> applyNeighborChoiceToSlot(mySlots.get(slotIndex), choice));
   }
 
   private void handleLoadForSlot(int slotIndex) {
@@ -363,6 +372,45 @@ public class SimulationController {
     for (SimulationSlot slot : mySlots) {
       mySimView.getMultiSimTile().getChildren().add(slot.getNode());
     }
+  }
+
+  private void wireNeighborSelection() {
+    ChoiceBox<String> neighborChoices = mySimView.getMyButtons().getNeighborChoices();
+    neighborChoices.setOnAction(e -> {
+      String selected = neighborChoices.getValue();
+      if (selected == null) throw new IllegalArgumentException("No neighborhood strategy selected.");
+      mySelectedNeighborChoice = Optional.of(selected);
+      applyNeighborChoiceToLoadedSimulations(selected);
+    });
+  }
+
+  private void applyNeighborChoiceToLoadedSimulations(String selectedChoice) {
+    for (SimulationSlot slot : mySlots) {
+      applyNeighborChoiceToSlot(slot, selectedChoice);
+    }
+  }
+
+  private void applyNeighborChoiceToSlot(SimulationSlot slot, String selectedChoice) {
+    if (!slot.hasSimulation()) return;
+    ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getGridViewData();
+    NeighborStrategy updatedStrategy = buildNeighborStrategy(selectedChoice, grid.getNeighborStrategy());
+    grid.setNeighborStrategy(updatedStrategy);
+  }
+
+  private NeighborStrategy buildNeighborStrategy(String selectedChoice, NeighborStrategy currentStrategy) {
+    if (ResourcePaths.VON_NEUMANN.equals(selectedChoice)) {
+      return new VonNeumannNeighborStrategy();
+    }
+    if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
+      NeighborStrategy base = chooseToroidalBase(currentStrategy);
+      return new WrappingNeighborStrategy(base);
+    }
+    return new MooreNeighborStrategy();
+  }
+
+  private NeighborStrategy chooseToroidalBase(NeighborStrategy currentStrategy) {
+    int neighborCount = currentStrategy.getNeighborOffsets().size();
+    return neighborCount <= 4 ? new VonNeumannNeighborStrategy() : new MooreNeighborStrategy();
   }
 
   private void checkIndex(int slotIndex) {

@@ -30,4 +30,10 @@ public final class ResourcePaths {
   public static final String CSS_LIGHT = "/cellsociety/stylesheets/light.css";
   public static final String CSS_DARK = "/cellsociety/stylesheets/dark.css";
   public static final String CSS_DUKE = "/cellsociety/stylesheets/duke.css";
+
+  // Neighbor Strategies
+
+  public static final String MOORE = "Moore";
+  public static final String VON_NEUMANN = "VonNeumann";
+  public static final String TOROIDAL = "Toroidal";
 }

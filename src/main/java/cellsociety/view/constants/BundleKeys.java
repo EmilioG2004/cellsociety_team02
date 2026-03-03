@@ -39,6 +39,7 @@ public final class BundleKeys {
   public static final String LABEL_CURRENT_SPEED = "label.currentSpeed";
   public static final String LABEL_GENERATION = "label.generation";
   public static final String LABEL_GENERATION_UNSET = "label.generation.unset";
+  public static final String LABEL_NEIGHBOR = "label.neighbor";
 
   // File chooser
   public static final String FILE_OPEN_CONFIG_TITLE = "fileChooser.openConfig.title";

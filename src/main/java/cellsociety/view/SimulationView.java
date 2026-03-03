@@ -2,6 +2,9 @@ package cellsociety.view;
 
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
+import static cellsociety.view.constants.ResourcePaths.VON_NEUMANN;
+import static cellsociety.view.constants.ResourcePaths.MOORE;
+import static cellsociety.view.constants.ResourcePaths.TOROIDAL;
 
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.constants.ResourcePaths;
@@ -136,7 +139,7 @@ public class SimulationView {
 
   private HBox buildUploadRow() {
     HBox myUploadRow = new HBox(SPACING_MEDIUM);
-    myUploadRow.getChildren().addAll(myButtons.getUploadRowButtons());
+    myUploadRow.getChildren().addAll(myButtons.getUploadRowNodes());
     myUploadRow.setAlignment(Pos.CENTER_LEFT);
     myUploadRow.setPadding(new Insets(
         UPLOAD_ROW_PADDING_TOP,

@@ -2,7 +2,9 @@ package cellsociety.view;
 
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.SPACING_MEDIUM;
+import static cellsociety.view.constants.SimulationUiConstants.PADDING_SETTINGS;
 
+import cellsociety.view.constants.SimulationUiConstants;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,7 +46,6 @@ public class SettingsSplash extends StackPane {
   private final ChoiceBox<String> myThemes = new ChoiceBox<>();
   private final Button myApplyChanges;
   private final Button myLoadButton;
-  private static final double SETTINGS_PADDING = 20;
   /**
    * Creates the settings splash and builds the dialog content.
    *
@@ -78,7 +79,8 @@ public class SettingsSplash extends StackPane {
   private void buildDialog(){
     getChildren().clear();
     VBox myPane = new VBox(SPACING_MEDIUM, myTitle, mySubtitle, myLanguage, myLanguages, myTheme, myThemes, myLoadButton, myApplyChanges);
-    myPane.setPadding(new Insets(SETTINGS_PADDING, SETTINGS_PADDING, SETTINGS_PADDING, SETTINGS_PADDING));
+    myPane.setPadding(new Insets(SimulationUiConstants.PADDING_SETTINGS, SimulationUiConstants.PADDING_SETTINGS, SimulationUiConstants.PADDING_SETTINGS,
+        SimulationUiConstants.PADDING_SETTINGS));
     myPane.setAlignment(Pos.CENTER);
 
     getChildren().add(myPane);
@@ -104,6 +106,8 @@ public class SettingsSplash extends StackPane {
         ResourcePaths.THEME_LIGHT,
         ResourcePaths.THEME_DARK,
         ResourcePaths.THEME_DUKE);
+    myLanguages.setValue(ResourcePaths.LANGUAGE_ENGLISH);
+    myThemes.setValue(ResourcePaths.THEME_LIGHT);
   }
 
   /**
