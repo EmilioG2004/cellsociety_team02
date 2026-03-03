@@ -3,6 +3,8 @@ package cellsociety.Model.GameRules;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.FallingSandState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
@@ -37,7 +39,7 @@ public class FallingSandRule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
     Grid nextGrid = currentGrid.emptyCopy();
@@ -79,7 +81,7 @@ public class FallingSandRule extends GameRule {
     return nextGrid;
   }
 
-  private void placeSand(Grid current, Grid next, int r, int c) {
+  private void placeSand(ReadOnlyGrid current, Grid next, int r, int c) {
     int rows = current.getRows();
     int nr = r + 1;
 
@@ -105,7 +107,7 @@ public class FallingSandRule extends GameRule {
     if (isEmpty(next, r, c)) next.setCellState(r, c, FallingSandState.SAND);
   }
 
-  private void placeWater(Grid current, Grid next, int r, int c) {
+  private void placeWater(ReadOnlyGrid current, Grid next, int r, int c) {
     int rows = current.getRows();
     int cols = current.getCols();
 
@@ -124,7 +126,7 @@ public class FallingSandRule extends GameRule {
     if (isEmpty(next, r, c)) next.setCellState(r, c, FallingSandState.WATER);
   }
 
-  private boolean tryMoveWater(Grid current, Grid next,
+  private boolean tryMoveWater(ReadOnlyGrid current, Grid next,
       int r, int c, int nr, int nc, int rows, int cols) {
     if (!inBounds(nr, nc, rows, cols)) return false;
     if (cast(current.getCellState(nr, nc)) != FallingSandState.EMPTY) return false;
@@ -137,7 +139,7 @@ public class FallingSandRule extends GameRule {
     return r >= 0 && r < rows && c >= 0 && c < cols;
   }
 
-  private boolean isEmpty(Grid grid, int r, int c) {
+  private boolean isEmpty(ReadOnlyGrid grid, int r, int c) {
     return cast(grid.getCellState(r, c)) == FallingSandState.EMPTY;
   }
 

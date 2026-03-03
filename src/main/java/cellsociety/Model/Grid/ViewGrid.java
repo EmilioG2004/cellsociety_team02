@@ -1,5 +1,4 @@
 package cellsociety.Model.Grid;
-import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 /**
  * Minimal grid data for the view: dimensions and per-cell state as an int.
@@ -12,12 +11,6 @@ public interface ViewGrid {
   int getRows();
 
   int getCols();
-
-  /** Returns the neighbor strategy attached to the grid (e.g. Moore, Von Neumann). */
-  NeighborStrategy getNeighborStrategy();
-
-  /** Sets the neighbor strategy so the view can change neighborhood (e.g. Moore vs Von Neumann) dynamically. */
-  void setNeighborStrategy(NeighborStrategy strategy);
 
   /**
    * Integer code for the cell at (row, col), used for color lookup and serialization.

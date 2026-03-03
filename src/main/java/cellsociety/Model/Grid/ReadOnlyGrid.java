@@ -24,6 +24,8 @@ public interface ReadOnlyGrid extends ViewGrid {
 
   boolean isInBounds(int row, int col);
 
+  /** Returns the neighbor strategy attached to the grid (e.g. Moore, Von Neumann). */
+  NeighborStrategy getNeighborStrategy();
 
   /**
    * Returns all neighbor states at (row, col). Positions are determined by this grid's
