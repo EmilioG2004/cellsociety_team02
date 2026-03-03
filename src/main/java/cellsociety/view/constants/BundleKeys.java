@@ -29,6 +29,7 @@ public final class BundleKeys {
   public static final String BUTTON_CHANGE_DIRECTION = "button.changeDirection";
   public static final String BUTTON_MULTI_SIM = "button.multisim";
   public static final String BUTTON_LOAD_SIM = "button.loadsim";
+  public static final String BUTTON_VIEW_GRAPH = "button.viewGraph";
   public static final String BUTTON_APPLY_CHANGES = "button.applyChanges";
   public static final String BUTTON_UPLOAD_CONFIGURATION = "button.uploadConfiguration";
   public static final String BUTTON_LOAD_SIMULATION = "button.loadSimulation";
@@ -39,6 +40,7 @@ public final class BundleKeys {
   public static final String LABEL_CURRENT_SPEED = "label.currentSpeed";
   public static final String LABEL_GENERATION = "label.generation";
   public static final String LABEL_GENERATION_UNSET = "label.generation.unset";
+  public static final String LABEL_NEIGHBOR = "label.neighbor";
 
   // File chooser
   public static final String FILE_OPEN_CONFIG_TITLE = "fileChooser.openConfig.title";

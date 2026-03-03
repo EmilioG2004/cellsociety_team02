@@ -4,6 +4,7 @@ import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
 import cellsociety.Model.Grid.ViewGrid;
+import java.util.Map;
 
 /**
  * Interface for a single simulation run: grid, rule, generation count,
@@ -56,4 +57,10 @@ public interface SimulationModel {
    * @throws IllegalStateException if already at the initial state
    */
   void stepBack();
+
+  /**
+   * Returns counts of each cell-state integer in the current grid.
+   * Keys are state ints and values are populations of that state.
+   */
+  Map<Integer, Integer> getStateCounts();
 }

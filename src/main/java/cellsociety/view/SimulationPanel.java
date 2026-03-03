@@ -54,6 +54,7 @@ public class SimulationPanel implements SimulationRenderer {
   private final Button myRotateRightButton;
   private final Button myAboutButton;
   private final Button mySaveButton;
+  private final Button myViewGraphButton;
 
   private final StackPane myGridContainer;
 
@@ -84,6 +85,7 @@ public class SimulationPanel implements SimulationRenderer {
     myRotateRightButton = buildButton(BUTTON_ROTATE_RIGHT);
     myAboutButton = buildButton(BUTTON_ABOUT_CONFIG);
     mySaveButton = buildButton(BUTTON_SAVE_STATE);
+    myViewGraphButton = buildButton(BUTTON_VIEW_GRAPH);
     myGridContainer = buildGridContainer();
 
     configureHandlers();
@@ -130,8 +132,10 @@ public class SimulationPanel implements SimulationRenderer {
   }
 
   private HBox buildRotationRow() {
-    HBox lower = new HBox(SPACING_SMALL, myRotateLeftButton, myRotateRightButton);
-    lower.setAlignment(Pos.CENTER);
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+    HBox lower = new HBox(SPACING_SMALL, myViewGraphButton, spacer, myRotateLeftButton, myRotateRightButton);
+    lower.setAlignment(Pos.CENTER_LEFT);
     return lower;
   }
 
@@ -227,6 +231,8 @@ public class SimulationPanel implements SimulationRenderer {
 
   public void setOnSave(Runnable action) { mySaveButton.setOnAction(e -> action.run()); }
 
+  public void setOnViewGraph(Runnable action) { myViewGraphButton.setOnAction(e -> action.run()); }
+
   /**
    * Registers a callback for clicks on this panel's grid cells.
    *
@@ -277,6 +283,7 @@ public class SimulationPanel implements SimulationRenderer {
     myLoadButton.setText(myBundle.getString(BUTTON_LOAD_SIM));
     mySaveButton.setText(myBundle.getString(BUTTON_SAVE_STATE));
     myAboutButton.setText(myBundle.getString(BUTTON_ABOUT_CONFIG));
+    myViewGraphButton.setText(myBundle.getString(BUTTON_VIEW_GRAPH));
     myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
     myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
   }

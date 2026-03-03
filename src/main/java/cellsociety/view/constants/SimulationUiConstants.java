@@ -45,4 +45,5 @@ public final class SimulationUiConstants {
   public static final double SPACING_SMALL = 8;
   public static final double SPACING_MEDIUM = 12;
   public static final double PADDING_STANDARD = 12;
+  public static final double PADDING_SETTINGS = 20;
 }
