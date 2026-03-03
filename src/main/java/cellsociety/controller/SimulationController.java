@@ -10,7 +10,9 @@ import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.view.SimulationPanel;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
+import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 import cellsociety.Model.Simulation.factory.SimulationFactory;
@@ -400,6 +402,12 @@ public class SimulationController {
   private NeighborStrategy buildNeighborStrategy(String selectedChoice, NeighborStrategy currentStrategy) {
     if (ResourcePaths.VON_NEUMANN.equals(selectedChoice)) {
       return new VonNeumannNeighborStrategy();
+    }
+    if (ResourcePaths.DIAGONAL.equals(selectedChoice)) {
+      return new DiagonalNeighborStrategy();
+    }
+    if (ResourcePaths.MOORE_RADIUS_2.equals(selectedChoice)) {
+      return new MooreNeighborStrategyRadius2();
     }
     if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
       NeighborStrategy base = chooseToroidalBase(currentStrategy);

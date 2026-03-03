@@ -154,7 +154,13 @@ public class ButtonManager {
   }
 
   private void buildNeighborChoices(){
-    myNeighborChoices.getItems().addAll(ResourcePaths.VON_NEUMANN, ResourcePaths.MOORE, ResourcePaths.TOROIDAL);
+    myNeighborChoices.getItems().addAll(
+        ResourcePaths.VON_NEUMANN,
+        ResourcePaths.MOORE,
+        ResourcePaths.MOORE_RADIUS_2,
+        ResourcePaths.DIAGONAL,
+        ResourcePaths.TOROIDAL
+    );
   }
 
   /**

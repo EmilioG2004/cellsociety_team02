@@ -34,6 +34,8 @@ public final class ResourcePaths {
   // Neighbor Strategies
 
   public static final String MOORE = "Moore";
+  public static final String MOORE_RADIUS_2 = "MooreRadius2";
+  public static final String DIAGONAL = "Diagonal";
   public static final String VON_NEUMANN = "VonNeumann";
   public static final String TOROIDAL = "Toroidal";
 }
