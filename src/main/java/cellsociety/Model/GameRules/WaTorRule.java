@@ -8,6 +8,7 @@ import cellsociety.Model.CellState.WaTor.WaTorTurnResult;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.Position;
 import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
@@ -60,7 +61,7 @@ public class WaTorRule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     Grid next = currentGrid.deepCopy();
     computeNext(currentGrid, next, currentGrid.getRows(), currentGrid.getCols());
     return next;

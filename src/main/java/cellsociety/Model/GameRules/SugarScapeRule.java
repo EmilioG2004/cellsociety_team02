@@ -6,6 +6,8 @@ import cellsociety.Model.CellState.SugarScape.Patch;
 import cellsociety.Model.CellState.SugarScape.SugarScapeCellState;
 import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.ReadOnlyGrid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 
@@ -69,7 +71,7 @@ public class SugarScapeRule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
     // Build next grid with new state instances (patch copied, no agent) so we don't mutate current.
@@ -131,7 +133,7 @@ public class SugarScapeRule extends GameRule {
   /**
    * Returns the best vacant, unclaimed neighbor (most sugar; tie-break by distance), or (agentRow, agentCol) if none.
    */
-  private int[] getBestVacantSpot(List<int[]> neighbors, Grid grid, Set<String> claimed,
+  private int[] getBestVacantSpot(List<int[]> neighbors, ReadOnlyGrid grid, Set<String> claimed,
       int agentRow, int agentCol) {
     int[] best = new int[]{agentRow, agentCol};
     int bestSugar = grid.getCellState(agentRow, agentCol) instanceof SugarScapeCellState ss
@@ -156,7 +158,7 @@ public class SugarScapeRule extends GameRule {
     return best;
   }
   /** Returns positions of all occupied cells in the grid. */
-  protected List<int[]> getAgentPositions(Grid grid, int rows, int cols) {
+  protected List<int[]> getAgentPositions(ReadOnlyGrid grid, int rows, int cols) {
     List<int[]> out = new ArrayList<>();
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {

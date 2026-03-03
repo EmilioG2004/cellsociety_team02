@@ -3,6 +3,7 @@ package cellsociety.Model.GameRules;
 import cellsociety.Model.CellState.CellState;
 import cellsociety.Model.CellState.GameOfLifeState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
@@ -33,7 +34,7 @@ public class ConwayGameOfLifeRule extends GameRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
     Grid next = currentGrid.emptyCopy();

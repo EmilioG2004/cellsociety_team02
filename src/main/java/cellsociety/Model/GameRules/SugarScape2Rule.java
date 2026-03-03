@@ -7,6 +7,7 @@ import cellsociety.Model.CellState.SugarScape.Patch;
 import cellsociety.Model.CellState.SugarScape.SugarScape2CellState;
 import cellsociety.Model.CellState.SugarScape.SugarScapeCellState;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class SugarScape2Rule extends SugarScapeRule {
   }
 
   @Override
-  public Grid getNextGrid(Grid currentGrid) {
+  public Grid getNextGrid(RuleGrid currentGrid) {
     // Base movement, metabolism, and sugar grow-back
     Grid next = super.getNextGrid(currentGrid);
     int rows = next.getRows();

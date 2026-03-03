@@ -1,6 +1,7 @@
 package cellsociety.Model.Simulation.model;
 
 import cellsociety.Model.GameRules.GameRule;
+import cellsociety.Model.Grid.ControllerGrid;
 import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.ReadOnlyGrid;
 import cellsociety.Model.Grid.ViewGrid;
@@ -24,6 +25,12 @@ public interface SimulationModel {
    * Returns a read-only view of the current grid (cell states, neighbors, bounds).
    */
   ReadOnlyGrid getReadOnlyGrid();
+
+  /**
+   * Returns a controller-facing view of the current grid (dimensions, state ints,
+   * plus neighbor-strategy get/set).
+   */
+  ControllerGrid getControllerGrid();
 
   /**
    * Returns the number of steps taken since the initial state (0 for initial).
