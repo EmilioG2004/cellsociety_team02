@@ -1,0 +1,24 @@
+<simulation type="SugarScape" class="cellsociety.Model.GameRules.SugarScapeRule">
+  <metadata>
+    <title>SugarScape Short Vision</title>
+    <author>cellsociety</author>
+    <description>Vision 1; few agents.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="100" count="24"/>
+      <state id="15" count="376"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sugarGrowBackRate" value="1"/>
+    <param name="sugarGrowBackInterval" value="1"/>
+    <param name="agentInitialMinimumSugar" value="10"/>
+    <param name="agentInitialMaximumSugar" value="25"/>
+    <param name="agentMinimumMetabolism" value="1"/>
+    <param name="agentMaximumMetabolism" value="3"/>
+    <param name="agentVision" value="1"/>
+  </parameters>
+</simulation>
