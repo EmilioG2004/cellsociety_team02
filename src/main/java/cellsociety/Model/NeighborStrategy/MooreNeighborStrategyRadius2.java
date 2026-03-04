@@ -5,12 +5,12 @@ import java.util.List;
 
 /**
  * Moore neighborhood extended to 2 cells away: a cell's neighbors are all adjacent cells
- * (distance 1) and all cells adjacent to those (distance 2 in the Chebyshev sense).
+ *  and all cells adjacent to those.
  * So every cell in the 5×5 square centered on the cell, excluding the cell itself (24 neighbors).
  *
  * @author Michael Lei
  */
-public class MooreNeighborStrategyRadius2 implements NeighborStrategy {
+public class MooreNeighborStrategyRadius2 extends AbstractNeighborStrategy {
 
   private static final int RADIUS = 2;
   private static final List<int[]> OFFSETS = buildOffsets();

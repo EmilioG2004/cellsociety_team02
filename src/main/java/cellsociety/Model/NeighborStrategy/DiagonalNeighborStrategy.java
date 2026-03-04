@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Michael Lei
  */
-public class DiagonalNeighborStrategy implements NeighborStrategy {
+public class DiagonalNeighborStrategy extends AbstractNeighborStrategy {
 
   private static final List<int[]> DIAGONAL_OFFSETS = List.of(
       new int[]{OFFSET_PREV_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL}, // NW
