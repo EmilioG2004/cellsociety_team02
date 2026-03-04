@@ -10,14 +10,14 @@ import java.util.List;
 public class MooreNeighborStrategy extends AbstractNeighborStrategy {
 
     private static final List<int[]> MOORE_OFFSETS = List.of(
-            new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // NW
-            new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }, // N
-            new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL }, // NE
-            new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // W
-            new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL }, // E
-            new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // SW
-            new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }, // S
-            new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL }  // SE
+            new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL },
+            new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL },
+            new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL },
+            new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL },
+            new int[] { OFFSET_SAME_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL },
+            new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL },
+            new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL },
+            new int[] { OFFSET_NEXT_ROW_OR_COL, OFFSET_NEXT_ROW_OR_COL }
     );
 
     public List<int[]> getNeighborOffsets() {

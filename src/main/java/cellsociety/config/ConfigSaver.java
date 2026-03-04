@@ -48,6 +48,12 @@ public class ConfigSaver {
     Element simulationEl = doc.createElement(CONFIG_SIMULATION);
     simulationEl.setAttribute(CONFIG_SIM_TYPE_ATTR, trimmed(config.getSimulationType()));
     simulationEl.setAttribute(CONFIG_SIM_CLASS_ATTR, trimmed(config.getRuleClass()));
+    if (config.getNeighborStrategyClass() != null && !config.getNeighborStrategyClass().isBlank()) {
+      simulationEl.setAttribute(CONFIG_NEIGHBOR_STRATEGY_ATTR, trimmed(config.getNeighborStrategyClass()));
+    }
+    if (config.getGridEdgeClass() != null && !config.getGridEdgeClass().isBlank()) {
+      simulationEl.setAttribute(CONFIG_GRID_EDGE_ATTR, trimmed(config.getGridEdgeClass()));
+    }
 
     simulationEl.appendChild(buildMetadataElement(doc, config));
     simulationEl.appendChild(buildGridElement(doc, config));

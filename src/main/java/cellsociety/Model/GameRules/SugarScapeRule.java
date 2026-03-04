@@ -74,7 +74,6 @@ public class SugarScapeRule extends GameRule {
   public Grid getNextGrid(RuleGrid currentGrid) {
     int rows = currentGrid.getRows();
     int cols = currentGrid.getCols();
-    // Build next grid with new state instances (patch copied, no agent) so we don't mutate current.
     CellState[][] copiedStates = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
@@ -94,6 +93,7 @@ public class SugarScapeRule extends GameRule {
       SugarScapeCellState currentState = (SugarScapeCellState) currentGrid.getCellState(r, c);
       Agent agent = currentState.getAgent();
       List<int[]> neighbors = strategy.getNeighborPositions(rows, cols, r, c, agent.getVision());
+      Collections.shuffle(neighbors);
       int[] best = getBestVacantSpot(neighbors, currentGrid, claimed, r, c);
 
       SugarScapeCellState destState = (SugarScapeCellState) next.getCellState(best[0], best[1]);
@@ -104,7 +104,6 @@ public class SugarScapeRule extends GameRule {
       }
       claimed.add(key(best[0], best[1]));
 
-      // Source cell in next is already vacant (copyWithoutAgent); only clear if we moved
       if (best[0] != r || best[1] != c) {
         ((SugarScapeCellState) next.getCellState(r, c)).setAgent(null);
       }

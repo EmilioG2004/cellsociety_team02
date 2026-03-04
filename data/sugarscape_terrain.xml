@@ -1,0 +1,28 @@
+<simulation type="SugarScape" class="cellsociety.Model.GameRules.SugarScapeRule">
+  <metadata>
+    <title>SugarScape Varied Terrain</title>
+    <author>cellsociety</author>
+    <description>Mixed patch capacities (2, 5, 8, 12, 15).</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="100" count="48"/>
+      <state id="2" count="68"/>
+      <state id="5" count="68"/>
+      <state id="8" count="68"/>
+      <state id="12" count="68"/>
+      <state id="15" count="80"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sugarGrowBackRate" value="1"/>
+    <param name="sugarGrowBackInterval" value="1"/>
+    <param name="agentInitialMinimumSugar" value="5"/>
+    <param name="agentInitialMaximumSugar" value="18"/>
+    <param name="agentMinimumMetabolism" value="1"/>
+    <param name="agentMaximumMetabolism" value="3"/>
+    <param name="agentVision" value="5"/>
+  </parameters>
+</simulation>

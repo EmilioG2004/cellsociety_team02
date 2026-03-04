@@ -11,6 +11,7 @@ public final class SimulationConfig {
   private final String simulationType;
   private final String ruleClass;
   private final String neighborStrategyClass;
+  private final String gridEdgeClass;
 
   private final String title;
   private final String author;
@@ -28,6 +29,7 @@ public final class SimulationConfig {
    * @param simulationType        display name for the simulation (e.g. "GameOfLife")
    * @param ruleClass             fully qualified class name of the rule
    * @param neighborStrategyClass fully qualified class name of the neighbor strategy, or null/blank to use the rule's default
+   * @param gridEdgeClass         fully qualified class name of the grid edge (e.g. ToroidalEdge), or null/blank for default (FiniteEdge)
    * @param title                 simulation title
    * @param author                author
    * @param description           description
@@ -40,6 +42,7 @@ public final class SimulationConfig {
       String simulationType,
       String ruleClass,
       String neighborStrategyClass,
+      String gridEdgeClass,
       String title,
       String author,
       String description,
@@ -51,6 +54,7 @@ public final class SimulationConfig {
     this.simulationType = simulationType;
     this.ruleClass = ruleClass;
     this.neighborStrategyClass = neighborStrategyClass;
+    this.gridEdgeClass = gridEdgeClass;
     this.title = title;
     this.author = author;
     this.description = description;
@@ -73,6 +77,12 @@ public final class SimulationConfig {
   public String getNeighborStrategyClass() {
     return neighborStrategyClass;
   }
+
+  /** Fully qualified class name of the grid edge to use (e.g. ToroidalEdge), or null/blank for strategy default (FiniteEdge). */
+  public String getGridEdgeClass() {
+    return gridEdgeClass;
+  }
+
   public String getTitle() {
     return title;
   }

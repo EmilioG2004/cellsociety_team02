@@ -1,0 +1,20 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Large Balanced</title>
+    <author>cellsociety</author>
+    <description>Large balanced ecosystem: 30x30 grid with proportional fish and shark populations and moderate shark energy.</description>
+  </metadata>
+
+  <grid rows="30" cols="30">
+    <randomByCount>
+      <state id="1" count="200"/>
+      <state id="2" count="50"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sharkStartEnergy" value="5"/>
+    <param name="sharkEnergyFromFish" value="4"/>
+    <param name="sharkMaxEnergy" value="15"/>
+  </parameters>
+</simulation>
