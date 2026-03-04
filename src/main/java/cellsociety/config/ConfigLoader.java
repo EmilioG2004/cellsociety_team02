@@ -6,6 +6,9 @@ import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -15,29 +18,57 @@ import static cellsociety.config.ConfigXmlConstants.*;
 /**
  * Loads simulation configuration from XML files. Expects a root or nested {@code <simulation>} element
  * with {@code type} and {@code class} attributes, plus {@code <metadata>}, {@code <grid>}, and optional {@code <parameters>}.
+ * @author Ixa Sigler
  */
-public class ConfigLoader {
+public class ConfigLoader implements XmlLoader<SimulationConfig> {
+
+  private static final Logger LOG = LogManager.getLogger(ConfigLoader.class);
 
   private final ConfigGridParser gridParser = new ConfigGridParser();
 
+  /**
+   * Loads a simulation config from an XML file on disk.
+   * Used by the app when selecting configs from the filesystem.
+   */
   public SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
-    Document xmlDocument = DocumentBuilderFactory
-        .newInstance()
-        .newDocumentBuilder()
-        .parse(xmlFile);
+    try {
+      Document xmlDocument = DocumentBuilderFactory
+          .newInstance()
+          .newDocumentBuilder()
+          .parse(xmlFile);
 
-    return loadConfig(xmlDocument);
+      return loadConfig(xmlDocument);
+
+    } catch (SAXException | IOException e) {
+      LOG.error("Failed to parse XML file '{}': {}", xmlFile.getPath(), e.getMessage(), e);
+      throw e;
+    }
   }
 
+  /**
+   * Implements {@link XmlLoader#load(File)} by delegating to {@link #loadConfig(File)}.
+   * Preserves the existing method name for teammates while satisfying the interface contract.
+   */
+  @Override
+  public SimulationConfig load(File file) throws ParserConfigurationException, IOException, SAXException {
+    return loadConfig(file);
+  }
+
+  /**
+   * Loads a simulation config from an existing <simulation> element.
+   * Useful when configs are embedded inside a larger document or already parsed upstream.
+   */
   public SimulationConfig loadConfig(Element simulationElement)
       throws ParserConfigurationException {
 
     if (simulationElement == null) {
+      LOG.error("simulationElement cannot be null");
       throw new IllegalArgumentException("simulationElement cannot be null");
     }
     if (!CONFIG_SIMULATION.equals(simulationElement.getTagName())) {
+      LOG.error("Expected <{}> element but got <{}>", CONFIG_SIMULATION, simulationElement.getTagName());
       throw new IllegalArgumentException(
           "Expected <" + CONFIG_SIMULATION + "> element but got <" + simulationElement.getTagName() + ">");
     }
@@ -92,6 +123,7 @@ public class ConfigLoader {
     Element root = xmlDocument.getDocumentElement();
     Element element = (Element) root.getElementsByTagName(tag).item(0);
     if (element == null) {
+      LOG.error("Missing <{}> element", tag);
       throw new IllegalArgumentException("Missing <" + tag + "> element");
     }
     return element;
@@ -109,6 +141,8 @@ public class ConfigLoader {
     String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR).trim();
     String classAttr = simulation.getAttribute(CONFIG_SIM_CLASS_ATTR).trim();
     if (typeAttr.isEmpty() || classAttr.isEmpty()) {
+      LOG.error("Simulation element must have both 'type' and 'class' attributes (type='{}', class='{}')",
+          typeAttr, classAttr);
       throw new IllegalArgumentException(
           "Simulation element must have both 'type' and 'class' attributes (e.g. type=\"GameOfLife\" class=\"cellsociety.Model.GameRules.ConwayGameOfLifeRule\")");
     }
@@ -133,8 +167,16 @@ public class ConfigLoader {
     return child.getTextContent().trim();
   }
 
-  /** Result of parsing the {@code <simulation>} element: display type, rule class, optional neighbor strategy class, optional grid edge class. */
-  public record SimulationTypeAndClass(String simulationType, String ruleClass, String neighborStrategyClass, String gridEdgeClass) {}
+  /**
+   * Parsed identity + wiring info from the <simulation> tag.
+   * Exposed as a simple carrier type for code that wants to reuse this parsing result.
+   */
+  public record SimulationTypeAndClass(
+      String simulationType,
+      String ruleClass,
+      String neighborStrategyClass,
+      String gridEdgeClass
+  ) {}
 
   private HashMap<String, Double> getParameters(Document xmlDocument) {
     HashMap<String, Double> params = new HashMap<>();
@@ -154,9 +196,11 @@ public class ConfigLoader {
       String value = paramElement.getAttribute(CONFIG_PARAM_VALUE_ATTR).trim();
 
       if (name.isEmpty()) {
+        LOG.error("<param> missing 'name' attribute");
         throw new IllegalArgumentException("<param> missing 'name' attribute");
       }
       if (value.isEmpty()) {
+        LOG.error("Parameter '{}' missing 'value' attribute", name);
         throw new IllegalArgumentException(
             "Parameter '" + name + "' missing 'value' attribute");
       }
@@ -171,6 +215,7 @@ public class ConfigLoader {
     try {
       return Double.parseDouble(value);
     } catch (NumberFormatException e) {
+      LOG.error("Invalid numeric value for parameter '{}': {}", name, value, e);
       throw new IllegalArgumentException(
           "Invalid numeric value for parameter '" + name + "': " + value
       );

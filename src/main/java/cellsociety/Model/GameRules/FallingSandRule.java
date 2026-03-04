@@ -7,6 +7,7 @@ import cellsociety.Model.Grid.ReadOnlyGrid;
 import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
+import cellsociety.Model.GridEdge.ToroidalEdge;
 
 import java.util.Map;
 import java.util.Random;
@@ -20,22 +21,27 @@ public class FallingSandRule extends GameRule {
   public static final int WATER = 3;
 
   private final Random rng = new Random();
+  private final NeighborStrategy defaultStrategy;
 
   public FallingSandRule() {
     super(Map.of());
+    this.defaultStrategy = null;
   }
 
   public FallingSandRule(Map<String, Double> parameters) {
     super(parameters);
+    this.defaultStrategy = null;
   }
 
   public FallingSandRule(NeighborStrategy strategy, Map<String, Double> parameters) {
     super(parameters);
+    this.defaultStrategy = strategy;
   }
 
   @Override
   public NeighborStrategy getDefaultNeighborStrategy() {
-    return new MooreNeighborStrategy();
+    NeighborStrategy ns = (defaultStrategy != null) ? defaultStrategy : new MooreNeighborStrategy();
+    return ns;
   }
 
   @Override
@@ -128,15 +134,14 @@ public class FallingSandRule extends GameRule {
 
   private boolean tryMoveWater(ReadOnlyGrid current, Grid next,
       int r, int c, int nr, int nc, int rows, int cols) {
-    if (!inBounds(nr, nc, rows, cols)) return false;
+
+    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) return false;
+
     if (cast(current.getCellState(nr, nc)) != FallingSandState.EMPTY) return false;
     if (!isEmpty(next, nr, nc)) return false;
+
     next.setCellState(nr, nc, FallingSandState.WATER);
     return true;
-  }
-
-  private boolean inBounds(int r, int c, int rows, int cols) {
-    return r >= 0 && r < rows && c >= 0 && c < cols;
   }
 
   private boolean isEmpty(ReadOnlyGrid grid, int r, int c) {

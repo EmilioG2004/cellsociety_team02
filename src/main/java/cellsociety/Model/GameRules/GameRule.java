@@ -5,6 +5,8 @@ import cellsociety.Model.Grid.Grid;
 import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +21,7 @@ public abstract class GameRule implements CellFactory {
   protected Map<String, Double> parameters;
 
   public GameRule(Map<String, Double> parameters) {
-    this.parameters = parameters != null ? parameters : Map.of();
+    this.parameters = parameters != null ? new HashMap<>(parameters) : new HashMap<>();
   }
 
   /**
@@ -35,7 +37,7 @@ public abstract class GameRule implements CellFactory {
   public abstract NeighborStrategy getDefaultNeighborStrategy();
 
   public void setParameters(Map<String, Double> parameters) {
-    this.parameters = parameters != null ? parameters : Map.of();
+    this.parameters = parameters != null ? new HashMap<>(parameters) : new HashMap<>();
   }
 
   public void setParameter(String key, Double value) {
@@ -43,7 +45,7 @@ public abstract class GameRule implements CellFactory {
   }
 
   public Map<String, Double> getParameters() {
-    return parameters;
+    return Collections.unmodifiableMap(parameters);
   }
 
   /** Creates a cell state from a config integer code. */
