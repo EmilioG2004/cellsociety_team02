@@ -1,0 +1,19 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Strip</title>
+    <author>Ixa Sigler</author>
+    <description>
+      Fish sticks
+    </description>
+  </metadata>
+
+  <grid rows="3" cols="60">
+    <randomByCount>
+      <state id="1" proportion="0.4"/>
+      <state id="2" proportion="0.1"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

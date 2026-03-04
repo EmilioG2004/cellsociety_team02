@@ -1,0 +1,19 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Fish Domination</title>
+    <author>Ixa Sigler</author>
+    <description>
+      Watch them rule the world!
+    </description>
+  </metadata>
+
+  <grid rows="120" cols="120">
+    <randomByCount>
+      <state id="1" count="1"/>
+    </randomByCount>
+
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
