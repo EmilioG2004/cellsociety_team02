@@ -1,0 +1,20 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Shark Heavy</title>
+    <author>cellsociety</author>
+    <description>Predator-heavy scenario: many sharks with high energy hunt a small fish population.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" count="60"/>
+      <state id="2" count="40"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sharkStartEnergy" value="8"/>
+    <param name="sharkEnergyFromFish" value="6"/>
+    <param name="sharkMaxEnergy" value="20"/>
+  </parameters>
+</simulation>

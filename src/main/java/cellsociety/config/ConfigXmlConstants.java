@@ -8,7 +8,8 @@ final class ConfigXmlConstants {
   static final String CONFIG_SIM_TYPE_ATTR = "type";
   static final String CONFIG_SIM_CLASS_ATTR = "class";
   static final String CONFIG_NEIGHBOR_STRATEGY_ATTR = "neighborStrategy";
-  
+  static final String CONFIG_GRID_EDGE_ATTR = "gridEdge";
+
   static final String CONFIG_METADATA = "metadata";
   static final String CONFIG_GRID = "grid";
 

@@ -109,6 +109,7 @@ public class SimulationSavingService {
         baseConfig.getSimulationType(),
         baseConfig.getRuleClass(),
         baseConfig.getNeighborStrategyClass(),
+        baseConfig.getGridEdgeClass(),
         baseConfig.getTitle(),
         baseConfig.getAuthor(),
         baseConfig.getDescription(),

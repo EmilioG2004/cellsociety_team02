@@ -5,6 +5,7 @@ import cellsociety.Model.GameRules.CellFactory;
 import cellsociety.Model.GameRules.GameRule;
 import cellsociety.Model.Grid.ArrayGrid;
 import cellsociety.Model.Grid.Grid;
+import cellsociety.Model.GridEdge.GridEdge;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.Simulation.model.Simulation;
 import cellsociety.Model.Simulation.model.SimulationModel;
@@ -110,6 +111,10 @@ public class SimulationFactory {
     NeighborStrategy strategy = (config.getNeighborStrategyClass() != null && !config.getNeighborStrategyClass().isBlank())
         ? createNeighborStrategyFromClass(config.getNeighborStrategyClass())
         : defaultStrategy;
+    String gridEdgeClass = config.getGridEdgeClass();
+    if (gridEdgeClass != null && !gridEdgeClass.isBlank()) {
+      strategy.setGridEdge(createGridEdgeFromClass(gridEdgeClass));
+    }
     int[][] intStates = config.getInitialStates();
     CellState[][] states = new CellState[rows][cols];
     for (int r = 0; r < rows; r++) {
@@ -118,5 +123,24 @@ public class SimulationFactory {
       }
     }
     return new ArrayGrid(states, strategy);
+  }
+
+  private static GridEdge createGridEdgeFromClass(String gridEdgeClassName) {
+    String trimmed = gridEdgeClassName.trim();
+    try {
+      Class<?> clazz = Class.forName(trimmed);
+      if (!GridEdge.class.isAssignableFrom(clazz)) {
+        throw new IllegalArgumentException("Class must implement GridEdge: " + trimmed);
+      }
+      return (GridEdge) clazz.getConstructor().newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new IllegalArgumentException("GridEdge class not found: " + trimmed, e);
+    } catch (NoSuchMethodException e) {
+        throw new IllegalArgumentException("GridEdge class must have a public no-arg constructor: " + trimmed, e);
+    } catch (ReflectiveOperationException e) {
+      Throwable cause = e.getCause();
+      String msg = cause != null ? cause.getMessage() : e.getMessage();
+      throw new IllegalArgumentException("GridEdge instantiation failed: " + msg, e);
+    }
   }
 }
