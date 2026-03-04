@@ -1,5 +1,7 @@
 package cellsociety.controller.services;
 
+import static cellsociety.view.constants.SimulationUiConstants.*;
+
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.ColorMapProvider;
@@ -39,7 +41,7 @@ public class SimulationLoadingService {
   private SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     return myConfigLoader.loadConfig(xmlFile);
   }
@@ -47,7 +49,7 @@ public class SimulationLoadingService {
   private SimulationState loadState(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     return mySimulationLoader.loadState(xmlFile);
   }
@@ -101,7 +103,7 @@ public class SimulationLoadingService {
 
   private void checkSlotIndex(List<SimulationSlot> slots, int slotIndex) {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
   }
 }

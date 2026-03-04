@@ -1,5 +1,7 @@
 package cellsociety.controller.multiview;
 
+import static cellsociety.view.constants.SimulationUiConstants.ERROR_MSG_INVALID_SLOT_INDEX_PREFIX;
+
 import cellsociety.view.multiview.SimulationPanel;
 import cellsociety.view.SimulationView;
 import java.util.List;
@@ -54,7 +56,7 @@ public class SlotManager {
 
   private void checkIndex(List<SimulationSlot> slots, int slotIndex) {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
   }
 

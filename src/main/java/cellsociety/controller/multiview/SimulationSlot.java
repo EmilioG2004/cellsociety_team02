@@ -1,5 +1,8 @@
 package cellsociety.controller.multiview;
 
+import static cellsociety.view.constants.SimulationUiConstants.ERROR_MSG_NO_CONFIGURATION_FOR_SLOT_PREFIX;
+import static cellsociety.view.constants.SimulationUiConstants.ERROR_MSG_NO_CONFIGURATION_SET;
+
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.SimulationConfig;
@@ -118,7 +121,7 @@ public class SimulationSlot {
    */
   public SimulationConfig getConfig() {
     if (myConfig == null) {
-      throw new IllegalStateException("No configuration set for slot " + myIndex);
+      throw new IllegalStateException(ERROR_MSG_NO_CONFIGURATION_FOR_SLOT_PREFIX + myIndex);
     }
     return myConfig;
   }
@@ -133,7 +136,7 @@ public class SimulationSlot {
    * <p>Return value: none.</p>
    */
   public void reset() {
-    if (myConfig == null) throw new IllegalArgumentException("No configuration set.");
+    if (myConfig == null) throw new IllegalArgumentException(ERROR_MSG_NO_CONFIGURATION_SET);
     SimulationModel sim = SimulationFactory.createSimulation(myConfig);
     setSimulation(sim);
   }

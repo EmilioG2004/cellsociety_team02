@@ -1,7 +1,6 @@
 package cellsociety.controller;
 
-import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
-import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+import static cellsociety.view.constants.SimulationUiConstants.*;
 
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.controller.multiview.SlotManager;
@@ -190,7 +189,7 @@ public class SimulationController {
     ChoiceBox<String> neighborChoices = mySimView.getMyButtons().getNeighborChoices();
     neighborChoices.setOnAction(e -> {
       String selected = neighborChoices.getValue();
-      if (selected == null) throw new IllegalArgumentException("No neighborhood strategy selected.");
+      if (selected == null) throw new IllegalArgumentException(ERROR_MSG_NO_NEIGHBORHOOD_SELECTED);
       mySelectedNeighborChoice = Optional.of(selected);
       applyNeighborChoiceToLoadedSimulations(selected);
     });
@@ -200,7 +199,7 @@ public class SimulationController {
     ChoiceBox<String> gridEdgeChoices = mySimView.getMyButtons().getGridEdgeChoices();
     gridEdgeChoices.setOnAction(e -> {
       String selected = gridEdgeChoices.getValue();
-      if (selected == null) throw new IllegalArgumentException("No grid edge selected.");
+      if (selected == null) throw new IllegalArgumentException(ERROR_MSG_NO_GRID_EDGE_SELECTED);
       mySelectedGridEdgeChoice = Optional.of(selected);
       applyGridEdgeChoiceToLoadedSimulations(selected);
     });

@@ -1,5 +1,7 @@
 package cellsociety.controller.multiview;
 
+import static cellsociety.view.constants.SimulationUiConstants.ERROR_MSG_NO_SIMULATION_LOADED;
+
 import cellsociety.Model.Simulation.driver.DefaultSimulationDriver;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
 import cellsociety.Model.Simulation.model.SimulationModel;
@@ -88,7 +90,7 @@ public class SimulationPresenter {
    */
   public void toggleCellState(int row, int col) {
     if (!myDriver.hasSimulation()) {
-      throw new IllegalStateException("No simulation loaded.");
+      throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_LOADED);
     }
     myDriver.toggleCellState(row, col);
     refreshFromSimulation();
@@ -108,7 +110,7 @@ public class SimulationPresenter {
 
   private Map<Integer, Integer> getCurrentStateCounts() {
     if (!myDriver.hasSimulation()) {
-      throw new IllegalStateException("No simulation loaded.");
+      throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_LOADED);
     }
     return Map.copyOf(myDriver.getSimulation().getStateCounts());
   }
@@ -119,7 +121,7 @@ public class SimulationPresenter {
 
   public void syncPopulationAtCurrentGeneration() {
     if (!myDriver.hasSimulation()) {
-      throw new IllegalStateException("No simulation loaded.");
+      throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_LOADED);
     }
 
     SimulationModel sim = myDriver.getSimulation();

@@ -271,7 +271,7 @@ public class SimulationPanel implements SimulationRenderer {
    * Rotates this panel's grid 90 degrees counterclockwise.
    */
   public void rotateLeft() {
-    if (myGridView == null) throw new IllegalStateException("No simulation loaded.");
+    if (myGridView == null) throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_LOADED);
     myGridView.rotateLeft();
   }
 
@@ -279,7 +279,7 @@ public class SimulationPanel implements SimulationRenderer {
    * Rotates this panel's grid 90 degrees clockwise.
    */
   public void rotateRight() {
-    if (myGridView == null) throw new IllegalStateException("No simulation loaded.");
+    if (myGridView == null) throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_LOADED);
     myGridView.rotateRight();
   }
 

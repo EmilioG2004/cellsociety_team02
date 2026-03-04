@@ -1,5 +1,7 @@
 package cellsociety.controller.services;
 
+import static cellsociety.view.constants.SimulationUiConstants.*;
+
 import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.config.ConfigSaver;
 import cellsociety.config.SimulationConfig;
@@ -36,7 +38,7 @@ public class SimulationSavingService {
 
   private void saveConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid, File saveDestination) {
     if (saveDestination == null) {
-      throw new IllegalArgumentException("No Save Destination Selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_SAVE_DESTINATION_SELECTED);
     }
     myConfigSaver.saveConfig(buildConfigSnapshot(baseConfig, grid), saveDestination);
   }
@@ -44,7 +46,7 @@ public class SimulationSavingService {
   private void saveState(List<SimulationConfig> snapshots, SimulationPreferences preferences,
       File saveDestination) {
     if (saveDestination == null) {
-      throw new IllegalArgumentException("No Save Destination Selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_SAVE_DESTINATION_SELECTED);
     }
     SimulationState state = new SimulationState(snapshots, preferences);
     mySimulationSaver.saveState(state, saveDestination);
@@ -57,7 +59,7 @@ public class SimulationSavingService {
     checkSlotIndex(slots, slotIndex);
     SimulationSlot slot = slots.get(slotIndex);
     if (!slot.hasSimulation()) {
-      throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+      throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_FOR_SLOT_PREFIX + slotIndex);
     }
     SimulationConfig baseConfig = slot.getConfig();
     ViewGrid grid = slot.getPresenter().getDriver().getSimulation().getViewGrid();
@@ -98,10 +100,10 @@ public class SimulationSavingService {
 
   private SimulationConfig buildConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid) {
     if (baseConfig == null) {
-      throw new IllegalArgumentException("Base configuration is required.");
+      throw new IllegalArgumentException(ERROR_MSG_BASE_CONFIGURATION_REQUIRED);
     }
     if (grid == null) {
-      throw new IllegalArgumentException("Grid snapshot is required.");
+      throw new IllegalArgumentException(ERROR_MSG_GRID_SNAPSHOT_REQUIRED);
     }
 
     int[][] states = ViewGrid.produceIntArray(grid);
@@ -122,7 +124,7 @@ public class SimulationSavingService {
 
   private void checkSlotIndex(List<SimulationSlot> slots, int slotIndex) {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
   }
 

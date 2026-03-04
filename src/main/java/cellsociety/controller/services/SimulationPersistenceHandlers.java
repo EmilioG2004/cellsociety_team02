@@ -1,6 +1,6 @@
 package cellsociety.controller.services;
 
-import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+import static cellsociety.view.constants.SimulationUiConstants.*;
 
 import cellsociety.config.SimulationPreferences;
 import cellsociety.controller.multiview.SimulationSlot;
@@ -60,7 +60,7 @@ public class SimulationPersistenceHandlers {
       Optional<String> selectedGridEdgeChoice) {
     File xmlFile = mySimView.showOpenConfigDialog();
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     try {
       myLoadingService.loadConfigIntoSlot(
@@ -84,7 +84,7 @@ public class SimulationPersistenceHandlers {
       Optional<String> selectedGridEdgeChoice) {
     File xmlFile = mySimView.showOpenStateDialog();
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     try {
       SimulationPreferences desiredPreferences = myLoadingService.loadStateIntoSlots(
@@ -107,11 +107,11 @@ public class SimulationPersistenceHandlers {
   public void handleLoadForSlot(int slotIndex, List<SimulationSlot> slots,
       Optional<String> selectedNeighborChoice, Optional<String> selectedGridEdgeChoice) {
     if (slotIndex < 0 || slotIndex >= MAX_SLOTS) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
     File xmlFile = mySimView.showOpenConfigDialog();
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     try {
       myLoadingService.loadConfigIntoSlot(
@@ -131,7 +131,7 @@ public class SimulationPersistenceHandlers {
 
   public void handleSaveForSlot(int slotIndex, List<SimulationSlot> slots) {
     if (slotIndex < 0 || slotIndex >= MAX_SLOTS) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
     try {
       File saveDestination = mySimView.showSaveConfigDialog();

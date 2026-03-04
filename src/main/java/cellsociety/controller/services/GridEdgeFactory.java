@@ -1,5 +1,7 @@
 package cellsociety.controller.services;
 
+import static cellsociety.view.constants.SimulationUiConstants.ERROR_MSG_UNSUPPORTED_GRID_EDGE_PREFIX;
+
 import cellsociety.Model.Grid.ControllerGrid;
 import cellsociety.Model.GridEdge.FiniteEdge;
 import cellsociety.Model.GridEdge.GridEdge;
@@ -46,6 +48,6 @@ public class GridEdgeFactory {
     if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
       return new ToroidalEdge();
     }
-    throw new IllegalArgumentException("Unsupported grid edge choice: " + selectedChoice);
+    throw new IllegalArgumentException(ERROR_MSG_UNSUPPORTED_GRID_EDGE_PREFIX + selectedChoice);
   }
 }

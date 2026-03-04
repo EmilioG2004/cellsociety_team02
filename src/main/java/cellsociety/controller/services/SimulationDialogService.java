@@ -1,5 +1,7 @@
 package cellsociety.controller.services;
 
+import static cellsociety.view.constants.SimulationUiConstants.*;
+
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.view.SimulationView;
 import cellsociety.view.dialogs.PopulationGraphDialog;
@@ -48,14 +50,14 @@ public class SimulationDialogService {
     checkSlotIndex(slots, slotIndex);
     SimulationSlot slot = slots.get(slotIndex);
     if (!slot.hasSimulation()) {
-      throw new IllegalStateException("No simulation loaded for slot " + slotIndex);
+      throw new IllegalStateException(ERROR_MSG_NO_SIMULATION_FOR_SLOT_PREFIX + slotIndex);
     }
     return slot;
   }
 
   private void checkSlotIndex(List<SimulationSlot> slots, int slotIndex) {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
   }
 }
