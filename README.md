@@ -53,6 +53,7 @@ This project implements a cellular automata simulator.
  * Noteworthy Features
  * Full support for advancing a simulation in both directions, forward and backward, either by single stepping or by driving.
  * Dynamic cell state update by clicking. Users can click a cell to cycle it to the next state in that simulation’s cycle (dead to alive to dead). They can effectively modify the starting state of any simulation by clicking cells to change their state before pressing start. It can be done both when the sim is paused and when it is running. (See Assumptions for the simplification that cell data beyond the cycle state is lost when toggling.)
+ * Simulations can be fully saved and restored using session files that store both user preferences and all active simulations.
 
 ### Design Decisions
 
