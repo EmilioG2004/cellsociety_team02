@@ -1,0 +1,24 @@
+<simulation type="Langton1984" class="cellsociety.Model.GameRules.Langton1984Rule">
+  <metadata>
+    <title>Langton 1984 Noise</title>
+    <author>Ixa Sigler</author>
+    <description>
+      Pretty! But it doesn't really do anything
+    </description>
+  </metadata>
+
+  <grid rows="120" cols="120">
+    <randomByCount>
+      <state id="1" proportion="0.14"/>
+      <state id="2" proportion="0.14"/>
+      <state id="3" proportion="0.14"/>
+      <state id="4" proportion="0.14"/>
+      <state id="5" proportion="0.14"/>
+      <state id="6" proportion="0.14"/>
+      <state id="7" proportion="0.14"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
