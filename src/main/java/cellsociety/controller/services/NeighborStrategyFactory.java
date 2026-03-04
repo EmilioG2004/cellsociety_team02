@@ -5,9 +5,9 @@ import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
+import cellsociety.Model.GridEdge.ToroidalEdge;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
-import cellsociety.Model.NeighborStrategy.WrappingNeighborStrategy;
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.view.constants.ResourcePaths;
 import java.util.List;
@@ -62,13 +62,9 @@ public class NeighborStrategyFactory {
       return new MooreNeighborStrategyRadius2();
     }
     if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
-      return new WrappingNeighborStrategy(chooseToroidalBase(currentStrategy));
+      currentStrategy.setGridEdge(new ToroidalEdge());
+      return currentStrategy;
     }
     return new MooreNeighborStrategy();
-  }
-
-  private NeighborStrategy chooseToroidalBase(NeighborStrategy currentStrategy) {
-    int neighborCount = currentStrategy.getNeighborOffsets().size();
-    return neighborCount <= 4 ? new VonNeumannNeighborStrategy() : new MooreNeighborStrategy();
   }
 }
