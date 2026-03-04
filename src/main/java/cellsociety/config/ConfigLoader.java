@@ -55,9 +55,10 @@ public class ConfigLoader {
 
   private SimulationConfig loadConfig(Document xmlDocument) {
     SimulationTypeAndClass simulationTypeAndClass = getSimulationType(xmlDocument);
-    String simulationType = simulationTypeAndClass.simulationType;
-    String ruleClass = simulationTypeAndClass.ruleClass;
-    String neighborStrategyClass = simulationTypeAndClass.neighborStrategyClass;
+    String simulationType = simulationTypeAndClass.simulationType();
+    String ruleClass = simulationTypeAndClass.ruleClass();
+    String neighborStrategyClass = simulationTypeAndClass.neighborStrategyClass();
+    String gridEdgeClass = simulationTypeAndClass.gridEdgeClass();
 
     Element metadata = getMetadata(xmlDocument);
     String title = getChildText(metadata, CONFIG_TITLE);
@@ -76,6 +77,7 @@ public class ConfigLoader {
         simulationType,
         ruleClass,
         neighborStrategyClass,
+        gridEdgeClass,
         title,
         author,
         description,
@@ -112,10 +114,12 @@ public class ConfigLoader {
     }
 
     String neighborStrategyAttr = simulation.getAttribute(CONFIG_NEIGHBOR_STRATEGY_ATTR).trim();
+    String gridEdgeAttr = simulation.getAttribute(CONFIG_GRID_EDGE_ATTR).trim();
     return new SimulationTypeAndClass(
         typeAttr,
         classAttr,
-        neighborStrategyAttr.isEmpty() ? null : neighborStrategyAttr
+        neighborStrategyAttr.isEmpty() ? null : neighborStrategyAttr,
+        gridEdgeAttr.isEmpty() ? null : gridEdgeAttr
     );
   }
 
@@ -129,8 +133,8 @@ public class ConfigLoader {
     return child.getTextContent().trim();
   }
 
-  /** Result of parsing the {@code <simulation>} element: display type, fully qualified rule class name, and optional neighbor strategy class name. */
-  public record SimulationTypeAndClass(String simulationType, String ruleClass, String neighborStrategyClass) {}
+  /** Result of parsing the {@code <simulation>} element: display type, rule class, optional neighbor strategy class, optional grid edge class. */
+  public record SimulationTypeAndClass(String simulationType, String ruleClass, String neighborStrategyClass, String gridEdgeClass) {}
 
   private HashMap<String, Double> getParameters(Document xmlDocument) {
     HashMap<String, Double> params = new HashMap<>();
