@@ -82,7 +82,8 @@ public class SimulationLoadingService {
     setSlotCount.accept(activeSims);
     setSlotChoice.accept(activeSims);
 
-    for (int i = 0; i < slots.size(); i++) {
+    int n = Math.min(slots.size(), desiredState.getActiveSimulations().size());
+    for (int i = 0; i < n; i++) {
       SimulationSlot currentSlot = slots.get(i);
       SimulationConfig currentConfig = desiredState.getActiveSimulations().get(i);
       SimulationModel currentSim = SimulationFactory.createSimulation(currentConfig);
