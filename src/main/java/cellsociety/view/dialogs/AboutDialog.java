@@ -16,20 +16,20 @@ import javafx.scene.text.Text;
 /**
  * Overlay dialog that displays simulation metadata (type, author, description, parameters).
  *
- * <p>Purpose: provide an in-app "About" view for the currently loaded configuration.</p>
+ *Purpose: provide an in-app "About" view for the currently loaded configuration.
  *
- * <p>Assumptions: a {@link SimulationConfig} has been loaded before calling
- * {@link #generateInfo(SimulationConfig)}; language bundles include the required keys.</p>
+ *Assumptions: a {@link SimulationConfig} has been loaded before calling
+ * {@link #generateInfo(SimulationConfig)}; language bundles include the required keys.
  *
- * <p>Dependencies: JavaFX {@link StackPane}/{@link VBox} layout and a {@link ResourceBundle}
- * for localized strings.</p>
+ *Dependencies: JavaFX {@link StackPane}/{@link VBox} layout and a {@link ResourceBundle}
+ * for localized strings.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * AboutDialog dialog = new AboutDialog();
  * dialog.applyLanguage(bundle);
  * dialog.generateInfo(config);
- * }</pre>
+ *
  *
  * @author Emilio Garcia
  */
@@ -48,13 +48,13 @@ public class AboutDialog extends StackPane{
   /**
    * Creates the dialog and its internal text nodes.
    *
-   * <p>Purpose: prepares the dialog for later population via {@link #generateInfo}.</p>
+   *Purpose: prepares the dialog for later population via {@link #generateInfo}.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public AboutDialog(){
     setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -82,13 +82,13 @@ public class AboutDialog extends StackPane{
   /**
    * Populates the dialog with simulation metadata and shows it.
    *
-   * <p>Purpose: builds the dialog content whenever a configuration is available.</p>
+   *Purpose: builds the dialog content whenever a configuration is available.
    *
-   * <p>Assumptions: {@code config} is non-null.</p>
+   *Assumptions: {@code config} is non-null.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param config simulation configuration used to populate fields
    * @param neighborStrategy current neighbor strategy class name
@@ -120,13 +120,13 @@ public class AboutDialog extends StackPane{
   /**
    * Removes the dialog from its parent container.
    *
-   * <p>Purpose: closes the overlay without disposing the object.</p>
+   *Purpose: closes the overlay without disposing the object.
    *
-   * <p>Assumptions: the dialog is attached to a {@link Pane}.</p>
+   *Assumptions: the dialog is attached to a {@link Pane}.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public void closeInfo() {
     if (getParent() instanceof Pane p) {
@@ -137,9 +137,9 @@ public class AboutDialog extends StackPane{
   /**
    * Returns the dialog's close button for controller wiring.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return close button
    */
@@ -148,13 +148,13 @@ public class AboutDialog extends StackPane{
   /**
    * Applies localized text to all labels using the provided bundle.
    *
-   * <p>Purpose: updates visible strings when language changes.</p>
+   *Purpose: updates visible strings when language changes.
    *
-   * <p>Assumptions: {@code bundle} contains the required keys.</p>
+   *Assumptions: {@code bundle} contains the required keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI strings
    */

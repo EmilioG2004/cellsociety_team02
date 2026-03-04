@@ -18,6 +18,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Handles load/save controller actions and delegates lower-level work to loading/saving services.
+ *
+ * @author Emilio Garcia
  */
 public class SimulationPersistenceHandlers {
 

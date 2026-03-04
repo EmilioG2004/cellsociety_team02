@@ -7,30 +7,32 @@ This project implements a cellular automata simulator.
 
 ### Timeline
 
- * Start Date: 
+ * Start Date: 02/03
 
- * Finish Date: 
+ * Finish Date: 03/04
 
- * Hours Spent:
+ * Hours Spent: Combined 100+
 
 
 
 ### Attributions
 
  * Resources used for learning (including AI assistance)
+   * ChatGPT and LLMs were used to explain difficult concepts, as well as to help explain basics and syntax for new knowledge points, specifically TestFX and OpenJFX syntax and functions and possibilities.
  
  * Resources used directly (including AI assistance)
+   * LLMs were used to help write comments and documentation. Also used where useful to apply simple, repetitive boilerplate (for example, in resourceBundle files to provide translations)
 
 
 ### Running the Program
 
- * Main class:
+ * Main class: properties files to create ResourceBundles, as main must run with a resourcebundle.
 
- * Data files needed: 
+ * Data files needed: ConfigXML files, Resource property files
 
- * Interesting data files:
+ * Interesting data files: 
 
- * Key/Mouse inputs:
+ * Key/Mouse inputs: Only clicks. Click to do everything in this simulation, start it, set simulation, and control simulations. All interaction is handled through buttons for ease of use.
 
 
 
@@ -39,12 +41,14 @@ This project implements a cellular automata simulator.
  * Assumptions or Simplifications
  * We support changing a cell state by clicking while the sim is running, but we assume that the full sequence (user clicks a cell in the view, the presenter calls the driver to update the cell state in the model, and the presenter triggers a re-render, for example the renderer re-rendering the grid) completes between two step-driven renders, that is between successive ticks of the sim driver’s scheduler. We do not explicitly synchronize click handling with the driver’s tick. In practice we rely on this happening within one step interval.
  * Click to toggle cell state is implemented by cycling the cell to the next state in that simulation’s cycle (for example dead, alive, dead). As a simplification, we do not preserve other cell data when toggling. Any rule-specific or cell-specific data (for example agent, age, sugar) is lost or reset. Only the state in the cycle changes.
+ * Controller assumptions: controller services assume all slot-mutating actions execute on the JavaFX application thread, slot indexes are validated before service calls, and global controls (speed, direction, strategy, edge) apply uniformly to currently loaded simulations.
+ * View assumptions: view classes assume required `ResourceBundle` keys and stylesheet resources exist, a JavaFX `Scene`/`Window` is available before file dialogs are shown, and grid renderers receive dimensions/state matrices that match their initialized size.
 
- * Known Bugs:
+ * Known Bugs: When uploading a simulation to a slot, and then changing some value like speed or rotations, or neighborhood strategy, despite being global controls adding a new simulation into a slot will not carry over all of those properties. In some cases, like with speed, the speed will not change at all unless brought back in the opposite direction of whatever the original change was (ie speeding up simulations then adding a new one will not change simulation speed unless slowing down). Also not all labels and buttons and ndoes have proper resourcebundle strings for dynamic updates.
 
- * Features implemented:
+ * Features implemented: all core features except those unimplemented. Grid Resetting, Loading Full SimulationState, StepSimulation, Grid Outline, Flip Grid, GridStaes, GraphView of Pop Changes, Dynamic Cell Neighborhood Updates, Dynamic GridEdge Updates, Dynamic Language/Theme Updates (Cell-51X Custom). Extended moore and VonNeumann neighbors, as well as cylindrical, mirrored, and toroidal edge types. All simulations except foraging ants, generalizedgameoflife, rock paper scissors. All extensions implemented except those expressly stated in features implemented.
 
- * Features unimplemented:
+ * Features unimplemented: Cell Shape Tilings (variation 2) and missing two cellviews (variation2).
 
  * Noteworthy Features
  * Full support for advancing a simulation in both directions, forward and backward, either by single stepping or by driving.
@@ -78,11 +82,20 @@ We introduce separate interfaces so each package receives only what it needs, re
  * All simulation-driving logic (stepping, undo, applying the rule, grid updates) lives in the model package. The sim controller gets a remote-control-style interface to the model. It triggers actions but does not hold or execute the logic. The view only observes the current grid and renders it.
 
 **UI and multi-simulation**
- * Multi-simulation dashboard is intentionally capped at three simultaneous simulations for UI simplicity, legibility, and performance on typical laptop screens. This keeps each panel large enough to be useful and reduces visual clutter.
+ * Multi-simulation dashboard is intentionally capped at nine simultaneous simulations for UI simplicity, legibility, and performance on typical laptop screens. This keeps each panel large enough to be useful and reduces visual clutter.
  * Multi-simulation controls are routed through the existing top control bar to avoid duplicating UI controls in each panel and to maintain a consistent interaction model.
  * The multi-simulation view uses render-only panels (no per-panel controls beyond loading) to separate visualization from control logic and minimize UI complexity.
+
+**Controller design**
+ * The controller is split into a thin orchestrator (`SimulationController`) and focused services (`SimulationLoadingService`, `SimulationSavingService`, `SimulationDialogService`, strategy/edge factories, and slot manager) so loading, persistence, dialog flows, and runtime updates can evolve independently.
+ * Slot lifecycle and per-slot wiring are centralized in `SlotManager`, while global controls are wired once through `WiringManager`, which keeps multi-slot behavior consistent and avoids duplicated callback setup.
+ * Error presentation is centralized through `ErrorHandler`, so service exceptions map to user-facing alerts in one place instead of being handled ad hoc across controller methods.
+
+**View design**
+ * `SimulationView` is a composition root for layout only; control creation/text localization is delegated to `ButtonManager`, and styling/language mapping is delegated to `ThemeApplier`/`LanguageApplier`.
+ * Grid rendering is abstracted behind `GridView`; `GridPaneView` is one implementation, which keeps renderer choice decoupled from controllers and panel composition.
+ * Multi-sim rendering uses lightweight `SimulationPanel` components implementing `SimulationRenderer`, so panels stay focused on display/callback hooks while controllers own behavior and simulation state transitions.
 
 
 
 ### Assignment Impressions
-

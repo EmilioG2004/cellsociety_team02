@@ -24,24 +24,24 @@ import java.io.File;
 /**
  * Primary JavaFX view for interacting with a single simulation.
  *
- * <p>Purpose: constructs the main application layout (title, upload row, control bar,
- * center grid card, and optional dialogs) and exposes accessors for controller wiring.</p>
+ *Purpose: constructs the main application layout (title, upload row, control bar,
+ * center grid card, and optional dialogs) and exposes accessors for controller wiring.
  *
- * <p>Assumptions: a valid {@link ResourceBundle} is supplied; controllers will call
- *  before attempting to render, and apply themes on a live {@link Scene}.</p>
+ *Assumptions: a valid {@link ResourceBundle} is supplied; controllers will call
+ *  before attempting to render, and apply themes on a live {@link Scene}.
  *
- * <p>Dependencies: {@link ButtonManager} for controls, JavaFX layout panes,
+ *Dependencies: {@link ButtonManager} for controls, JavaFX layout panes,
  * {@link cellsociety.view.gridviews.GridView} implementations for rendering, and dialog components
- * {@link AboutDialog} and {@link SettingsSplash}.</p>
+ * {@link AboutDialog} and {@link SettingsSplash}.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * SimulationView view = new SimulationView(bundle);
  * Scene scene = new Scene(view.getRoot());
  * stage.setScene(scene);
- * }</pre>
  *
- * <p>Other details: this class is UI-only; controllers own simulation logic and event wiring.</p>
+ *
+ *Other details: this class is UI-only; controllers own simulation logic and event wiring.
  *
  * @author Emilio Garcia
  */
@@ -67,13 +67,13 @@ public class SimulationView {
   /**
    * Creates a SimulationView with optional initial settings splash.
    *
-   * <p>Purpose: allows a startup flow where settings are shown before any simulation is loaded.</p>
+   *Purpose: allows a startup flow where settings are shown before any simulation is loaded.
    *
-   * <p>Assumptions: {@code bundle} contains all required keys.</p>
+   *Assumptions: {@code bundle} contains all required keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI strings
    */
@@ -209,11 +209,11 @@ public class SimulationView {
   /**
    * Shows a file chooser for opening a simulation configuration.
    *
-   * <p>Purpose: provides a UI entry point for loading XML configuration files.</p>
+   *Purpose: provides a UI entry point for loading XML configuration files.
    *
-   * <p>Assumptions: the {@link Scene} is attached to a {@link Window}.</p>
+   *Assumptions: the {@link Scene} is attached to a {@link Window}.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return selected XML file, or {@code null} if the user cancels
    */
@@ -232,11 +232,11 @@ public class SimulationView {
   /**
    * Shows a file chooser for saving a simulation configuration.
    *
-   * <p>Purpose: provides a UI entry point for exporting the current state.</p>
+   *Purpose: provides a UI entry point for exporting the current state.
    *
-   * <p>Assumptions: the {@link Scene} is attached to a {@link Window}.</p>
+   *Assumptions: the {@link Scene} is attached to a {@link Window}.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return destination XML file, or {@code null} if the user cancels
    */
@@ -267,13 +267,13 @@ public class SimulationView {
   /**
    * Displays the "About" dialog for a specific configuration.
    *
-   * <p>Purpose: surface simulation metadata without leaving the main view.</p>
+   *Purpose: surface simulation metadata without leaving the main view.
    *
-   * <p>Assumptions: {@code config} is non-null.</p>
+   *Assumptions: {@code config} is non-null.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param config configuration used to populate the dialog
    */
@@ -293,13 +293,13 @@ public class SimulationView {
   /**
    * Hides the settings splash and removes it from layout calculations.
    *
-   * <p>Purpose: returns focus to the main simulation UI.</p>
+   *Purpose: returns focus to the main simulation UI.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public void closeSettings(){
     mySettings.setVisible(false);
@@ -309,13 +309,13 @@ public class SimulationView {
   /**
    * Shows the settings splash and makes it participate in layout.
    *
-   * <p>Purpose: allows the user to change language/theme or upload a config.</p>
+   *Purpose: allows the user to change language/theme or upload a config.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public void openSettings(){
     mySettings.setVisible(true);
@@ -325,9 +325,9 @@ public class SimulationView {
   /**
    * Returns the root node for scene construction.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return root JavaFX node for this view
    */
@@ -336,9 +336,9 @@ public class SimulationView {
   /**
    * Returns the settings splash component.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return settings splash UI
    */
@@ -347,9 +347,9 @@ public class SimulationView {
   /**
    * Returns the about dialog component.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return about dialog UI
    */
@@ -360,13 +360,13 @@ public class SimulationView {
   /**
    * Applies a new language bundle to all view components.
    *
-   * <p>Purpose: updates all visible strings without rebuilding the UI.</p>
+   *Purpose: updates all visible strings without rebuilding the UI.
    *
-   * <p>Assumptions: {@code bundle} contains required keys.</p>
+   *Assumptions: {@code bundle} contains required keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI strings
    */
@@ -383,13 +383,13 @@ public class SimulationView {
   /**
    * Applies the selected theme stylesheet to the scene.
    *
-   * <p>Purpose: changes the application's visual theme without recreating nodes.</p>
+   *Purpose: changes the application's visual theme without recreating nodes.
    *
-   * <p>Assumptions: {@code scene} is non-null and attached to a Stage.</p>
+   *Assumptions: {@code scene} is non-null and attached to a Stage.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param scene JavaFX scene to update
    * @param themeChoice theme name (e.g., "Light", "Dark", "Duke")
@@ -401,9 +401,9 @@ public class SimulationView {
   /**
    * Returns the resource bundle used by this view.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return current localization bundle
    */
@@ -412,9 +412,9 @@ public class SimulationView {
   /**
    * Returns the button manager that owns the UI controls.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button manager
    */
@@ -423,13 +423,13 @@ public class SimulationView {
   /**
    * Replaces the center content with a provided node wrapped in a card.
    *
-   * <p>Purpose: allows controllers to swap the center display (e.g., multi-sim dashboard).</p>
+   *Purpose: allows controllers to swap the center display (e.g., multi-sim dashboard).
    *
-   * <p>Assumptions: {@code content} is non-null.</p>
+   *Assumptions: {@code content} is non-null.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param content node to display in the center card
    */
@@ -447,7 +447,7 @@ public class SimulationView {
   /**
    * Returns the TilePane used by the multi-sim dashboard.
    *
-   * <p>Assumptions: the dashboard has been built.</p>
+   *Assumptions: the dashboard has been built.
    *
    * @return multi-sim TilePane
    */
@@ -458,7 +458,7 @@ public class SimulationView {
   /**
    * Returns the slot count choice box used by the multi-sim dashboard.
    *
-   * <p>Assumptions: the dashboard has been built.</p>
+   *Assumptions: the dashboard has been built.
    *
    * @return slot count choice box
    */

@@ -1,22 +1,16 @@
 /**
- * View-layer components for the Cellular Automata simulator.
+ * Public view API for the simulator application.
  *
- * <p>Purpose: provides JavaFX UI elements that render simulations, expose controls, and
- * present dialogs/splashes without embedding simulation logic.</p>
+ * Design goals:
+ * Keep rendering and UI composition separate from simulation rules and controller logic.
+ * Allow controllers to evolve without forcing view implementations to expose internal state.
+ * Support future extension with additional dialogs, renderers, and themes.
  *
- * <p>Assumptions: the JavaFX application thread is initialized before any view is created,
- * and controller code is responsible for supplying valid models and callbacks.</p>
- *
- * <p>Dependencies: JavaFX UI toolkit, {@code cellsociety.Model} read-only grid access,
- * and {@code cellsociety.controller} presenters/controllers.</p>
- *
- * <p>Example usage:</p>
- * <pre>{@code
- * ResourceBundle bundle = ResourceBundle.getBundle("cellsociety.languages.English");
- * SimulationView view = new SimulationView(bundle);
- * Scene scene = new Scene(view.getRoot());
- * stage.setScene(scene);
- * }</pre>
+ * Contracts:
+ * Controllers drive this package through stable methods on view classes and interfaces.
+ * View classes return JavaFX nodes and consume immutable or read-only model data where possible.
+ * Errors are surfaced as runtime exceptions for invalid UI usage, such as missing required data.
+ * Communication is callback-based for user actions and object-based for simulation snapshots.
  *
  * @author Emilio Garcia
  * @author Michael Lei

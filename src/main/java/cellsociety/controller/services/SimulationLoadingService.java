@@ -22,6 +22,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Service-layer class for simulation loading workflows.
+ *
+ * @author Emilio Garcia
  */
 public class SimulationLoadingService {
 

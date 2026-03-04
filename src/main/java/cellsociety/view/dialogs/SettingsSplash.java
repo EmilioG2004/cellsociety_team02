@@ -20,20 +20,20 @@ import cellsociety.view.constants.ResourcePaths;
 /**
  * Full-screen settings overlay for language/theme selection and initial upload.
  *
- * <p>Purpose: provides a startup and in-app settings UI without navigating away
- * from the main view.</p>
+ *Purpose: provides a startup and in-app settings UI without navigating away
+ * from the main view.
  *
- * <p>Assumptions: localization keys exist for all labels and buttons; controller
- * wires button actions.</p>
+ *Assumptions: localization keys exist for all labels and buttons; controller
+ * wires button actions.
  *
- * <p>Dependencies: JavaFX controls and {@link ResourceBundle} for localization.</p>
+ *Dependencies: JavaFX controls and {@link ResourceBundle} for localization.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * SettingsSplash splash = new SettingsSplash();
  * splash.applyLanguage(bundle);
  * splash.getMyApplyChanges().setOnAction(e -> applySettings());
- * }</pre>
+ *
  *
  * @author Emilio Garcia
  */
@@ -50,13 +50,13 @@ public class SettingsSplash extends StackPane {
   /**
    * Creates the settings splash and builds the dialog content.
    *
-   * <p>Purpose: initializes controls and choice boxes for later wiring.</p>
+   *Purpose: initializes controls and choice boxes for later wiring.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public SettingsSplash(){
     setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -90,13 +90,13 @@ public class SettingsSplash extends StackPane {
   /**
    * Populates the language and theme dropdown options.
    *
-   * <p>Purpose: sets the internal canonical values used by the converters.</p>
+   *Purpose: sets the internal canonical values used by the converters.
    *
-   * <p>Assumptions: dropdowns are empty or can accept duplicate entries.</p>
+   *Assumptions: dropdowns are empty or can accept duplicate entries.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   private void buildDropdowns(){
     myLanguages.getItems().addAll(myLanguageApplier.getLanguageChoices());
@@ -111,13 +111,13 @@ public class SettingsSplash extends StackPane {
   /**
    * Applies localized text and updates dropdown converters.
    *
-   * <p>Purpose: display translated labels while preserving internal canonical values.</p>
+   *Purpose: display translated labels while preserving internal canonical values.
    *
-   * <p>Assumptions: {@code bundle} contains the required keys.</p>
+   *Assumptions: {@code bundle} contains the required keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI strings
    */
@@ -164,9 +164,9 @@ public class SettingsSplash extends StackPane {
   /**
    * Returns the Apply Changes button for controller wiring.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return apply button
    */
@@ -175,9 +175,9 @@ public class SettingsSplash extends StackPane {
   /**
    * Returns the language selection dropdown.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return language choice box
    */
@@ -186,9 +186,9 @@ public class SettingsSplash extends StackPane {
   /**
    * Returns the theme selection dropdown.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return theme choice box
    */
@@ -197,9 +197,9 @@ public class SettingsSplash extends StackPane {
   /**
    * Returns the Load Simulation button for controller wiring.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return load simulation button
    */

@@ -26,24 +26,24 @@ import javafx.scene.layout.VBox;
 /**
  * Lightweight render-only panel for a single simulation (generation label + grid).
  *
- * <p>Purpose: enables multi-simulation dashboards without duplicating the full
- * {@link SimulationView} UI.</p>
+ *Purpose: enables multi-simulation dashboards without duplicating the full
+ * {@link SimulationView} UI.
  *
- * <p>Assumptions: the caller initializes the grid via {@link #setGrid(int, int)}
- * before calling {@link #render(ViewGrid)}.</p>
+ *Assumptions: the caller initializes the grid via {@link #setGrid(int, int)}
+ * before calling {@link #render(ViewGrid)}.
  *
- * <p>Dependencies: {@link GridView} implementations, JavaFX layout nodes, and
- * localized strings from {@link ResourceBundle}.</p>
+ *Dependencies: {@link GridView} implementations, JavaFX layout nodes, and
+ * localized strings from {@link ResourceBundle}.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * SimulationPanel panel = new SimulationPanel(bundle);
  * panel.setGrid(rows, cols);
  * panel.render(sim.getViewGrid());
- * }</pre>
  *
- * <p>Other details: this panel exposes controls for loading, viewing metadata, and rotating
- * the grid. The controller supplies behavior via callbacks.</p>
+ *
+ *Other details: this panel exposes controls for loading, viewing metadata, and rotating
+ * the grid. The controller supplies behavior via callbacks.
  *
  * @author Emilio Garcia
  */
@@ -70,14 +70,14 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * Creates a panel with localized labels and a blank grid container.
    *
-   * <p>Purpose: sets up the static header and grid container for later rendering.</p>
+   *Purpose: sets up the static header and grid container for later rendering.
    *
-   * <p>Assumptions: {@code bundle} contains the {@code button.loadsim} and
-   * {@code label.generation} keys.</p>
+   *Assumptions: {@code bundle} contains the {@code button.loadsim} and
+   * {@code label.generation} keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI text
    */
@@ -148,11 +148,11 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: rows and cols are positive.</p>
+   *Assumptions: rows and cols are positive.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void setGrid(int rows, int cols) {
@@ -168,11 +168,11 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: {@link #setGrid(int, int)} has been called.</p>
+   *Assumptions: {@link #setGrid(int, int)} has been called.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void render(ViewGrid grid) {
@@ -183,11 +183,11 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: generation is non-negative.</p>
+   *Assumptions: generation is non-negative.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void setGeneration(int generation) {
@@ -199,9 +199,9 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return panel root node
    */
@@ -213,13 +213,13 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * Registers the callback for the panel's "Load" button.
    *
-   * <p>Purpose: allows the controller to open a config chooser for this slot.</p>
+   *Purpose: allows the controller to open a config chooser for this slot.
    *
-   * <p>Assumptions: {@code action} is non-null.</p>
+   *Assumptions: {@code action} is non-null.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param action callback executed when the load button is pressed
    */
@@ -252,13 +252,13 @@ public class SimulationPanel implements SimulationRenderer {
   /**
    * Toggles outline visibility for this panel's grid.
    *
-   * <p>Purpose: mirror the global outline toggle in multi-sim mode.</p>
+   *Purpose: mirror the global outline toggle in multi-sim mode.
    *
-   * <p>Assumptions: {@code grid} dimensions match the current grid.</p>
+   *Assumptions: {@code grid} dimensions match the current grid.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param grid read-only grid used to update outlines
    */

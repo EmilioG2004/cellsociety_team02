@@ -19,22 +19,22 @@ import javafx.scene.shape.Rectangle;
 /**
  * GridPane-based {@link GridView} implementation that renders cells as rectangles.
  *
- * <p>Purpose: provide a straightforward grid visualization for cellular automata
- * while remaining compatible with the {@link GridView} interface.</p>
+ *Purpose: provide a straightforward grid visualization for cellular automata
+ * while remaining compatible with the {@link GridView} interface.
  *
- * <p>Assumptions: grid dimensions are fixed for the lifetime of the view; the
- * provided {@link ViewGrid} matches those dimensions.</p>
+ *Assumptions: grid dimensions are fixed for the lifetime of the view; the
+ * provided {@link ViewGrid} matches those dimensions.
  *
- * <p>Dependencies: JavaFX {@link GridPane}, {@link Rectangle}, and binding APIs.</p>
+ *Dependencies: JavaFX {@link GridPane}, {@link Rectangle}, and binding APIs.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * GridView gridView = new GridPaneView(20, 20);
  * gridView.render(sim.getViewGrid());
- * }</pre>
  *
- * <p>Other details: rotation is implemented by rotating the underlying GridPane
- * and exposing a layout-friendly wrapper node.</p>
+ *
+ *Other details: rotation is implemented by rotating the underlying GridPane
+ * and exposing a layout-friendly wrapper node.
  *
  * @author Emilio Garcia
  * @author Michael Lei
@@ -57,13 +57,13 @@ public class GridPaneView implements GridView {
   /**
    * Constructs a GridPaneView with the specified dimensions.
    *
-   * <p>Purpose: initializes the visual grid and allocates rectangles for each cell.</p>
+   *Purpose: initializes the visual grid and allocates rectangles for each cell.
    *
-   * <p>Assumptions: {@code rows} and {@code cols} are positive integers.</p>
+   *Assumptions: {@code rows} and {@code cols} are positive integers.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param rows number of rows in the grid
    * @param cols number of columns in the grid
@@ -96,9 +96,9 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return node used to display the grid
    */
@@ -140,11 +140,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: the grid has been constructed.</p>
+   *Assumptions: the grid has been constructed.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void clear() {
@@ -158,11 +158,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: {@code grid} dimensions match the view's dimensions.</p>
+   *Assumptions: {@code grid} dimensions match the view's dimensions.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void render(ViewGrid grid) {
@@ -181,11 +181,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void setOnCellClicked(java.util.function.BiConsumer<Integer, Integer> handler) {
@@ -195,11 +195,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: {@code grid} dimensions match the view's dimensions.</p>
+   *Assumptions: {@code grid} dimensions match the view's dimensions.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void toggleOutline(ViewGrid grid){
@@ -241,11 +241,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: rotation state is maintained internally.</p>
+   *Assumptions: rotation state is maintained internally.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public void rotateRight() {
     myRotationSteps.set((myRotationSteps.get() + 1) % 4);
@@ -255,11 +255,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: rotation state is maintained internally.</p>
+   *Assumptions: rotation state is maintained internally.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   public void rotateLeft() {
     myRotationSteps.set((myRotationSteps.get() + 3) % 4);
@@ -269,11 +269,11 @@ public class GridPaneView implements GridView {
   /**
    * {@inheritDoc}
    *
-   * <p>Assumptions: {@code container} is a Region that participates in layout.</p>
+   *Assumptions: {@code container} is a Region that participates in layout.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    */
   @Override
   public void bindToContainer(Region container){

@@ -2,6 +2,12 @@ package cellsociety.view.constants;
 
 /**
  * Centralized ResourceBundle key names used by the UI.
+ *
+ * Purpose: prevent string-key drift across view and controller wiring.
+ * Assumptions: matching entries exist in active language bundles.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public final class BundleKeys {
   private BundleKeys() {}

@@ -2,6 +2,11 @@ package cellsociety.view.constants;
 
 /**
  * Centralized resource paths and bundle names.
+ *
+ * Purpose: keep file-system/resource identifiers out of runtime logic.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public final class ResourcePaths {
   private ResourcePaths() {}
@@ -41,4 +46,6 @@ public final class ResourcePaths {
   // Grid edge policies
   public static final String FINITE = "Finite";
   public static final String TOROIDAL = "Toroidal";
+  public static final String CYLINDRICAL = "Cylindrical";
+  public static final String MIRRORED = "Mirrored";
 }

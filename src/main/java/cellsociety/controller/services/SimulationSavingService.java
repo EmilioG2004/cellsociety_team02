@@ -17,6 +17,8 @@ import cellsociety.view.constants.ResourcePaths;
 
 /**
  * Service-layer class for simulation saving workflows.
+ *
+ * @author Emilio Garcia
  */
 public class SimulationSavingService {
 

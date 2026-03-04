@@ -2,6 +2,11 @@ package cellsociety.view.constants;
 
 /**
  * Numeric constants for simulation defaults and UI layout.
+ *
+ * Purpose: centralize tunable UI and control defaults used by view and controller code.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public final class SimulationUiConstants {
   private SimulationUiConstants() {}

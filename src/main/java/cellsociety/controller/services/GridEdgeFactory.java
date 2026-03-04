@@ -3,8 +3,10 @@ package cellsociety.controller.services;
 import static cellsociety.view.constants.SimulationUiConstants.ERROR_MSG_UNSUPPORTED_GRID_EDGE_PREFIX;
 
 import cellsociety.Model.Grid.ControllerGrid;
+import cellsociety.Model.GridEdge.CylindricalEdge;
 import cellsociety.Model.GridEdge.FiniteEdge;
 import cellsociety.Model.GridEdge.GridEdge;
+import cellsociety.Model.GridEdge.MirroredEdge;
 import cellsociety.Model.GridEdge.ToroidalEdge;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.controller.multiview.SimulationSlot;
@@ -13,6 +15,8 @@ import java.util.List;
 
 /**
  * Creates and applies grid edge policies based on UI choice values.
+ *
+ * @author Emilio Garcia
  */
 public class GridEdgeFactory {
 
@@ -47,6 +51,12 @@ public class GridEdgeFactory {
     }
     if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
       return new ToroidalEdge();
+    }
+    if (ResourcePaths.CYLINDRICAL.equals(selectedChoice)) {
+      return new CylindricalEdge();
+    }
+    if (ResourcePaths.MIRRORED.equals(selectedChoice)) {
+      return new MirroredEdge();
     }
     throw new IllegalArgumentException(ERROR_MSG_UNSUPPORTED_GRID_EDGE_PREFIX + selectedChoice);
   }

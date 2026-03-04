@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * Service for simulation-specific dialog workflows (about and population graph dialogs).
+ *
+ * @author Emilio Garcia
  */
 public class SimulationDialogService {
 

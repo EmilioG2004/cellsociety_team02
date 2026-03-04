@@ -10,6 +10,8 @@ import java.util.function.IntConsumer;
 
 /**
  * Manages simulation slot lifecycle and dashboard tile updates.
+ *
+ * @author Emilio Garcia
  */
 public class SlotManager {
 

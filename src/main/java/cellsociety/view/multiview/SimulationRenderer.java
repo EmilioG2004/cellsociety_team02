@@ -7,19 +7,19 @@ import javafx.scene.Node;
 /**
  * Minimal view contract for rendering a simulation without interactive controls.
  *
- * <p>Purpose: lets presenters drive multiple simulation displays (e.g., multi-sim dashboard)
- * without exposing the full {@link SimulationView} API.</p>
+ *Purpose: lets presenters drive multiple simulation displays (e.g., multi-sim dashboard)
+ * without exposing the full {@link SimulationView} API.
  *
- * <p>Assumptions: implementations maintain their own internal view state and size.</p>
+ *Assumptions: implementations maintain their own internal view state and size.
  *
- * <p>Dependencies: {@link ViewGrid} for grid state and JavaFX {@link Node} for embedding.</p>
+ *Dependencies: {@link ViewGrid} for grid state and JavaFX {@link Node} for embedding.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * SimulationRenderer renderer = new SimulationPanel(bundle);
  * renderer.setGrid(rows, cols);
  * renderer.render(sim.getViewGrid());
- * }</pre>
+ *
  *
  * @author Emilio Garcia
  */
@@ -28,14 +28,14 @@ public interface SimulationRenderer {
   /**
    * Initializes the renderer for a grid of the given dimensions.
    *
-   * <p>Purpose: allocates the underlying visual grid once per simulation.</p>
+   *Purpose: allocates the underlying visual grid once per simulation.
    *
-   * <p>Assumptions: {@code rows} and {@code cols} are positive.</p>
+   *Assumptions: {@code rows} and {@code cols} are positive.
    *
-   * <p>Exceptions: may throw {@link IllegalArgumentException} if rows/cols are non-positive
-   * (implementation-defined).</p>
+   *Exceptions: may throw {@link IllegalArgumentException} if rows/cols are non-positive
+   * (implementation-defined).
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param rows number of grid rows
    * @param cols number of grid columns
@@ -45,13 +45,13 @@ public interface SimulationRenderer {
   /**
    * Renders the grid's current state.
    *
-   * <p>Purpose: updates cell visuals to match the simulation state.</p>
+   *Purpose: updates cell visuals to match the simulation state.
    *
-   * <p>Assumptions: {@code grid} dimensions match the values passed to {@link #setGrid}.</p>
+   *Assumptions: {@code grid} dimensions match the values passed to {@link #setGrid}.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param grid read-only view data of the simulation grid
    */
@@ -60,13 +60,13 @@ public interface SimulationRenderer {
   /**
    * Updates the displayed generation counter.
    *
-   * <p>Purpose: keeps the UI in sync with the model's generation count.</p>
+   *Purpose: keeps the UI in sync with the model's generation count.
    *
-   * <p>Assumptions: generation is non-negative.</p>
+   *Assumptions: generation is non-negative.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param generation current generation value
    */
@@ -75,9 +75,9 @@ public interface SimulationRenderer {
   /**
    * Returns the root JavaFX node for embedding in layouts.
    *
-   * <p>Assumptions: implementers return a stable node instance.</p>
+   *Assumptions: implementers return a stable node instance.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return JavaFX node for this renderer
    */

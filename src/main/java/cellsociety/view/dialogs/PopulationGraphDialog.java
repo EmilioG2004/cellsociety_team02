@@ -34,6 +34,13 @@ import javafx.stage.Stage;
 
 /**
  * Small dialog that displays population counts over time for a single simulation slot.
+ *
+ * Purpose: provide an at-a-glance time series for state populations in one slot.
+ * Assumptions: history is non-empty and each snapshot contains non-null counts.
+ * Dependencies: JavaFX chart APIs and {@link PopulationSnapshot}.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public class PopulationGraphDialog {
 
@@ -42,6 +49,9 @@ public class PopulationGraphDialog {
   private final NumberAxis myPopulationAxis;
   private final LineChart<Number, Number> myChart;
 
+  /**
+   * Creates a modal graph dialog with chart and close action.
+   */
   public PopulationGraphDialog() {
     myStage = new Stage();
     myStage.initModality(Modality.APPLICATION_MODAL);
@@ -74,6 +84,13 @@ public class PopulationGraphDialog {
     myStage.setScene(new Scene(root, DIALOG_WIDTH, DIALOG_HEIGHT));
   }
 
+  /**
+   * Displays a population chart for one slot.
+   *
+   * @param slotIndex zero-based slot index
+   * @param history ordered population snapshots for that slot
+   * @throws IllegalStateException when history is null or empty
+   */
   public void showForSlot(int slotIndex, List<PopulationSnapshot> history) {
     if (history == null || history.isEmpty()) {
       throw new IllegalStateException(NO_HISTORY_PREFIX + slotIndex);

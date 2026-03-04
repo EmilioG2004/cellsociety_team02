@@ -12,6 +12,8 @@ import java.util.List;
 
 /**
  * Creates and applies neighbor strategies based on UI choice values.
+ *
+ * @author Emilio Garcia
  */
 public class NeighborStrategyFactory {
 

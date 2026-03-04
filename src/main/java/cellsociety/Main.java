@@ -28,9 +28,6 @@ import org.xml.sax.SAXException;
  * Feel free to completely change this code or delete it entirely. 
  */
 public class Main extends Application {
-    // NOTE: make ONE chooser since generally accepted behavior is that it remembers where user left it last
-    private final static FileChooser FILE_CHOOSER = makeChooser(XML_FILE_EXTENSION);
-
 
     /**
      * @see Application#start(Stage)
@@ -41,7 +38,6 @@ public class Main extends Application {
         buildGUI(primaryStage, bundle);
     }
 
-    //TO-DO REFACTOR: leave view creation, remove scene creation, in controller when creating controller then create scene
     private void buildGUI(Stage stage, ResourceBundle bundle){
         SimulationView view = new SimulationView(bundle);
         Scene scene = new Scene(view.getRoot());
@@ -52,66 +48,6 @@ public class Main extends Application {
         stage.setMaximized(true);
 
         stage.show();
-    }
-
-    /**
-     * Returns number of blocks needed to cover the width and height given in the data file.
-     */
-    public int calculateNumBlocks(File xmlFile) {
-        try {
-            Document xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
-            Element root = xmlDocument.getDocumentElement();
-            int width = Integer.parseInt(getTextValue(root, "width"));
-            int height = Integer.parseInt(getTextValue(root, "height"));
-            return width * height;
-        }
-        catch (NumberFormatException e) {
-            showMessage(AlertType.ERROR, "Invalid number given in data");
-            return 0;
-        }
-        catch (ParserConfigurationException e) {
-            showMessage(AlertType.ERROR, "Invalid XML Configuration");
-            return 0;
-        }
-        catch (SAXException | IOException e) {
-            showMessage(AlertType.ERROR, "Invalid XML Data");
-            return 0;
-        }
-    }
-
-    /**
-     * A method to test getting internal resources.
-     */
-    public double getVersion () {
-        ResourceBundle resources = ResourceBundle.getBundle(ResourcePaths.BUNDLE_VERSION);
-        return Double.parseDouble(resources.getString(VERSION_KEY));
-    }
-
-    // get value of Element's text
-    private String getTextValue (Element e, String tagName) {
-        NodeList nodeList = e.getElementsByTagName(tagName);
-        if (nodeList.getLength() > 0) {
-            return nodeList.item(0).getTextContent();
-        }
-        else {
-            // FIXME: empty string or exception? In some cases it may be an error to not find any text
-            return "";
-        }
-    }
-
-    // display given message to user using the given type of Alert dialog box
-    void showMessage (AlertType type, String message) {
-        new Alert(type, message).showAndWait();
-    }
-
-    // set some sensible defaults when the FileChooser is created
-    private static FileChooser makeChooser (String extensionAccepted) {
-        FileChooser result = new FileChooser();
-        result.setTitle("Open Data File");
-        // pick a reasonable place to start searching for files
-        result.setInitialDirectory(new File(DATA_FILE_FOLDER));
-        result.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("Data Files", extensionAccepted));
-        return result;
     }
 
     /**

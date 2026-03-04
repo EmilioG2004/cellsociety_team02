@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * Synchronizes per-slot population snapshots for all currently loaded simulations.
+ *
+ * @author Emilio Garcia
  */
 public class PopulationSyncService {
 
