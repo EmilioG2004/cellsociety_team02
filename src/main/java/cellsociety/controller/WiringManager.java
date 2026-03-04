@@ -4,6 +4,7 @@ import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_BACKWARD;
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_FORWARD;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
+import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.view.SimulationView;
 import cellsociety.view.constants.ResourcePaths;
 import java.util.List;

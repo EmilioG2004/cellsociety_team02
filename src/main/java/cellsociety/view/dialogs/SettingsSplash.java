@@ -1,8 +1,7 @@
-package cellsociety.view;
+package cellsociety.view.dialogs;
 
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.SPACING_MEDIUM;
-import static cellsociety.view.constants.SimulationUiConstants.PADDING_SETTINGS;
 
 import cellsociety.view.constants.SimulationUiConstants;
 import java.util.ResourceBundle;

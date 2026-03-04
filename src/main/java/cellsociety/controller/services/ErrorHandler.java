@@ -1,4 +1,4 @@
-package cellsociety.controller;
+package cellsociety.controller.services;
 
 import static cellsociety.view.constants.BundleKeys.ERROR_FILE_READ;
 import static cellsociety.view.constants.BundleKeys.ERROR_INVALID_CONFIG;

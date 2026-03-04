@@ -1,4 +1,4 @@
-package cellsociety.view;
+package cellsociety.view.dialogs;
 
 import static cellsociety.view.constants.BundleKeys.*;
 

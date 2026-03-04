@@ -1,9 +1,14 @@
-package cellsociety.view;
+package cellsociety.view.multiview;
 
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
+import cellsociety.view.GridPaneView;
+import cellsociety.view.GridView;
+import cellsociety.view.SimulationView;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import cellsociety.Model.Grid.ViewGrid;
@@ -59,6 +64,7 @@ public class SimulationPanel implements SimulationRenderer {
   private final StackPane myGridContainer;
 
   private GridView myGridView;
+  private Map<Integer, String> myStateColors = new HashMap<>();
   private BiConsumer<Integer, Integer> myOnCellClicked;
 
   /**
@@ -151,6 +157,7 @@ public class SimulationPanel implements SimulationRenderer {
   @Override
   public void setGrid(int rows, int cols) {
     myGridView = new GridPaneView(rows, cols);
+    myGridView.setStateColors(myStateColors);
     myGridView.setOnCellClicked(myOnCellClicked);
     Node gridNode = myGridView.getNode();
     myGridContainer.getChildren().setAll(gridNode);
@@ -286,5 +293,12 @@ public class SimulationPanel implements SimulationRenderer {
     myViewGraphButton.setText(myBundle.getString(BUTTON_VIEW_GRAPH));
     myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
     myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
+  }
+
+  public void applyStateColors(Map<Integer, String> stateColors) {
+    myStateColors = new HashMap<>(stateColors);
+    if (myGridView != null) {
+      myGridView.setStateColors(myStateColors);
+    }
   }
 }

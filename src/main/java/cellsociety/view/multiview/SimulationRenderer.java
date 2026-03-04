@@ -1,6 +1,7 @@
-package cellsociety.view;
+package cellsociety.view.multiview;
 
 import cellsociety.Model.Grid.ViewGrid;
+import cellsociety.view.SimulationView;
 import javafx.scene.Node;
 
 /**
