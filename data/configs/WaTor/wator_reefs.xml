@@ -1,0 +1,87 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Reefs</title>
+    <author>Ixa Sigler</author>
+    <description>
+      40x40 WaTor with dense "reef" fish clusters around the edges and a shark pack near the center.
+    </description>
+  </metadata>
+
+  <grid rows="40" cols="40">
+    <randomByCount>
+      <state id="0" count="1400"/>
+      <state id="1" count="200"/>
+    </randomByCount>
+
+    <!-- reef cluster (top-left) -->
+    <pattern row="3" col="3">
+      <states>
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+      </states>
+    </pattern>
+
+    <!-- reef cluster (top-right) -->
+    <pattern row="3" col="27">
+      <states>
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+      </states>
+    </pattern>
+
+    <!-- eeef cluster (bottom-left) -->
+    <pattern row="29" col="3">
+      <states>
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+      </states>
+    </pattern>
+
+    <!-- reef cluster (bottom-right) -->
+    <pattern row="29" col="27">
+      <states>
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1
+      </states>
+    </pattern>
+
+    <!-- shark pack near center -->
+    <pattern row="18" col="18">
+      <states>
+        0,2,0,2,0
+        2,0,2,0,2
+        0,2,2,2,0
+        2,0,2,0,2
+        0,2,0,2,0
+      </states>
+    </pattern>
+
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
