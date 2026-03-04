@@ -20,7 +20,7 @@ import static cellsociety.config.ConfigXmlConstants.*;
  * with {@code type} and {@code class} attributes, plus {@code <metadata>}, {@code <grid>}, and optional {@code <parameters>}.
  * @author Ixa Sigler
  */
-public class ConfigLoader {
+public class ConfigLoader implements XmlLoader<SimulationConfig> {
 
   private static final Logger LOG = LogManager.getLogger(ConfigLoader.class);
 
@@ -45,6 +45,15 @@ public class ConfigLoader {
       LOG.error("Failed to parse XML file '{}': {}", xmlFile.getPath(), e.getMessage(), e);
       throw e;
     }
+  }
+
+  /**
+   * Implements {@link XmlLoader#load(File)} by delegating to {@link #loadConfig(File)}.
+   * Preserves the existing method name for teammates while satisfying the interface contract.
+   */
+  @Override
+  public SimulationConfig load(File file) throws ParserConfigurationException, IOException, SAXException {
+    return loadConfig(file);
   }
 
   /**

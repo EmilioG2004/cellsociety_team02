@@ -29,7 +29,7 @@ import static cellsociety.config.ConfigXmlConstants.*;
  * so saved files reflect the currently-registered rendering scheme.
  * @author Ixa Sigler
  */
-public class SimulationSaver {
+public class SimulationSaver implements XmlSaver<SimulationState> {
 
   private static final Logger LOG = LogManager.getLogger(SimulationSaver.class);
 
@@ -114,6 +114,15 @@ public class SimulationSaver {
       LOG.error("Failed to save simulation state to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save simulation state to " + outFile.getPath(), e);
     }
+  }
+
+  /**
+   * Implements {@link XmlSaver#save(Object, File)} by delegating to {@link #saveState(SimulationState, File)}.
+   * Preserves the existing method name for teammates while satisfying the interface contract.
+   */
+  @Override
+  public void save(SimulationState state, File outFile) {
+    saveState(state, outFile);
   }
 
   /**

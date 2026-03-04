@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,9 +26,13 @@ import static cellsociety.config.ConfigXmlConstants.*;
  * This differs from {@link ConfigLoader}, which loads a single simulation.
  * @author Ixa Sigler
  */
-public class SimulationLoader {
+public class SimulationLoader implements XmlLoader<SimulationState> {
 
   private static final Logger LOG = LogManager.getLogger(SimulationLoader.class);
+
+  /** Matches valid CSS hex color strings: #RGB, #RRGGBB, #RRGGBBAA (case-insensitive). */
+  private static final Pattern HEX_COLOR_PATTERN =
+      Pattern.compile("^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$");
 
   private final ConfigLoader configLoader = new ConfigLoader();
 
@@ -61,6 +66,15 @@ public class SimulationLoader {
     }
 
     return new SimulationState(configs, prefs);
+  }
+
+  /**
+   * Implements {@link XmlLoader#load(File)} by delegating to {@link #loadState(File)}.
+   * Preserves the existing method name for teammates while satisfying the interface contract.
+   */
+  @Override
+  public SimulationState load(File file) throws ParserConfigurationException, IOException, SAXException {
+    return loadState(file);
   }
 
   /**
@@ -147,37 +161,28 @@ public class SimulationLoader {
 
   /**
    * Registers parsed color maps with the {@link ColorMapProvider}.
+   * Color strings are validated as hex values to remain UI-framework-agnostic (DESIGN-09).
    */
   private void registerColorMaps(Map<String, Map<Integer, String>> mapsByType) {
     for (Map.Entry<String, Map<Integer, String>> e : mapsByType.entrySet()) {
       String simType = e.getKey();
       Map<Integer, String> raw = e.getValue();
 
-      Map<Integer, String> fxMap = new HashMap<>();
+      Map<Integer, String> validatedMap = new HashMap<>();
       for (Map.Entry<Integer, String> entry : raw.entrySet()) {
-        try {
-          validateColorString(entry.getValue()); // validate color string
-          fxMap.put(entry.getKey(), entry.getValue());
-        } catch (IllegalArgumentException ex) {
+        String colorValue = entry.getValue();
+        if (!HEX_COLOR_PATTERN.matcher(colorValue).matches()) {
           LOG.error("Invalid color value '{}' for state {} in colorMap type='{}'",
-              entry.getValue(), entry.getKey(), simType, ex);
+              colorValue, entry.getKey(), simType);
           throw new IllegalArgumentException(
-              "Invalid color value '" + entry.getValue() + "' for state " + entry.getKey()
+              "Invalid color value '" + colorValue + "' for state " + entry.getKey()
                   + " in colorMap type='" + simType + "'"
           );
         }
+        validatedMap.put(entry.getKey(), colorValue);
       }
 
-      ColorMapProvider.addOrReplaceColorMap(simType, fxMap);
-    }
-  }
-
-  private void validateColorString(String color) {
-    if (color == null) throw new IllegalArgumentException("color cannot be null");
-    String c = color.trim();
-    // accept #RGB, #RRGGBB, #RRGGBBAA
-    if (!c.matches("^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")) {
-      throw new IllegalArgumentException("Invalid color value '" + color + "'. Expected hex like #RRGGBB");
+      ColorMapProvider.addOrReplaceColorMap(simType, validatedMap);
     }
   }
 

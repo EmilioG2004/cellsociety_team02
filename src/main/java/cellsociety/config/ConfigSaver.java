@@ -22,7 +22,7 @@ import static cellsociety.config.ConfigXmlConstants.*;
  * Output root is one <simulation> element (no SimulationState, no settings, no multi-sim list).
  * @author Ixa Sigler
  */
-public class ConfigSaver {
+public class ConfigSaver implements XmlSaver<SimulationConfig> {
 
   private static final Logger LOG = LogManager.getLogger(ConfigSaver.class);
 
@@ -54,6 +54,15 @@ public class ConfigSaver {
       LOG.error("Failed to save config to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save config to " + outFile.getPath(), e);
     }
+  }
+
+  /**
+   * Implements {@link XmlSaver#save(Object, File)} by delegating to {@link #saveConfig(SimulationConfig, File)}.
+   * Preserves the existing method name for teammates while satisfying the interface contract.
+   */
+  @Override
+  public void save(SimulationConfig config, File outFile) {
+    saveConfig(config, outFile);
   }
 
   /** Creates a blank XML DOM document used as the output container. */
