@@ -14,6 +14,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static cellsociety.config.ConfigXmlConstants.*;
 
 /**
@@ -28,6 +31,8 @@ import static cellsociety.config.ConfigXmlConstants.*;
  */
 public class SimulationSaver {
 
+  private static final Logger LOG = LogManager.getLogger(SimulationSaver.class);
+
   private final ConfigSaver configSaver = new ConfigSaver();
 
   /**
@@ -35,8 +40,14 @@ public class SimulationSaver {
    * Useful for persisting UI settings even when no simulations are currently loaded.
    */
   public void savePreferences(SimulationPreferences prefs, File outFile) {
-    if (prefs == null) throw new IllegalArgumentException("prefs cannot be null");
-    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+    if (prefs == null) {
+      LOG.error("prefs cannot be null");
+      throw new IllegalArgumentException("prefs cannot be null");
+    }
+    if (outFile == null) {
+      LOG.error("outFile cannot be null");
+      throw new IllegalArgumentException("outFile cannot be null");
+    }
 
     validatePreferences(prefs);
 
@@ -46,6 +57,7 @@ public class SimulationSaver {
       doc.appendChild(root);
       writeXml(doc, outFile);
     } catch (Exception e) {
+      LOG.error("Failed to save preferences to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save preferences to " + outFile.getPath(), e);
     }
   }
@@ -55,13 +67,22 @@ public class SimulationSaver {
    * This is used by "Save Session" behavior to restore both UI settings and the open simulations.
    */
   public void saveState(SimulationState state, File outFile) {
-    if (state == null) throw new IllegalArgumentException("state cannot be null");
-    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+    if (state == null) {
+      LOG.error("state cannot be null");
+      throw new IllegalArgumentException("state cannot be null");
+    }
+    if (outFile == null) {
+      LOG.error("outFile cannot be null");
+      throw new IllegalArgumentException("outFile cannot be null");
+    }
 
     validatePreferences(state.getPreferences());
 
     List<SimulationConfig> configs = state.getActiveSimulations();
-    if (configs == null) throw new IllegalArgumentException("activeSimulations cannot be null");
+    if (configs == null) {
+      LOG.error("activeSimulations cannot be null");
+      throw new IllegalArgumentException("activeSimulations cannot be null");
+    }
 
     try {
       Document doc = newDocument();
@@ -75,6 +96,7 @@ public class SimulationSaver {
 
       for (SimulationConfig cfg : configs) {
         if (cfg == null) {
+          LOG.error("activeSimulations contains null config");
           throw new IllegalArgumentException("activeSimulations contains null config");
         }
 
@@ -89,6 +111,7 @@ public class SimulationSaver {
       writeXml(doc, outFile);
 
     } catch (Exception e) {
+      LOG.error("Failed to save simulation state to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save simulation state to " + outFile.getPath(), e);
     }
   }
@@ -138,6 +161,7 @@ public class SimulationSaver {
     for (Map.Entry<String, Map<Integer, String>> typeEntry : colorMapsByType.entrySet()) {
       String type = trimmed(typeEntry.getKey());
       if (type.isEmpty()) {
+        LOG.error("ColorMapProvider contains blank simulationType key");
         throw new IllegalArgumentException("ColorMapProvider contains blank simulationType key");
       }
 
@@ -161,11 +185,13 @@ public class SimulationSaver {
     for (Map.Entry<Integer, String> entry : map.entrySet()) {
       Integer state = entry.getKey();
       if (state == null) {
+        LOG.error("color map for type '{}' contains null state key", type);
         throw new IllegalArgumentException("color map for type '" + type + "' contains null state key");
       }
 
       String c = entry.getValue();
       if (c == null) {
+        LOG.error("color map for type '{}' has null color for state {}", type, state);
         throw new IllegalArgumentException("color map for type '" + type + "' has null color for state " + state);
       }
 
@@ -180,14 +206,20 @@ public class SimulationSaver {
   }
 
   private void validatePreferences(SimulationPreferences prefs) {
-    if (prefs.getTheme() == null)
+    if (prefs.getTheme() == null) {
+      LOG.error("theme cannot be null");
       throw new IllegalArgumentException("theme cannot be null");
+    }
 
-    if (trimmed(prefs.getLanguage()).isEmpty())
+    if (trimmed(prefs.getLanguage()).isEmpty()) {
+      LOG.error("language is blank");
       throw new IllegalArgumentException("language is blank");
+    }
 
-    if (prefs.getSimulationSpeed() <= 0)
+    if (prefs.getSimulationSpeed() <= 0) {
+      LOG.error("simulationSpeed must be > 0");
       throw new IllegalArgumentException("simulationSpeed must be > 0");
+    }
   }
 
   private Document newDocument() throws Exception {

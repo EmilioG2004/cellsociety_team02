@@ -1,5 +1,7 @@
 package cellsociety.config;
 
+import javafx.scene.paint.Color;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +17,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static cellsociety.config.ConfigXmlConstants.*;
 
 /**
@@ -23,6 +28,8 @@ import static cellsociety.config.ConfigXmlConstants.*;
  * @author Ixa Sigler
  */
 public class SimulationLoader {
+
+  private static final Logger LOG = LogManager.getLogger(SimulationLoader.class);
 
   private final ConfigLoader configLoader = new ConfigLoader();
 
@@ -37,6 +44,7 @@ public class SimulationLoader {
 
     Element root = doc.getDocumentElement();
     if (root == null || !CONFIG_SIMULATION_STATE.equals(root.getTagName())) {
+      LOG.error("Expected root <{}> in {}", CONFIG_SIMULATION_STATE, xmlFile.getName());
       throw new IllegalArgumentException("Expected root <" + CONFIG_SIMULATION_STATE + "> in " + xmlFile.getName());
     }
 
@@ -66,9 +74,11 @@ public class SimulationLoader {
     String language = getChildText(preferencesEl, CONFIG_LANGUAGE);
 
     if (language.isBlank()) {
+      LOG.error("<{}> cannot be blank", CONFIG_LANGUAGE);
       throw new IllegalArgumentException("<" + CONFIG_LANGUAGE + "> cannot be blank");
     }
     if (speed <= 0) {
+      LOG.error("<{}> must be > 0 (was {})", CONFIG_SIMULATION_SPEED, speed);
       throw new IllegalArgumentException("<" + CONFIG_SIMULATION_SPEED + "> must be > 0");
     }
 
@@ -93,6 +103,7 @@ public class SimulationLoader {
 
         String type = colorMapEl.getAttribute(CONFIG_COLOR_MAP_TYPE_ATTR).trim();
         if (type.isEmpty()) {
+          LOG.error("<{}> missing '{}'", CONFIG_COLOR_MAP, CONFIG_COLOR_MAP_TYPE_ATTR);
           throw new IllegalArgumentException("<" + CONFIG_COLOR_MAP + "> missing '" + CONFIG_COLOR_MAP_TYPE_ATTR + "'");
         }
 
@@ -121,9 +132,11 @@ public class SimulationLoader {
       String colorStr = entry.getAttribute(CONFIG_COLOR_VALUE_ATTR).trim();
 
       if (stateStr.isEmpty()) {
+        LOG.error("<{}> missing '{}'", CONFIG_COLOR_ENTRY, CONFIG_COLOR_STATE_ATTR);
         throw new IllegalArgumentException("<" + CONFIG_COLOR_ENTRY + "> missing '" + CONFIG_COLOR_STATE_ATTR + "'");
       }
       if (colorStr.isEmpty()) {
+        LOG.error("<{}> missing '{}'", CONFIG_COLOR_ENTRY, CONFIG_COLOR_VALUE_ATTR);
         throw new IllegalArgumentException("<" + CONFIG_COLOR_ENTRY + "> missing '" + CONFIG_COLOR_VALUE_ATTR + "'");
       }
 
@@ -145,9 +158,11 @@ public class SimulationLoader {
       Map<Integer, String> fxMap = new HashMap<>();
       for (Map.Entry<Integer, String> entry : raw.entrySet()) {
         try {
-          validateColorString(entry.getValue());
+          Color.web(entry.getValue()); // validate color string
           fxMap.put(entry.getKey(), entry.getValue());
         } catch (IllegalArgumentException ex) {
+          LOG.error("Invalid color value '{}' for state {} in colorMap type='{}'",
+              entry.getValue(), entry.getKey(), simType, ex);
           throw new IllegalArgumentException(
               "Invalid color value '" + entry.getValue() + "' for state " + entry.getKey()
                   + " in colorMap type='" + simType + "'"
@@ -156,15 +171,6 @@ public class SimulationLoader {
       }
 
       ColorMapProvider.addOrReplaceColorMap(simType, fxMap);
-    }
-  }
-
-  private void validateColorString(String color) {
-    if (color == null) throw new IllegalArgumentException("color cannot be null");
-    String c = color.trim();
-    // accept #RGB, #RRGGBB, #RRGGBBAA
-    if (!c.matches("^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")) {
-      throw new IllegalArgumentException("Invalid color value '" + color + "'. Expected hex like #RRGGBB");
     }
   }
 
@@ -178,7 +184,10 @@ public class SimulationLoader {
 
   private Element getFirstChildElementByTag(Element parent, String tag) {
     Element el = getOptionalFirstChildElementByTag(parent, tag);
-    if (el == null) throw new IllegalArgumentException("Missing <" + tag + "> element");
+    if (el == null) {
+      LOG.error("Missing <{}> element", tag);
+      throw new IllegalArgumentException("Missing <" + tag + "> element");
+    }
     return el;
   }
 
@@ -197,22 +206,26 @@ public class SimulationLoader {
 
   private int tryParseInt(String text, String fieldName) {
     if (text == null || text.trim().isEmpty()) {
+      LOG.error("Missing/blank integer for {}", fieldName);
       throw new IllegalArgumentException("Missing/blank integer for " + fieldName);
     }
     try {
       return Integer.parseInt(text.trim());
     } catch (NumberFormatException e) {
+      LOG.error("Invalid integer for {}: {}", fieldName, text, e);
       throw new IllegalArgumentException("Invalid integer for " + fieldName + ": " + text);
     }
   }
 
   private double tryParseDouble(String text, String fieldName) {
     if (text == null || text.trim().isEmpty()) {
+      LOG.error("Missing/blank number for {}", fieldName);
       throw new IllegalArgumentException("Missing/blank number for " + fieldName);
     }
     try {
       return Double.parseDouble(text.trim());
     } catch (NumberFormatException e) {
+      LOG.error("Invalid number for {}: {}", fieldName, text, e);
       throw new IllegalArgumentException("Invalid number for " + fieldName + ": " + text);
     }
   }

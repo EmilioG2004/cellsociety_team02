@@ -9,6 +9,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -21,13 +24,21 @@ import static cellsociety.config.ConfigXmlConstants.*;
  */
 public class ConfigSaver {
 
+  private static final Logger LOG = LogManager.getLogger(ConfigSaver.class);
+
   /**
    * Writes one simulation config to an XML file.
    * This is typically used by export/save features to persist the current simulation setup.
    */
   public void saveConfig(SimulationConfig config, File outFile) {
-    if (config == null) throw new IllegalArgumentException("config cannot be null");
-    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+    if (config == null) {
+      LOG.error("config cannot be null");
+      throw new IllegalArgumentException("config cannot be null");
+    }
+    if (outFile == null) {
+      LOG.error("outFile cannot be null");
+      throw new IllegalArgumentException("outFile cannot be null");
+    }
 
     validateConfig(config);
 
@@ -40,6 +51,7 @@ public class ConfigSaver {
       // Serialize the DOM tree to disk
       writeXml(doc, outFile);
     } catch (Exception e) {
+      LOG.error("Failed to save config to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save config to " + outFile.getPath(), e);
     }
   }
@@ -130,8 +142,14 @@ public class ConfigSaver {
     String n = trimmed(name);
     String v = trimmed(value);
 
-    if (n.isEmpty()) throw new IllegalArgumentException("Parameter has blank name");
-    if (v.isEmpty()) throw new IllegalArgumentException("Parameter '" + n + "' has blank value");
+    if (n.isEmpty()) {
+      LOG.error("Parameter has blank name");
+      throw new IllegalArgumentException("Parameter has blank name");
+    }
+    if (v.isEmpty()) {
+      LOG.error("Parameter '{}' has blank value", n);
+      throw new IllegalArgumentException("Parameter '" + n + "' has blank value");
+    }
 
     Element paramEl = doc.createElement(CONFIG_PARAM);
     paramEl.setAttribute(CONFIG_PARAM_NAME_ATTR, n);
@@ -161,26 +179,38 @@ public class ConfigSaver {
    * Prevents producing malformed XML (e.g., mismatched grid sizes).
    */
   private void validateConfig(SimulationConfig config) {
-    if (trimmed(config.getSimulationType()).isEmpty())
+    if (trimmed(config.getSimulationType()).isEmpty()) {
+      LOG.error("simulation type is blank");
       throw new IllegalArgumentException("simulation type is blank");
+    }
 
-    if (trimmed(config.getRuleClass()).isEmpty())
+    if (trimmed(config.getRuleClass()).isEmpty()) {
+      LOG.error("rule class is blank");
       throw new IllegalArgumentException("rule class is blank");
+    }
 
     int rows = config.getRows();
     int cols = config.getCols();
-    if (rows <= 0 || cols <= 0)
+    if (rows <= 0 || cols <= 0) {
+      LOG.error("rows/cols must be positive (rows={}, cols={})", rows, cols);
       throw new IllegalArgumentException("rows/cols must be positive");
+    }
 
     int[][] states = config.getInitialStates();
-    if (states == null || states.length != rows)
+    if (states == null || states.length != rows) {
+      LOG.error("initialStates row count does not match rows (rows={}, actual={})",
+          rows, (states == null ? "null" : states.length));
       throw new IllegalArgumentException("initialStates row count does not match rows");
+    }
 
     for (int r = 0; r < rows; r++) {
-      if (states[r] == null || states[r].length != cols)
+      if (states[r] == null || states[r].length != cols) {
+        LOG.error("initialStates col count does not match cols at row {} (cols={}, actual={})",
+            r, cols, (states[r] == null ? "null" : states[r].length));
         throw new IllegalArgumentException(
             "initialStates col count does not match cols at row " + r
         );
+      }
     }
   }
 

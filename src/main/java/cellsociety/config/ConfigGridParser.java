@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,6 +22,8 @@ import static cellsociety.config.ConfigXmlConstants.*;
  */
 public class ConfigGridParser {
 
+  private static final Logger LOG = LogManager.getLogger(ConfigGridParser.class);
+
   /**
    * Parses the grid dimensions from the config's <grid> element.
    * Exposed so higher-level config loaders can size data structures before reading cell states.
@@ -28,12 +34,14 @@ public class ConfigGridParser {
     String rowsStr = grid.getAttribute(CONFIG_ROWS);
     String colsStr = grid.getAttribute(CONFIG_COLUMNS);
     if (rowsStr.isBlank() || colsStr.isBlank()) {
+      LOG.error("Missing grid rows/cols attributes (rows='{}', cols='{}')", rowsStr, colsStr);
       throw new IllegalArgumentException("Missing grid rows/cols attributes");
     }
 
     int rows = Integer.parseInt(rowsStr);
     int cols = Integer.parseInt(colsStr);
     if (rows <= 0 || cols <= 0) {
+      LOG.error("Grid rows/cols must be positive (rows={}, cols={})", rows, cols);
       throw new IllegalArgumentException("Grid rows/cols must be positive");
     }
     return new int[] { rows, cols };
@@ -63,6 +71,7 @@ public class ConfigGridParser {
   private int[][] parseRandomByCountStates(Element grid, int rows, int cols) {
     Element randomElement = getFirstDirectChild(grid, CONFIG_RANDOM_BY_COUNT);
     if (randomElement == null) {
+      LOG.error("Missing <{}> and no <{}> provided.", CONFIG_STATES, CONFIG_RANDOM_BY_COUNT);
       throw new IllegalArgumentException(
           "Missing <" + CONFIG_STATES + "> and no <" + CONFIG_RANDOM_BY_COUNT + "> provided."
       );
@@ -73,6 +82,7 @@ public class ConfigGridParser {
 
     int fixedSum = sumInts(spec.fixedCounts);
     if (fixedSum > totalCells) {
+      LOG.error("Specified fixed state counts ({}) exceed total grid cells ({})", fixedSum, totalCells);
       throw new IllegalArgumentException(
           "Specified fixed state counts (" + fixedSum + ") exceed total grid cells (" + totalCells + ")"
       );
@@ -112,6 +122,8 @@ public class ConfigGridParser {
       boolean hasProp  = !propRaw.isEmpty();
 
       if (hasCount == hasProp) {
+        LOG.error("<state id=\"{}\"> must specify exactly one of '{}' or '{}'",
+            id, CONFIG_COUNT_ATTR, CONFIG_PROPORTION_ATTR);
         throw new IllegalArgumentException(
             "<state id=\"" + id + "\"> must specify exactly one of '" +
                 CONFIG_COUNT_ATTR + "' or '" + CONFIG_PROPORTION_ATTR + "'"
@@ -119,6 +131,7 @@ public class ConfigGridParser {
       }
 
       if (spec.fixedCounts.containsKey(id) || spec.proportions.containsKey(id)) {
+        LOG.error("Duplicate state id: {}", id);
         throw new IllegalArgumentException("Duplicate state id: " + id);
       }
 
@@ -127,6 +140,7 @@ public class ConfigGridParser {
       } else {
         double p = parseNonNegativeDouble(stateEl, CONFIG_PROPORTION_ATTR);
         if (p > 1.0) {
+          LOG.error("Proportion must be between 0.0 and 1.0 for state id {} (was {})", id, p);
           throw new IllegalArgumentException("Proportion must be between 0.0 and 1.0 for state id: " + id);
         }
         spec.proportions.put(id, p);
@@ -146,6 +160,7 @@ public class ConfigGridParser {
     for (double p : proportions.values()) sumProps += p;
 
     if (sumProps > 1.0) {
+      LOG.error("Sum of proportions ({}) exceeds 1.0", sumProps);
       throw new IllegalArgumentException("Sum of proportions (" + sumProps + ") exceeds 1.0");
     }
 
@@ -154,6 +169,7 @@ public class ConfigGridParser {
       double p = e.getValue();
 
       if (p < 0.0 || p > 1.0) {
+        LOG.error("Invalid proportion for state {}: {}", id, p);
         throw new IllegalArgumentException("Invalid proportion for state " + id + ": " + p);
       }
 
@@ -172,6 +188,7 @@ public class ConfigGridParser {
     Element root = xmlDocument.getDocumentElement();
     Element grid = (Element) root.getElementsByTagName(CONFIG_GRID).item(0);
     if (grid == null) {
+      LOG.error("Missing <{}> element", CONFIG_GRID);
       throw new IllegalArgumentException("Missing <" + CONFIG_GRID + "> element");
     }
     return grid;
@@ -194,6 +211,7 @@ public class ConfigGridParser {
       // pattern must contain its own <states> direct child
       Element patternStatesEl = getFirstDirectChild(patternEl, CONFIG_STATES);
       if (patternStatesEl == null) {
+        LOG.error("Missing <{}> inside <{}>", CONFIG_STATES, CONFIG_PATTERN);
         throw new IllegalArgumentException("Missing <" + CONFIG_STATES + "> inside <" + CONFIG_PATTERN + ">");
       }
 
@@ -203,6 +221,8 @@ public class ConfigGridParser {
       int patternCols = lines.get(0).split(",").length;
 
       if (startRow + lines.size() > rows || startCol + patternCols > cols) {
+        LOG.error("Pattern at ({},{}) with size {}x{} exceeds grid bounds {}x{}",
+            startRow, startCol, lines.size(), patternCols, rows, cols);
         throw new IllegalArgumentException(
             "Pattern at (" + startRow + "," + startCol + ") with size " +
                 lines.size() + "x" + patternCols + " exceeds grid bounds " + rows + "x" + cols
@@ -235,24 +255,32 @@ public class ConfigGridParser {
 
   private int parseNonNegativeInt(Element el, String attr) {
     String raw = el.getAttribute(attr).trim();
-    if (raw.isEmpty()) throw new IllegalArgumentException("<state> missing '" + attr + "' attribute");
+    if (raw.isEmpty()) {
+      LOG.error("<state> missing '{}' attribute", attr);
+      throw new IllegalArgumentException("<state> missing '" + attr + "' attribute");
+    }
     try {
       int value = Integer.parseInt(raw);
       if (value < 0) throw new IllegalArgumentException();
       return value;
     } catch (Exception e) {
+      LOG.error("Invalid non-negative integer for '{}': {}", attr, raw, e);
       throw new IllegalArgumentException("Invalid non-negative integer for '" + attr + "': " + raw);
     }
   }
 
   private double parseNonNegativeDouble(Element el, String attr) {
     String raw = el.getAttribute(attr).trim();
-    if (raw.isEmpty()) throw new IllegalArgumentException("<state> missing '" + attr + "' attribute");
+    if (raw.isEmpty()) {
+      LOG.error("<state> missing '{}' attribute", attr);
+      throw new IllegalArgumentException("<state> missing '" + attr + "' attribute");
+    }
     try {
       double value = Double.parseDouble(raw);
       if (value < 0) throw new IllegalArgumentException();
       return value;
     } catch (Exception e) {
+      LOG.error("Invalid non-negative double for '{}': {}", attr, raw, e);
       throw new IllegalArgumentException("Invalid non-negative double for '" + attr + "': " + raw);
     }
   }
@@ -262,6 +290,7 @@ public class ConfigGridParser {
     for (int c : counts.values()) sum += c;
 
     if (sum > totalCells) {
+      LOG.error("Specified state counts ({}) exceed total grid cells ({})", sum, totalCells);
       throw new IllegalArgumentException(
           "Specified state counts (" + sum + ") exceed total grid cells (" + totalCells + ")"
       );
@@ -283,6 +312,7 @@ public class ConfigGridParser {
     }
 
     if (values.size() != totalCells) {
+      LOG.error("State counts do not match grid size. Expected {} but got {}", totalCells, values.size());
       throw new IllegalArgumentException(
           "State counts do not match grid size. Expected " + totalCells + " but got " + values.size()
       );
@@ -311,6 +341,7 @@ public class ConfigGridParser {
 
   private int[][] iterateThroughRows(List<String> lines, int rows, int cols) {
     if (lines.size() != rows) {
+      LOG.error("Expected {} rows in <{}>, but got {}", rows, CONFIG_STATES, lines.size());
       throw new IllegalArgumentException(
           "Expected " + rows + " rows in <" + CONFIG_STATES + ">, but got " + lines.size()
       );
@@ -326,6 +357,7 @@ public class ConfigGridParser {
   private int[] parseRow(String line, int cols, int currentRow) {
     String[] tokens = line.split(",");
     if (tokens.length != cols) {
+      LOG.error("Row {} has {} columns, expected {}", currentRow, tokens.length, cols);
       throw new IllegalArgumentException(
           "Row " + currentRow + " has " + tokens.length + " columns, expected " + cols
       );
@@ -336,6 +368,7 @@ public class ConfigGridParser {
       try {
         row[c] = Integer.parseInt(tokens[c].trim());
       } catch (NumberFormatException e) {
+        LOG.error("Invalid state value at row {}, col {}", currentRow, c, e);
         throw new IllegalArgumentException("Invalid state value at row " + currentRow + ", col " + c);
       }
     }

@@ -6,6 +6,9 @@ import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -18,6 +21,8 @@ import static cellsociety.config.ConfigXmlConstants.*;
  * @author Ixa Sigler
  */
 public class ConfigLoader {
+
+  private static final Logger LOG = LogManager.getLogger(ConfigLoader.class);
 
   private final ConfigGridParser gridParser = new ConfigGridParser();
 
@@ -44,9 +49,11 @@ public class ConfigLoader {
       throws ParserConfigurationException {
 
     if (simulationElement == null) {
+      LOG.error("simulationElement cannot be null");
       throw new IllegalArgumentException("simulationElement cannot be null");
     }
     if (!CONFIG_SIMULATION.equals(simulationElement.getTagName())) {
+      LOG.error("Expected <{}> element but got <{}>", CONFIG_SIMULATION, simulationElement.getTagName());
       throw new IllegalArgumentException(
           "Expected <" + CONFIG_SIMULATION + "> element but got <" + simulationElement.getTagName() + ">");
     }
@@ -101,6 +108,7 @@ public class ConfigLoader {
     Element root = xmlDocument.getDocumentElement();
     Element element = (Element) root.getElementsByTagName(tag).item(0);
     if (element == null) {
+      LOG.error("Missing <{}> element", tag);
       throw new IllegalArgumentException("Missing <" + tag + "> element");
     }
     return element;
@@ -118,6 +126,8 @@ public class ConfigLoader {
     String typeAttr = simulation.getAttribute(CONFIG_SIM_TYPE_ATTR).trim();
     String classAttr = simulation.getAttribute(CONFIG_SIM_CLASS_ATTR).trim();
     if (typeAttr.isEmpty() || classAttr.isEmpty()) {
+      LOG.error("Simulation element must have both 'type' and 'class' attributes (type='{}', class='{}')",
+          typeAttr, classAttr);
       throw new IllegalArgumentException(
           "Simulation element must have both 'type' and 'class' attributes (e.g. type=\"GameOfLife\" class=\"cellsociety.Model.GameRules.ConwayGameOfLifeRule\")");
     }
@@ -171,9 +181,11 @@ public class ConfigLoader {
       String value = paramElement.getAttribute(CONFIG_PARAM_VALUE_ATTR).trim();
 
       if (name.isEmpty()) {
+        LOG.error("<param> missing 'name' attribute");
         throw new IllegalArgumentException("<param> missing 'name' attribute");
       }
       if (value.isEmpty()) {
+        LOG.error("Parameter '{}' missing 'value' attribute", name);
         throw new IllegalArgumentException(
             "Parameter '" + name + "' missing 'value' attribute");
       }
@@ -188,6 +200,7 @@ public class ConfigLoader {
     try {
       return Double.parseDouble(value);
     } catch (NumberFormatException e) {
+      LOG.error("Invalid numeric value for parameter '{}': {}", name, value, e);
       throw new IllegalArgumentException(
           "Invalid numeric value for parameter '" + name + "': " + value
       );
