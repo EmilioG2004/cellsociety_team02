@@ -1,7 +1,5 @@
 package cellsociety.config;
 
-import javafx.scene.paint.Color;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -158,7 +156,7 @@ public class SimulationLoader {
       Map<Integer, String> fxMap = new HashMap<>();
       for (Map.Entry<Integer, String> entry : raw.entrySet()) {
         try {
-          Color.web(entry.getValue()); // validate color string
+          validateColorString(entry.getValue()); // validate color string
           fxMap.put(entry.getKey(), entry.getValue());
         } catch (IllegalArgumentException ex) {
           LOG.error("Invalid color value '{}' for state {} in colorMap type='{}'",
@@ -171,6 +169,15 @@ public class SimulationLoader {
       }
 
       ColorMapProvider.addOrReplaceColorMap(simType, fxMap);
+    }
+  }
+
+  private void validateColorString(String color) {
+    if (color == null) throw new IllegalArgumentException("color cannot be null");
+    String c = color.trim();
+    // accept #RGB, #RRGGBB, #RRGGBBAA
+    if (!c.matches("^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")) {
+      throw new IllegalArgumentException("Invalid color value '" + color + "'. Expected hex like #RRGGBB");
     }
   }
 
