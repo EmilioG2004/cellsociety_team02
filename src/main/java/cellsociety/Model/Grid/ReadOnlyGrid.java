@@ -1,6 +1,7 @@
 package cellsociety.Model.Grid;
 
 import cellsociety.Model.CellState.CellState;
+import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ public interface ReadOnlyGrid extends ViewGrid {
 
   boolean isInBounds(int row, int col);
 
+  /** Returns the neighbor strategy used by this grid. */
+  NeighborStrategy getNeighborStrategy();
 
   /**
    * Returns all neighbor states at (row, col). Positions are determined by this grid's

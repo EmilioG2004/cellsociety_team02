@@ -1,0 +1,33 @@
+<simulation type="LangtonSDSR" class="cellsociety.Model.GameRules.LangtonSDSRRule">
+  <metadata>
+    <title>Langton SDSR Simple</title>
+    <author>Ixa Sigler</author>
+    <description>
+      60x60 grid with simple test loop. Should naturally show dissolution after hitting wall.
+    </description>
+  </metadata>
+
+  <grid rows="60" cols="60">
+    <randomByCount>
+      <state id="0" count="3600"/>
+    </randomByCount>
+
+    <pattern row="25" col="25">
+      <states>
+        0,2,2,2,2,2,2,2,2,0,0,0,0,0,0
+        2,1,7,0,1,4,0,1,4,2,0,0,0,0,0
+        2,0,2,2,2,2,2,2,0,2,0,0,0,0,0
+        2,7,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,1,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,0,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,7,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,1,2,2,2,2,2,2,1,2,2,2,2,2,0
+        2,0,7,1,0,7,1,0,7,1,1,1,1,1,2
+        0,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+      </states>
+    </pattern>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

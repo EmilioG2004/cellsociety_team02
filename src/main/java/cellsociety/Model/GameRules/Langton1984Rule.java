@@ -43,11 +43,22 @@ public class Langton1984Rule extends GameRule {
         int center = currentGrid.getCellState(r, c).toInt();
 
         // neighbors in n,e,s,w order
-        List<CellState> n = currentGrid.getNeighbors(r, c);
-        int north = n.get(0).toInt();
-        int east  = n.get(1).toInt();
-        int south = n.get(2).toInt();
-        int west  = n.get(3).toInt();
+        int north = 0;
+        if (r > 0) {
+          north = currentGrid.getCellState(r - 1, c).toInt();
+        }
+        int east = 0;
+        if (c < cols - 1) {
+          east = currentGrid.getCellState(r, c + 1).toInt();
+        }
+        int south = 0;
+        if (r < rows - 1) {
+          south = currentGrid.getCellState(r + 1, c).toInt();
+        }
+        int west = 0;
+        if (c > 0) {
+          west = currentGrid.getCellState(r, c - 1).toInt();
+        }
 
         int nextVal = NEXT[idx(center, north, east, south, west)];
         next.setCellState(r, c, Langton1984State.fromInt(nextVal));
