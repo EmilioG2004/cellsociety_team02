@@ -1,0 +1,35 @@
+<simulation type="LangtonSDSR" class="cellsociety.Model.GameRules.LangtonSDSRRule">
+  <metadata>
+    <title>Langton SDSR Twin</title>
+    <author>Ixa Sigler</author>
+    <description>
+      Twin-core seed that tends to generate interacting growth fronts before dissolving.
+    </description>
+  </metadata>
+
+  <grid rows="60" cols="60">
+    <randomByCount>
+      <state id="0" count="3600"/>
+    </randomByCount>
+
+    <pattern row="23" col="23">
+      <states>
+        0,0,2,2,2,2,2,2,2,0,0
+        0,2,1,7,0,1,4,0,1,2,0
+        2,1,2,2,2,2,2,2,2,1,2
+        2,7,2,0,0,0,0,0,2,7,2
+        2,1,2,0,1,7,1,0,2,1,2
+        2,0,2,0,7,2,7,0,2,0,2
+        2,1,2,0,1,7,1,0,2,1,2
+        2,7,2,0,0,0,0,0,2,7,2
+        2,1,2,2,2,2,2,2,2,1,2
+        0,2,1,7,0,1,4,0,1,2,0
+        0,0,2,2,2,2,2,2,2,0,0
+      </states>
+    </pattern>
+
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
