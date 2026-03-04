@@ -1,0 +1,17 @@
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule"
+            neighborStrategy="cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy">
+  <metadata>
+    <title>Game of Life Von Neumann</title>
+    <author>cellsociety</author>
+    <description>4 neighbors (N,E,S,W); finite edges.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" proportion="0.25"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

@@ -1,0 +1,25 @@
+<simulation type="SugarScape" class="cellsociety.Model.GameRules.SugarScapeRule"
+            neighborStrategy="cellsociety.Model.NeighborStrategy.MooreNeighborStrategy">
+  <metadata>
+    <title>SugarScape Moore</title>
+    <author>cellsociety</author>
+    <description>8 neighbors for movement; finite edges.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="100" proportion="0.18"/>
+      <state id="15" proportion="0.82"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sugarGrowBackRate" value="1"/>
+    <param name="sugarGrowBackInterval" value="1"/>
+    <param name="agentInitialMinimumSugar" value="8"/>
+    <param name="agentInitialMaximumSugar" value="20"/>
+    <param name="agentMinimumMetabolism" value="1"/>
+    <param name="agentMaximumMetabolism" value="3"/>
+    <param name="agentVision" value="4"/>
+  </parameters>
+</simulation>
