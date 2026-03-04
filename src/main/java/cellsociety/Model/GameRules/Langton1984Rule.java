@@ -7,7 +7,6 @@ import cellsociety.Model.Grid.RuleGrid;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 
-import java.util.List;
 import java.util.Map;
 
 /**
