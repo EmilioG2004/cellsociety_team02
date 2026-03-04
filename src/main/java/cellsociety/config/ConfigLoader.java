@@ -15,11 +15,16 @@ import static cellsociety.config.ConfigXmlConstants.*;
 /**
  * Loads simulation configuration from XML files. Expects a root or nested {@code <simulation>} element
  * with {@code type} and {@code class} attributes, plus {@code <metadata>}, {@code <grid>}, and optional {@code <parameters>}.
+ * @author Ixa Sigler
  */
 public class ConfigLoader {
 
   private final ConfigGridParser gridParser = new ConfigGridParser();
 
+  /**
+   * Loads a simulation config from an XML file on disk.
+   * Used by the app when selecting configs from the filesystem.
+   */
   public SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
@@ -31,6 +36,10 @@ public class ConfigLoader {
     return loadConfig(xmlDocument);
   }
 
+  /**
+   * Loads a simulation config from an existing <simulation> element.
+   * Useful when configs are embedded inside a larger document or already parsed upstream.
+   */
   public SimulationConfig loadConfig(Element simulationElement)
       throws ParserConfigurationException {
 
@@ -133,8 +142,16 @@ public class ConfigLoader {
     return child.getTextContent().trim();
   }
 
-  /** Result of parsing the {@code <simulation>} element: display type, rule class, optional neighbor strategy class, optional grid edge class. */
-  public record SimulationTypeAndClass(String simulationType, String ruleClass, String neighborStrategyClass, String gridEdgeClass) {}
+  /**
+   * Parsed identity + wiring info from the <simulation> tag.
+   * Exposed as a simple carrier type for code that wants to reuse this parsing result.
+   */
+  public record SimulationTypeAndClass(
+      String simulationType,
+      String ruleClass,
+      String neighborStrategyClass,
+      String gridEdgeClass
+  ) {}
 
   private HashMap<String, Double> getParameters(Document xmlDocument) {
     HashMap<String, Double> params = new HashMap<>();

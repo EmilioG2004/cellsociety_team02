@@ -1,7 +1,5 @@
 package cellsociety.config;
 
-import javafx.scene.paint.Color;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,10 +17,19 @@ import org.xml.sax.SAXException;
 
 import static cellsociety.config.ConfigXmlConstants.*;
 
+/**
+ * Loads a full simulation session (preferences + simulations) from an XML file.
+ * This differs from {@link ConfigLoader}, which loads a single simulation.
+ * @author Ixa Sigler
+ */
 public class SimulationLoader {
 
   private final ConfigLoader configLoader = new ConfigLoader();
 
+  /**
+   * Loads a full simulation session (preferences + zero or more simulations) from an XML file.
+   * This is used when restoring the app's saved state rather than loading a single simulation config.
+   */
   public SimulationState loadState(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
@@ -42,6 +49,7 @@ public class SimulationLoader {
     List<SimulationConfig> configs = new ArrayList<>();
     if (simNodes != null) {
       for (int i = 0; i < simNodes.getLength(); i++) {
+        // Delegate parsing of individual simulations to ConfigLoader
         configs.add(configLoader.loadConfig((Element) simNodes.item(i)));
       }
     }
@@ -49,6 +57,9 @@ public class SimulationLoader {
     return new SimulationState(configs, prefs);
   }
 
+  /**
+   * Parses the <preferences> element and registers any defined color maps.
+   */
   private SimulationPreferences parsePreferencesElement(Element preferencesEl) {
     Integer theme = tryParseInt(getChildText(preferencesEl, CONFIG_THEME), CONFIG_THEME);
     double speed = tryParseDouble(getChildText(preferencesEl, CONFIG_SIMULATION_SPEED), CONFIG_SIMULATION_SPEED);
@@ -61,23 +72,15 @@ public class SimulationLoader {
       throw new IllegalArgumentException("<" + CONFIG_SIMULATION_SPEED + "> must be > 0");
     }
 
-    // parse many color maps keyed by simulation type (including default), then register in ColorMapProvider
     Map<String, Map<Integer, String>> colorMapsByType = parseColorMaps(preferencesEl);
     registerColorMaps(colorMapsByType);
 
-    // preferences stores all maps
     return new SimulationPreferences(theme, language, speed);
   }
 
   /**
-   * Parses multiple color maps.
-   *
-   * Expected structure:
-   * <colorMaps>
-   *   <colorMap type="__DEFAULT__">
-   *     <colorEntry state="0" value="#FFFFFF"/>
-   *   </colorMap>
-   * </colorMaps>
+   * Parses color maps defined under <preferences>. Supports multiple maps
+   * (<colorMaps>) or a single legacy <colorMap>.
    */
   private Map<String, Map<Integer, String>> parseColorMaps(Element preferencesEl) {
     Map<String, Map<Integer, String>> maps = new HashMap<>();
@@ -98,7 +101,6 @@ public class SimulationLoader {
       return maps;
     }
 
-    // if only one map, use default
     Element singleOldColorMapEl = getOptionalFirstChildElementByTag(preferencesEl, CONFIG_COLOR_MAP);
     if (singleOldColorMapEl != null) {
       maps.put(ColorMapProvider.DEFAULT_KEY, parseSingleColorMap(singleOldColorMapEl));
@@ -107,7 +109,7 @@ public class SimulationLoader {
     return maps;
   }
 
-  /** Parses one <colorMap> element into state -> colorString. */
+  /** Parses a single <colorMap> block into state -> color values. */
   private Map<Integer, String> parseSingleColorMap(Element colorMapEl) {
     Map<Integer, String> map = new HashMap<>();
 
@@ -132,6 +134,9 @@ public class SimulationLoader {
     return map;
   }
 
+  /**
+   * Registers parsed color maps with the {@link ColorMapProvider}.
+   */
   private void registerColorMaps(Map<String, Map<Integer, String>> mapsByType) {
     for (Map.Entry<String, Map<Integer, String>> e : mapsByType.entrySet()) {
       String simType = e.getKey();
@@ -140,6 +145,7 @@ public class SimulationLoader {
       Map<Integer, String> fxMap = new HashMap<>();
       for (Map.Entry<Integer, String> entry : raw.entrySet()) {
         try {
+          validateColorString(entry.getValue());
           fxMap.put(entry.getKey(), entry.getValue());
         } catch (IllegalArgumentException ex) {
           throw new IllegalArgumentException(
@@ -149,8 +155,16 @@ public class SimulationLoader {
         }
       }
 
-      // replace any existing map for that type (including DEFAULT_KEY)
       ColorMapProvider.addOrReplaceColorMap(simType, fxMap);
+    }
+  }
+
+  private void validateColorString(String color) {
+    if (color == null) throw new IllegalArgumentException("color cannot be null");
+    String c = color.trim();
+    // accept #RGB, #RRGGBB, #RRGGBBAA
+    if (!c.matches("^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")) {
+      throw new IllegalArgumentException("Invalid color value '" + color + "'. Expected hex like #RRGGBB");
     }
   }
 

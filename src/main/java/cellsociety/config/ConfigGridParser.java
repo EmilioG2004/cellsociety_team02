@@ -12,8 +12,16 @@ import org.w3c.dom.NodeList;
 
 import static cellsociety.config.ConfigXmlConstants.*;
 
+/**
+ * Helper class used by ConfigLoader to parse the <grid> element and subelements.
+ * @author Ixa Sigler
+ */
 public class ConfigGridParser {
 
+  /**
+   * Parses the grid dimensions from the config's <grid> element.
+   * Exposed so higher-level config loaders can size data structures before reading cell states.
+   */
   public int[] parseGridSize(Document xmlDocument) {
     Element grid = getGridElement(xmlDocument);
 
@@ -31,6 +39,10 @@ public class ConfigGridParser {
     return new int[] { rows, cols };
   }
 
+  /**
+   * Parses the initial state grid from config, supporting either explicit <states> or <randomByCount>,
+   * then applies any <pattern> overlays.
+   */
   public int[][] parseInitialStates(Document xmlDocument, int rows, int cols) {
     Element gridEl = getGridElement(xmlDocument);
 
