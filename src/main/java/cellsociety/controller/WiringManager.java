@@ -2,6 +2,8 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_BACKWARD;
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_FORWARD;
+import static cellsociety.view.constants.SimulationUiConstants.MAX_SPEED;
+
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.controller.multiview.SimulationSlot;
@@ -174,7 +176,7 @@ public class WiringManager {
   private void wireSpeedUp(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
       double currentSpeed = getReferenceSpeed(mySlots);
-      if (currentSpeed >= 4) return;
+      if (currentSpeed >= MAX_SPEED) return;
       for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() * 2.0);
