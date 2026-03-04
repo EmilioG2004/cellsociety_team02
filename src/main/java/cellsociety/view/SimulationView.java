@@ -220,7 +220,7 @@ public class SimulationView {
   public File showOpenConfigDialog() {
     FileChooser chooser = new FileChooser();
     chooser.setTitle(myBundle.getString(FILE_OPEN_CONFIG_TITLE));
-    chooser.setInitialDirectory(new File(DATA_FILE_FOLDER));
+    chooser.setInitialDirectory(new File(CONFIGS_FILE_FOLDER));
     chooser.getExtensionFilters().add(
         new FileChooser.ExtensionFilter(myBundle.getString(FILE_FILTER_XML), XML_FILE_EXTENSION)
     );
@@ -243,12 +243,25 @@ public class SimulationView {
   public File showSaveConfigDialog(){
     FileChooser chooser = new FileChooser();
     chooser.setTitle(myBundle.getString(FILE_SAVE_CONFIG_TITLE));
+    chooser.setInitialDirectory(new File(SAVES_FILE_FOLDER));
     chooser.getExtensionFilters().add(
         new ExtensionFilter(myBundle.getString(FILE_FILTER_XML), XML_FILE_EXTENSION)
     );
 
     Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
     return chooser.showSaveDialog(w);
+  }
+
+  public File showOpenStateDialog() {
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle(myBundle.getString(FILE_OPEN_CONFIG_TITLE));
+    chooser.setInitialDirectory(new File(SAVES_FILE_FOLDER));
+    chooser.getExtensionFilters().add(
+        new FileChooser.ExtensionFilter(myBundle.getString(FILE_FILTER_XML), XML_FILE_EXTENSION)
+    );
+
+    Window w = myMain.getScene() == null ? null : myMain.getScene().getWindow();
+    return chooser.showOpenDialog(w);
   }
 
   /**

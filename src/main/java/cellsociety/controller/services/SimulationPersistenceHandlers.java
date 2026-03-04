@@ -82,7 +82,7 @@ public class SimulationPersistenceHandlers {
       List<SimulationSlot> slots,
       Optional<String> selectedNeighborChoice,
       Optional<String> selectedGridEdgeChoice) {
-    File xmlFile = mySimView.showOpenConfigDialog();
+    File xmlFile = mySimView.showOpenStateDialog();
     if (xmlFile == null) {
       throw new IllegalArgumentException("No file selected.");
     }

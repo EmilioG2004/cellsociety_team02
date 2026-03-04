@@ -9,6 +9,8 @@ public final class SimulationUiConstants {
   // Files
   public static final String XML_FILE_EXTENSION = "*.xml";
   public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
+  public static final String CONFIGS_FILE_FOLDER = DATA_FILE_FOLDER + "/configs";
+  public static final String SAVES_FILE_FOLDER = DATA_FILE_FOLDER + "/saves";
   public static final String VERSION_KEY = "Version";
 
   // Simulation controller defaults
