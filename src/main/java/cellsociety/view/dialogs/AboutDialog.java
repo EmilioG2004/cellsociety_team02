@@ -39,9 +39,11 @@ public class AboutDialog extends StackPane{
   private final Button myCloseButton;
   private final Text myTitle;
   private final Text myType;
+  private final Text myNeighborStrategy;
   private final Text myAuthor;
   private final Text myDescription;
   private final Text myParameters;
+  private String myCurrentNeighborStrategy;
 
   /**
    * Creates the dialog and its internal text nodes.
@@ -59,6 +61,7 @@ public class AboutDialog extends StackPane{
     myCloseButton = new Button();
     myTitle = new Text();
     myType = new Text();
+    myNeighborStrategy = new Text();
     myAuthor = new Text();
     myDescription = new Text();
     myParameters = new Text();
@@ -69,6 +72,7 @@ public class AboutDialog extends StackPane{
   private void setStyleClasses() {
     myTitle.getStyleClass().add("text");
     myType.getStyleClass().add("text");
+    myNeighborStrategy.getStyleClass().add("text");
     myAuthor.getStyleClass().add("text");
     myDescription.getStyleClass().add("text");
     myParameters.getStyleClass().add("text");
@@ -87,12 +91,23 @@ public class AboutDialog extends StackPane{
    * <p>Return value: none.</p>
    *
    * @param config simulation configuration used to populate fields
+   * @param neighborStrategy current neighbor strategy class name
    */
-  public void generateInfo(SimulationConfig config){
+  public void generateInfo(SimulationConfig config, String neighborStrategy){
     myConfig = config;
+    myCurrentNeighborStrategy = neighborStrategy;
 
     getChildren().clear();
-    VBox infoPanel = new VBox(10, myTitle, myType, myAuthor, myDescription, myParameters, myCloseButton);
+    VBox infoPanel = new VBox(
+        10,
+        myTitle,
+        myType,
+        myNeighborStrategy,
+        myAuthor,
+        myDescription,
+        myParameters,
+        myCloseButton
+    );
     infoPanel.setAlignment(Pos.TOP_CENTER);
 
     getChildren().add(infoPanel);
@@ -151,6 +166,10 @@ public class AboutDialog extends StackPane{
     if (myConfig == null) return;
 
     myType.setText(MessageFormat.format(bundle.getString(ABOUT_SIMULATION_TYPE), myConfig.getSimulationType()));
+    myNeighborStrategy.setText(MessageFormat.format(
+        bundle.getString(ABOUT_NEIGHBOR_STRATEGY),
+        myCurrentNeighborStrategy
+    ));
     myDescription.setText(MessageFormat.format(bundle.getString(ABOUT_DESCRIPTION), myConfig.getDescription()));
     myAuthor.setText(MessageFormat.format(bundle.getString(ABOUT_AUTHOR), myConfig.getAuthor()));
     myParameters.setText(MessageFormat.format(bundle.getString(ABOUT_PARAMETERS), myConfig.getParameters()));

@@ -272,13 +272,13 @@ public class SimulationView {
    *
    * @param config configuration used to populate the dialog
    */
-  public void showAboutSplash(SimulationConfig config){
+  public void showAboutSplash(SimulationConfig config, String neighborStrategy){
     if (centerPane == null){
       centerPane = new StackPane();
       centerPane.setPadding(new Insets(CENTER_VERTICAL_PADDING,0,CENTER_VERTICAL_PADDING,0));
       myMain.setCenter(centerPane);
     }
-    myAboutDialog.generateInfo(config);
+    myAboutDialog.generateInfo(config, neighborStrategy);
 
     centerPane.getChildren().add(myAboutDialog);
 
