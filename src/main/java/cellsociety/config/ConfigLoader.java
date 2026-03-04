@@ -33,12 +33,18 @@ public class ConfigLoader {
   public SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
-    Document xmlDocument = DocumentBuilderFactory
-        .newInstance()
-        .newDocumentBuilder()
-        .parse(xmlFile);
+    try {
+      Document xmlDocument = DocumentBuilderFactory
+          .newInstance()
+          .newDocumentBuilder()
+          .parse(xmlFile);
 
-    return loadConfig(xmlDocument);
+      return loadConfig(xmlDocument);
+
+    } catch (SAXException | IOException e) {
+      LOG.error("Failed to parse XML file '{}': {}", xmlFile.getPath(), e.getMessage(), e);
+      throw e;
+    }
   }
 
   /**
