@@ -2,12 +2,11 @@ package cellsociety.view;
 
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
-import static cellsociety.view.constants.ResourcePaths.VON_NEUMANN;
-import static cellsociety.view.constants.ResourcePaths.MOORE;
-import static cellsociety.view.constants.ResourcePaths.TOROIDAL;
 
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.constants.ResourcePaths;
+import cellsociety.view.dialogs.AboutDialog;
+import cellsociety.view.dialogs.SettingsSplash;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

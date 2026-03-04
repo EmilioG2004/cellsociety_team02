@@ -1,6 +1,7 @@
 package cellsociety.view;
 
 import cellsociety.Model.Grid.ViewGrid;
+import java.util.Map;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
@@ -144,4 +145,20 @@ public interface GridView {
    * @param container the region whose size drives cell sizing
    */
   void bindToContainer(Region container);
+
+  /**
+   * Sets the mapping from integer state values to color strings.
+   *
+   * <p>Purpose: decouple rendering colors from hardcoded values so controller/config
+   * can provide simulation-specific palettes.</p>
+   *
+   * <p>Assumptions: keys are state integers and values are JavaFX-compatible color strings.</p>
+   *
+   * <p>Exceptions: none.</p>
+   *
+   * <p>Return value: none.</p>
+   *
+   * @param stateColors mapping from state value to color string
+   */
+  void setStateColors(Map<Integer, String> stateColors);
 }

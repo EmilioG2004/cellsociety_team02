@@ -1,6 +1,8 @@
 package cellsociety.view;
 
 import cellsociety.Model.Grid.ViewGrid;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
@@ -46,6 +48,7 @@ public class GridPaneView implements GridView {
   private java.util.function.BiConsumer<Integer, Integer> myOnCellClicked;
   private boolean isOutlined;
   private final IntegerProperty myRotationSteps = new SimpleIntegerProperty(0);
+  private Map<Integer, Color> myStateColors = new HashMap<>();
 
   private final Group myRotator;
   private final StackPane myWrapper = new StackPane();
@@ -213,6 +216,10 @@ public class GridPaneView implements GridView {
   }
 
   private Color stateToColor(int stateValue) {
+    Color mappedColor = myStateColors.get(stateValue);
+    if (mappedColor != null) {
+      return mappedColor;
+    }
     return switch (stateValue) {
       case 0 -> Color.WHITE;
       case 1 -> Color.BLACK;
@@ -221,6 +228,14 @@ public class GridPaneView implements GridView {
       case 4 -> Color.FORESTGREEN;
       default -> Color.GRAY;
     };
+  }
+
+  @Override
+  public void setStateColors(Map<Integer, String> stateColors) {
+    myStateColors.clear();
+    for (Map.Entry<Integer, String> entry : stateColors.entrySet()) {
+      myStateColors.put(entry.getKey(), Color.web(entry.getValue()));
+    }
   }
 
   /**

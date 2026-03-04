@@ -1,9 +1,9 @@
-package cellsociety.controller;
+package cellsociety.controller.multiview;
 
 import cellsociety.Model.Simulation.driver.DefaultSimulationDriver;
 import cellsociety.Model.Simulation.driver.SimulationDriver;
 import cellsociety.Model.Simulation.model.SimulationModel;
-import cellsociety.view.SimulationRenderer;
+import cellsociety.view.multiview.SimulationRenderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
