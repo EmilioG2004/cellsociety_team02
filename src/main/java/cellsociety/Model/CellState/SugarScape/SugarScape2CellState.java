@@ -15,6 +15,12 @@ public class SugarScape2CellState extends SugarScapeCellState {
     super(patch, agent);
   }
 
+  /** Keeps the next grid as SugarScape2CellState so toInt() returns 100/101/102 by gender/age. */
+  @Override
+  public SugarScapeCellState copyWithoutAgent() {
+    return new SugarScape2CellState(getPatch().copy(), null);
+  }
+
   @Override
   public int toInt() {
     if (getAgent() == null) {

@@ -11,7 +11,6 @@ import java.util.Random;
  */
 public class Agent {
 
-  // --- Default limits (used when no limits are provided) ---
   public static final int DEFAULT_INIT_SUGAR_MIN = 5;
   public static final int DEFAULT_INIT_SUGAR_MAX = 25;
   public static final int DEFAULT_SUGAR_METABOLISM_MIN = 1;

@@ -57,7 +57,6 @@ public class ArrayGrid implements Grid {
     this.neighborStrategy = strategy;
   }
 
-  // -------------------- ReadOnlyGrid --------------------
   @Override
   public int getRows() {
     return cells.length;

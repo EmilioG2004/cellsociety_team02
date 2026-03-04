@@ -1,0 +1,28 @@
+<simulation type="SugarScape2" class="cellsociety.Model.GameRules.SugarScape2Rule">
+  <metadata>
+    <title>SugarScape II Long Vision</title>
+    <author>cellsociety</author>
+    <description>Reproduction; vision 6; few agents. Blue=male, pink=female, gray=old.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="100" count="24"/>
+      <state id="15" count="376"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sugarGrowBackRate" value="1"/>
+    <param name="sugarGrowBackInterval" value="1"/>
+    <param name="agentInitialMinimumSugar" value="10"/>
+    <param name="agentInitialMaximumSugar" value="25"/>
+    <param name="agentMinimumMetabolism" value="1"/>
+    <param name="agentMaximumMetabolism" value="3"/>
+    <param name="agentVision" value="6"/>
+    <param name="agentMaxAgeMin" value="60"/>
+    <param name="agentMaxAgeMax" value="100"/>
+    <param name="agentFertileStart" value="12"/>
+    <param name="agentFertileEnd" value="50"/>
+  </parameters>
+</simulation>

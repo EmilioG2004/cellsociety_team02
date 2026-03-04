@@ -1,0 +1,20 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Fish Dominant</title>
+    <author>cellsociety</author>
+    <description>Fish-dominant scenario: large fish population with very few sharks. Low shark energy per meal makes survival difficult.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" count="120"/>
+      <state id="2" count="5"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+    <param name="sharkStartEnergy" value="3"/>
+    <param name="sharkEnergyFromFish" value="2"/>
+    <param name="sharkMaxEnergy" value="8"/>
+  </parameters>
+</simulation>
