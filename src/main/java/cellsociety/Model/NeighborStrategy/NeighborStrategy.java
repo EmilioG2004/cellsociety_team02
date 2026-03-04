@@ -1,13 +1,13 @@
 package cellsociety.Model.NeighborStrategy;
 
+import cellsociety.Model.GridEdge.GridEdge;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Defines which grid positions count as neighbors for a given cell (e.g. Moore 8, Von Neumann 4).
- * Responsible for all neighbor logic: which directions and how bounds/wrapping are applied.
- * Callers (e.g. Grid, GameRule) use {@link #getNeighborPositions(int, int, int, int)} to get
- * neighbor positions, then look up cell states at those positions.
+ * Neighbor shape is defined by {@link #getNeighborOffsets()}; edge behavior (clip, wrap, etc.)
+ * is delegated to a {@link GridEdge} via {@link #getGridEdge()}.
  *
  * @author Michael Lei
  */
@@ -23,12 +23,18 @@ public interface NeighborStrategy {
   /** Used by strategy implementations to compute neighbor positions. */
   List<int[]> getNeighborOffsets();
 
+  /** Returns the edge policy used by this strategy. */
+  GridEdge getGridEdge();
+
+  /** Sets the edge policy used by this strategy. */
+  void setGridEdge(GridEdge gridEdge);
+
   /**
-   * Returns the grid positions of all neighbors of (r, c) for a grid of size rows×cols.
-   * Handles bounds (e.g. clip out-of-bounds or wrap). Callers use these positions to get cell states.
+   * Returns the grid positions of all neighbors of (r, c) for a grid of size rows x cols.
+   * Edge handling is delegated to {@link GridEdge#resolve}.
    */
   default List<int[]> getNeighborPositions(int rows, int cols, int r, int c) {
-    return offsetsToPositions(getNeighborOffsets(), rows, cols, r, c);
+    return getGridEdge().resolve(applyOffsets(getNeighborOffsets(), r, c), rows, cols);
   }
 
   default List<int[]> getExpandedOffsets(int rows, int cols, int vision) {
@@ -48,18 +54,14 @@ public interface NeighborStrategy {
   }
 
   default List<int[]> getNeighborPositions(int rows, int cols, int r, int c, int vision) {
-    return offsetsToPositions(getExpandedOffsets(rows, cols, vision), rows, cols, r, c);
+    return getGridEdge().resolve(applyOffsets(getExpandedOffsets(rows, cols, vision), r, c), rows, cols);
   }
 
-  /** Converts a list of (dr, dc) offsets into in-bounds positions (r+dr, c+dc). */
-  private List<int[]> offsetsToPositions(List<int[]> offsets, int rows, int cols, int r, int c) {
+  /** Adds each (dr, dc) offset to the position (r, c), returning raw (possibly out-of-bounds) positions. */
+  private List<int[]> applyOffsets(List<int[]> offsets, int r, int c) {
     List<int[]> positions = new ArrayList<>();
     for (int[] offset : offsets) {
-      int nr = r + offset[0];
-      int nc = c + offset[1];
-      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-        positions.add(new int[]{nr, nc});
-      }
+      positions.add(new int[]{r + offset[0], c + offset[1]});
     }
     return positions;
   }
