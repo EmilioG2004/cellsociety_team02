@@ -41,8 +41,6 @@ public class FallingSandRule extends GameRule {
   @Override
   public NeighborStrategy getDefaultNeighborStrategy() {
     NeighborStrategy ns = (defaultStrategy != null) ? defaultStrategy : new MooreNeighborStrategy();
-    // Match WaTor-style edge handling: wrap neighbors at edges.
-    ns.setGridEdge(new ToroidalEdge());
     return ns;
   }
 
@@ -137,8 +135,7 @@ public class FallingSandRule extends GameRule {
   private boolean tryMoveWater(ReadOnlyGrid current, Grid next,
       int r, int c, int nr, int nc, int rows, int cols) {
 
-    nr = ((nr % rows) + rows) % rows;
-    nc = ((nc % cols) + cols) % cols;
+    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) return false;
 
     if (cast(current.getCellState(nr, nc)) != FallingSandState.EMPTY) return false;
     if (!isEmpty(next, nr, nc)) return false;
