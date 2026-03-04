@@ -89,6 +89,136 @@ public class SimulationViewTest extends DukeApplicationTest {
         myView.getMyButtons().getStartButton().getText()
     );
   }
+  @Test
+  void ApplyLanguage_WhenPortugueseBundleProvided_ControlTextsUpdateToPortuguese() {
+    ResourceBundle portugueseBundle = ResourceBundle.getBundle("cellsociety.Languages.Portuguese");
+
+    runAsJFXAction(() -> myView.applyLanguage(portugueseBundle));
+
+    assertEquals(
+        portugueseBundle.getString("button.loadSimulation"),
+        myView.getMySettings().getMyLoadButton().getText()
+    );
+    assertEquals(
+        portugueseBundle.getString("button.pause"),
+        myView.getMyButtons().getPauseButton().getText()
+    );
+  }
+
+  @Test
+  void ApplyLanguage_WhenBundleMissingRequiredKeys_MissingResourceExceptionThrown() {
+    ResourceBundle missingKeysBundle = new ResourceBundle() {
+      @Override
+      protected Object handleGetObject(String key) {
+        if ("settings.title".equals(key)) {
+          return "Settings";
+        }
+        throw new MissingResourceException("Missing key", "TestBundle", key);
+      }
+
+      @Override
+      public java.util.Enumeration<String> getKeys() {
+        return java.util.Collections.enumeration(List.of("settings.title"));
+      }
+    };
+
+    assertThrows(MissingResourceException.class, () -> myView.applyLanguage(missingKeysBundle));
+  }
+
+  @Test
+  void ApplyLanguage_WhenBundleIsNull_IllegalArgumentExceptionThrown() {
+    assertThrows(IllegalArgumentException.class, () -> myView.applyLanguage(null));
+  }
+
+  @Test
+  void ShowAboutSplash_WhenValidConfigAndNeighborProvided_AboutDialogIsAddedToCenterPane() {
+    SimulationConfig validConfig = buildValidConfig();
+
+    runAsJFXAction(() -> myView.showAboutSplash(validConfig, "MooreNeighborStrategy"));
+
+    assertNotNull(myView.getMyAboutDialog().getParent());
+    lookup("Neighbor Strategy: MooreNeighborStrategy").queryText();
+  }
+
+  @Test
+  void ShowAboutSplash_WhenCalledTwice_AboutDialogContentIsUpdatedWithLatestNeighborStrategy() {
+    SimulationConfig validConfig = buildValidConfig();
+
+    runAsJFXAction(() -> myView.showAboutSplash(validConfig, "MooreNeighborStrategy"));
+    runAsJFXAction(() -> myView.showAboutSplash(validConfig, "VonNeumannNeighborStrategy"));
+
+    lookup("Neighbor Strategy: VonNeumannNeighborStrategy").queryText();
+  }
+
+  @Test
+  void ShowAboutSplash_WhenConfigIsNull_IllegalArgumentExceptionThrown() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> myView.showAboutSplash(null, "MooreNeighborStrategy")
+    );
+  }
+
+  @Test
+  void ShowAboutSplash_WhenNeighborStrategyIsBlank_IllegalArgumentExceptionThrown() {
+    SimulationConfig validConfig = buildValidConfig();
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> myView.showAboutSplash(validConfig, "")
+    );
+  }
+
+  @Test
+  void SetCenterContent_WhenNodeProvided_NodeIsDisplayedInCenterCard() {
+    Label contentNode = new Label("CENTER_CONTENT_LABEL_ONE");
+
+    runAsJFXAction(() -> myView.setCenterContent(contentNode));
+
+    lookup("CENTER_CONTENT_LABEL_ONE").queryLabeled();
+  }
+
+  @Test
+  void SetCenterContent_WhenCalledMultipleTimes_LatestNodeReplacesPreviousNode() {
+    Label firstContentNode = new Label("CENTER_CONTENT_LABEL_FIRST");
+    Label secondContentNode = new Label("CENTER_CONTENT_LABEL_SECOND");
+
+    runAsJFXAction(() -> myView.setCenterContent(firstContentNode));
+    runAsJFXAction(() -> myView.setCenterContent(secondContentNode));
+
+    lookup("CENTER_CONTENT_LABEL_SECOND").queryLabeled();
+    assertThrows(
+        EmptyNodeQueryException.class,
+        () -> lookup("CENTER_CONTENT_LABEL_FIRST").queryLabeled()
+    );
+  }
+
+  @Test
+  void SetCenterContent_WhenNodeIsNull_IllegalArgumentExceptionThrown() {
+    assertThrows(IllegalArgumentException.class, () -> myView.setCenterContent(null));
+  }
+
+  @Test
+  void SetSpeedLabel_WhenSpeedValueChanges_LabelDisplaysNewMultiplier() {
+    runAsJFXAction(() -> myView.setSpeedLabel(2.0));
+
+    String expectedSpeedLabel = MessageFormat.format(
+        myEnglishBundle.getString("label.currentSpeed"),
+        2.0
+    );
+    assertEquals(expectedSpeedLabel, myView.getMyButtons().getSpeedLabel().getText());
+  }
+
+  @Test
+  void SetSpeedLabel_WhenCalledRepeatedly_LabelMatchesMostRecentValue() {
+    runAsJFXAction(() -> myView.setSpeedLabel(0.5));
+    runAsJFXAction(() -> myView.setSpeedLabel(3.0));
+
+    String expectedSpeedLabel = MessageFormat.format(
+        myEnglishBundle.getString("label.currentSpeed"),
+        3.0
+    );
+    assertEquals(expectedSpeedLabel, myView.getMyButtons().getSpeedLabel().getText());
+  }
 
   private void assertThemeApplied(String expectedCssFileSuffix) {
     assertTrue(myScene.getStylesheets().stream().anyMatch(css -> css.endsWith(expectedCssFileSuffix)));
