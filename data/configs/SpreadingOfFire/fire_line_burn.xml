@@ -1,0 +1,20 @@
+<simulation type="SpreadingOfFire" class="cellsociety.Model.GameRules.SpreadingOfFireRule">
+  <metadata>
+    <title>Fire Burns Along Line</title>
+    <author>cellsociety</author>
+    <description>probCatch=1, probTree=0. One row: fire at left, trees to the right.</description>
+  </metadata>
+
+  <grid rows="3" cols="9">
+    <states>
+      0,0,0,0,0,0,0,0,0
+      2,1,1,1,1,1,1,1,1
+      0,0,0,0,0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+    <param name="probCatch" value="1.0"/>
+    <param name="probTree" value="0.0"/>
+  </parameters>
+</simulation>

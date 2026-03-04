@@ -1,0 +1,17 @@
+<simulation type="GameOfLife" class="cellsociety.Model.GameRules.ConwayGameOfLifeRule"
+            gridEdge="cellsociety.Model.GridEdge.ToroidalEdge">
+  <metadata>
+    <title>Game of Life Toroidal</title>
+    <author>cellsociety</author>
+    <description>Moore neighborhood; wrap both dimensions.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" proportion="0.25"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
