@@ -1,0 +1,18 @@
+<simulation type="SpreadingOfFire" class="cellsociety.Model.GameRules.SpreadingOfFireRule"
+            gridEdge="cellsociety.Model.GridEdge.ToroidalEdge">
+  <metadata>
+    <title>Fire Toroidal</title>
+    <author>cellsociety</author>
+    <description>Von Neumann; wrap-around edges.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="1" proportion="0.2"/>
+      <state id="2" proportion="0.2"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

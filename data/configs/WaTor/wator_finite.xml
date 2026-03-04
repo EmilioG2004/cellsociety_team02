@@ -1,0 +1,18 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule"
+            gridEdge="cellsociety.Model.GridEdge.FiniteEdge">
+  <metadata>
+    <title>WaTor Finite</title>
+    <author>cellsociety</author>
+    <description>Von Neumann; no wrap, clip at edges.</description>
+  </metadata>
+
+  <grid rows="15" cols="15">
+    <randomByCount>
+      <state id="1" count="25"/>
+      <state id="2" count="8"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

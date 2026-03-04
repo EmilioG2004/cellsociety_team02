@@ -1,0 +1,24 @@
+<simulation type="Percolation" class="cellsociety.Model.GameRules.PercolationRule"
+            neighborStrategy="cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2">
+  <metadata>
+    <title>Percolation Moore Radius 2</title>
+    <author>cellsociety</author>
+    <description>24 neighbors in 5×5; open becomes full with 1+ full in that neighborhood. 0=closed, 1=open, 2=full.</description>
+  </metadata>
+
+  <grid rows="8" cols="8">
+    <states>
+      1,1,1,1,1,2,1,1
+      0,1,0,1,0,1,0,1
+      1,0,1,0,1,0,1,0
+      0,1,0,1,0,1,0,1
+      1,0,1,0,1,0,1,0
+      0,1,0,1,0,1,0,1
+      1,0,1,0,1,0,1,0
+      0,1,0,1,0,1,0,1
+    </states>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

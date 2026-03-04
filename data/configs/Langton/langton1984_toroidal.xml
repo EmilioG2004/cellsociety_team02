@@ -1,0 +1,32 @@
+<simulation type="Langton1984" class="cellsociety.Model.GameRules.Langton1984Rule"
+            gridEdge="cellsociety.Model.GridEdge.ToroidalEdge">
+  <metadata>
+    <title>Langton 1984 Toroidal</title>
+    <author>cellsociety</author>
+    <description>Von Neumann; wrap both dimensions.</description>
+  </metadata>
+
+  <grid rows="60" cols="60">
+    <randomByCount>
+      <state id="0" count="3600"/>
+    </randomByCount>
+
+    <pattern row="25" col="25">
+      <states>
+        0,2,2,2,2,2,2,2,2,0,0,0,0,0,0
+        2,1,7,0,1,4,0,1,4,2,0,0,0,0,0
+        2,0,2,2,2,2,2,2,0,2,0,0,0,0,0
+        2,7,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,1,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,0,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,7,2,0,0,0,0,2,1,2,0,0,0,0,0
+        2,1,2,2,2,2,2,2,1,2,2,2,2,2,0
+        2,0,7,1,0,7,1,0,7,1,1,1,1,1,2
+        0,2,2,2,2,2,2,2,2,2,2,2,2,2,0
+      </states>
+    </pattern>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
