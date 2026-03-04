@@ -141,12 +141,4 @@ public final class ColorMapProvider {
   public static Set<String> getSimulationTypes() {
     return Collections.unmodifiableSet(COLOR_MAPS.keySet());
   }
-
-  private static String hsbToHex(double h, double s, double b) {
-    int rgb = java.awt.Color.HSBtoRGB((float) (h / 360.0), (float) s, (float) b);
-    int r = (rgb >> 16) & 0xFF;
-    int g = (rgb >> 8) & 0xFF;
-    int bl = rgb & 0xFF;
-    return String.format("#%02X%02X%02X", r, g, bl);
-  }
 }
