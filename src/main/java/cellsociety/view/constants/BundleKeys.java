@@ -2,6 +2,12 @@ package cellsociety.view.constants;
 
 /**
  * Centralized ResourceBundle key names used by the UI.
+ *
+ * Purpose: prevent string-key drift across view and controller wiring.
+ * Assumptions: matching entries exist in active language bundles.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public final class BundleKeys {
   private BundleKeys() {}
@@ -41,6 +47,7 @@ public final class BundleKeys {
   public static final String LABEL_GENERATION = "label.generation";
   public static final String LABEL_GENERATION_UNSET = "label.generation.unset";
   public static final String LABEL_NEIGHBOR = "label.neighbor";
+  public static final String LABEL_EDGE = "label.edge";
 
   // File chooser
   public static final String FILE_OPEN_CONFIG_TITLE = "fileChooser.openConfig.title";

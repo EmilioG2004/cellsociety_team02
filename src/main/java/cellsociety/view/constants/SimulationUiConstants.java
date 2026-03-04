@@ -2,6 +2,11 @@ package cellsociety.view.constants;
 
 /**
  * Numeric constants for simulation defaults and UI layout.
+ *
+ * Purpose: centralize tunable UI and control defaults used by view and controller code.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public final class SimulationUiConstants {
   private SimulationUiConstants() {}
@@ -9,6 +14,8 @@ public final class SimulationUiConstants {
   // Files
   public static final String XML_FILE_EXTENSION = "*.xml";
   public static final String DATA_FILE_FOLDER = System.getProperty("user.dir") + "/data";
+  public static final String CONFIGS_FILE_FOLDER = DATA_FILE_FOLDER + "/configs";
+  public static final String SAVES_FILE_FOLDER = DATA_FILE_FOLDER + "/saves";
   public static final String VERSION_KEY = "Version";
 
   // Simulation controller defaults
@@ -46,4 +53,18 @@ public final class SimulationUiConstants {
   public static final double SPACING_MEDIUM = 12;
   public static final double PADDING_STANDARD = 12;
   public static final double PADDING_SETTINGS = 20;
+
+  // Exception messages
+  public static final String ERROR_MSG_NO_SIMULATION_LOADED = "No simulation loaded.";
+  public static final String ERROR_MSG_NO_FILE_SELECTED = "No file selected.";
+  public static final String ERROR_MSG_INVALID_SLOT_INDEX_PREFIX = "Invalid slot index: ";
+  public static final String ERROR_MSG_NO_SIMULATION_FOR_SLOT_PREFIX = "No simulation loaded for slot ";
+  public static final String ERROR_MSG_NO_SAVE_DESTINATION_SELECTED = "No Save Destination Selected.";
+  public static final String ERROR_MSG_BASE_CONFIGURATION_REQUIRED = "Base configuration is required.";
+  public static final String ERROR_MSG_GRID_SNAPSHOT_REQUIRED = "Grid snapshot is required.";
+  public static final String ERROR_MSG_NO_NEIGHBORHOOD_SELECTED = "No neighborhood strategy selected.";
+  public static final String ERROR_MSG_NO_GRID_EDGE_SELECTED = "No grid edge selected.";
+  public static final String ERROR_MSG_UNSUPPORTED_GRID_EDGE_PREFIX = "Unsupported grid edge choice: ";
+  public static final String ERROR_MSG_NO_CONFIGURATION_FOR_SLOT_PREFIX = "No configuration set for slot ";
+  public static final String ERROR_MSG_NO_CONFIGURATION_SET = "No configuration set.";
 }

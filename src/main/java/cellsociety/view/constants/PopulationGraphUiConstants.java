@@ -2,6 +2,11 @@ package cellsociety.view.constants;
 
 /**
  * UI constants used by the population graph dialog.
+ *
+ * Purpose: isolate graph-specific dimensions and labels from dialog behavior.
+ *
+ * @author Emilio Garcia
+ * @author Team 02
  */
 public final class PopulationGraphUiConstants {
   private PopulationGraphUiConstants() {}

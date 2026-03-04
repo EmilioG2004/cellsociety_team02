@@ -20,6 +20,8 @@ import org.xml.sax.SAXException;
  * Centralized UI error handling for controller-level actions.
  *
  * <p>Purpose: map technical exceptions to user-facing messages and display them consistently.</p>
+ *
+ * @author Emilio Garcia
  */
 public class ErrorHandler {
 

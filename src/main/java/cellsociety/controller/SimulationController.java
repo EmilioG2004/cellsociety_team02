@@ -1,11 +1,11 @@
 package cellsociety.controller;
 
-import static cellsociety.view.constants.SimulationUiConstants.DEFAULT_SLOTS;
-import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
+import static cellsociety.view.constants.SimulationUiConstants.*;
 
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.controller.multiview.SlotManager;
 import cellsociety.controller.services.ErrorHandler;
+import cellsociety.controller.services.GridEdgeFactory;
 import cellsociety.controller.services.NeighborStrategyFactory;
 import cellsociety.controller.services.PopulationSyncService;
 import cellsociety.controller.services.SimulationDialogService;
@@ -50,10 +50,12 @@ public class SimulationController {
   private final List<SimulationSlot> mySlots;
   private final SlotManager mySlotManager;
   private final NeighborStrategyFactory myNeighborStrategyFactory;
+  private final GridEdgeFactory myGridEdgeFactory;
   private final PopulationSyncService myPopulationSyncService;
   private final SimulationDialogService myDialogService;
   private final SimulationPersistenceHandlers myPersistenceHandlers;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
+  private Optional<String> mySelectedGridEdgeChoice = Optional.empty();
 
 
   /**
@@ -78,10 +80,11 @@ public class SimulationController {
     mySlots = new ArrayList<>();
     mySlotManager = new SlotManager(mySimView);
     myNeighborStrategyFactory = new NeighborStrategyFactory();
+    myGridEdgeFactory = new GridEdgeFactory();
     myPopulationSyncService = new PopulationSyncService();
     myDialogService = new SimulationDialogService(mySimView);
     myScene = scene;
-    myPersistenceHandlers = new SimulationPersistenceHandlers(mySimView, myScene, myErrorHandler, myNeighborStrategyFactory, this::handlePopulationDataChanged, this::setSlotCount
+    myPersistenceHandlers = new SimulationPersistenceHandlers(mySimView, myScene, myErrorHandler, myNeighborStrategyFactory, myGridEdgeFactory, this::handlePopulationDataChanged, this::setSlotCount
     );
     myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll, this::handleLoadState, this::handlePopulationDataChanged);
 
@@ -90,6 +93,7 @@ public class SimulationController {
 
     myWires.wireAll(mySlots, this::handleSplashLoad);
     wireNeighborSelection();
+    wireGridEdgeSelection();
   }
 
   private void buildSlotChoices() {
@@ -106,7 +110,11 @@ public class SimulationController {
    * Called when the user clicks "Load Simulation" in the settings/splash panel.
    */
   private void handleSplashLoad() {
-    myPersistenceHandlers.handleSplashLoad(mySlots, mySelectedNeighborChoice);
+    myPersistenceHandlers.handleSplashLoad(
+        mySlots,
+        mySelectedNeighborChoice,
+        mySelectedGridEdgeChoice
+    );
   }
 
   /**
@@ -122,7 +130,7 @@ public class SimulationController {
    *
    * @param desired requested number of slots
    */
-  public void setSlotCount(int desired) {
+  private void setSlotCount(int desired) {
     mySlotManager.setSlotCount(
         mySlots,
         desired,
@@ -137,11 +145,20 @@ public class SimulationController {
   }
 
   private void handleLoadState(){
-    myPersistenceHandlers.handleLoadState(mySlots, mySelectedNeighborChoice);
+    myPersistenceHandlers.handleLoadState(
+        mySlots,
+        mySelectedNeighborChoice,
+        mySelectedGridEdgeChoice
+    );
   }
 
   private void handleLoadForSlot(int slotIndex) {
-    myPersistenceHandlers.handleLoadForSlot(slotIndex, mySlots, mySelectedNeighborChoice);
+    myPersistenceHandlers.handleLoadForSlot(
+        slotIndex,
+        mySlots,
+        mySelectedNeighborChoice,
+        mySelectedGridEdgeChoice
+    );
   }
 
   private void handleSaveForSlot(int slotIndex) {
@@ -172,9 +189,19 @@ public class SimulationController {
     ChoiceBox<String> neighborChoices = mySimView.getMyButtons().getNeighborChoices();
     neighborChoices.setOnAction(e -> {
       String selected = neighborChoices.getValue();
-      if (selected == null) throw new IllegalArgumentException("No neighborhood strategy selected.");
+      if (selected == null) throw new IllegalArgumentException(ERROR_MSG_NO_NEIGHBORHOOD_SELECTED);
       mySelectedNeighborChoice = Optional.of(selected);
       applyNeighborChoiceToLoadedSimulations(selected);
+    });
+  }
+
+  private void wireGridEdgeSelection() {
+    ChoiceBox<String> gridEdgeChoices = mySimView.getMyButtons().getGridEdgeChoices();
+    gridEdgeChoices.setOnAction(e -> {
+      String selected = gridEdgeChoices.getValue();
+      if (selected == null) throw new IllegalArgumentException(ERROR_MSG_NO_GRID_EDGE_SELECTED);
+      mySelectedGridEdgeChoice = Optional.of(selected);
+      applyGridEdgeChoiceToLoadedSimulations(selected);
     });
   }
 
@@ -183,9 +210,14 @@ public class SimulationController {
     handlePopulationDataChanged();
   }
 
+  private void applyGridEdgeChoiceToLoadedSimulations(String selectedChoice) {
+    myGridEdgeFactory.applyToLoadedSimulations(mySlots, selectedChoice);
+    handlePopulationDataChanged();
+  }
+
   private void handlePopulationDataChanged() {
     myPopulationSyncService.syncLoadedSlots(mySlots);
   }
 
-  public void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
+  private void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
 }

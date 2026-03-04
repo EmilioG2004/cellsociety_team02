@@ -1,5 +1,7 @@
 package cellsociety.controller.services;
 
+import static cellsociety.view.constants.SimulationUiConstants.*;
+
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.ColorMapProvider;
@@ -20,6 +22,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Service-layer class for simulation loading workflows.
+ *
+ * @author Emilio Garcia
  */
 public class SimulationLoadingService {
 
@@ -36,18 +40,18 @@ public class SimulationLoadingService {
     mySimulationLoader = simulationLoader;
   }
 
-  public SimulationConfig loadConfig(File xmlFile)
+  private SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     return myConfigLoader.loadConfig(xmlFile);
   }
 
-  public SimulationState loadState(File xmlFile)
+  private SimulationState loadState(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
     if (xmlFile == null) {
-      throw new IllegalArgumentException("No file selected.");
+      throw new IllegalArgumentException(ERROR_MSG_NO_FILE_SELECTED);
     }
     return mySimulationLoader.loadState(xmlFile);
   }
@@ -56,7 +60,8 @@ public class SimulationLoadingService {
    * Loads one config file and installs it into the target slot.
    */
   public void loadConfigIntoSlot(int slotIndex, File xmlFile, List<SimulationSlot> slots,
-      Optional<String> selectedNeighborChoice, NeighborStrategyFactory neighborStrategyFactory)
+      Optional<String> selectedNeighborChoice, NeighborStrategyFactory neighborStrategyFactory,
+      Optional<String> selectedGridEdgeChoice, GridEdgeFactory gridEdgeFactory)
       throws ParserConfigurationException, IOException, SAXException {
     checkSlotIndex(slots, slotIndex);
     SimulationConfig config = loadConfig(xmlFile);
@@ -66,6 +71,7 @@ public class SimulationLoadingService {
     slot.setConfig(config);
     slot.applyStateColors(ColorMapProvider.getColorMap(config.getSimulationType()));
     selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(slot, choice));
+    selectedGridEdgeChoice.ifPresent(choice -> gridEdgeFactory.applyToSlot(slot, choice));
   }
 
   /**
@@ -75,7 +81,8 @@ public class SimulationLoadingService {
    */
   public SimulationPreferences loadStateIntoSlots(File xmlFile, List<SimulationSlot> slots,
       IntConsumer setSlotCount, Consumer<Integer> setSlotChoice, Optional<String> selectedNeighborChoice,
-      NeighborStrategyFactory neighborStrategyFactory)
+      NeighborStrategyFactory neighborStrategyFactory, Optional<String> selectedGridEdgeChoice,
+      GridEdgeFactory gridEdgeFactory)
       throws ParserConfigurationException, IOException, SAXException {
     SimulationState desiredState = loadState(xmlFile);
     int activeSims = desiredState.getActiveSimulations().size();
@@ -91,13 +98,14 @@ public class SimulationLoadingService {
       currentSlot.setConfig(currentConfig);
       currentSlot.applyStateColors(ColorMapProvider.getColorMap(currentConfig.getSimulationType()));
       selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(currentSlot, choice));
+      selectedGridEdgeChoice.ifPresent(choice -> gridEdgeFactory.applyToSlot(currentSlot, choice));
     }
     return desiredState.getPreferences();
   }
 
   private void checkSlotIndex(List<SimulationSlot> slots, int slotIndex) {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
+      throw new IndexOutOfBoundsException(ERROR_MSG_INVALID_SLOT_INDEX_PREFIX + slotIndex);
     }
   }
 }

@@ -8,6 +8,8 @@ import java.util.function.IntConsumer;
 
 /**
  * Manages simulation slot lifecycle and dashboard tile updates.
+ *
+ * @author Emilio Garcia
  */
 public class SlotManager {
 
@@ -45,16 +47,10 @@ public class SlotManager {
     rebuildTileChildren(slots);
   }
 
-  public void rebuildTileChildren(List<SimulationSlot> slots) {
+  private void rebuildTileChildren(List<SimulationSlot> slots) {
     mySimView.getMultiSimTile().getChildren().clear();
     for (SimulationSlot slot : slots) {
       mySimView.getMultiSimTile().getChildren().add(slot.getNode());
-    }
-  }
-
-  public void checkIndex(List<SimulationSlot> slots, int slotIndex) {
-    if (slotIndex < 0 || slotIndex >= slots.size()) {
-      throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
     }
   }
 

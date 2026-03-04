@@ -14,22 +14,22 @@ import javafx.scene.control.Label;
 /**
  * Owns the SimulationView's controls and centralizes bundle-based text updates.
  *
- * <p>Purpose: keeps {@link SimulationView} focused on layout by isolating control creation,
- * language application, and accessors in one place.</p>
+ *Purpose: keeps {@link SimulationView} focused on layout by isolating control creation,
+ * language application, and accessors in one place.
  *
- * <p>Assumptions: the provided {@link ResourceBundle} contains all required keys; callers
- * update the bundle via {@link #applyLanguage(ResourceBundle)} when the language changes.</p>
+ *Assumptions: the provided {@link ResourceBundle} contains all required keys; callers
+ * update the bundle via {@link #applyLanguage(ResourceBundle)} when the language changes.
  *
- * <p>Dependencies: JavaFX {@link Button} and {@link Label} controls and a
- * {@link ResourceBundle} for localization.</p>
+ *Dependencies: JavaFX {@link Button} and {@link Label} controls and a
+ * {@link ResourceBundle} for localization.
  *
- * <p>Example usage:</p>
- * <pre>{@code
+ *Example usage:
+ * Example:
  * ButtonManager buttons = new ButtonManager(bundle);
  * HBox uploadRow = new HBox(buttons.getUploadRowNodes());
- * }</pre>
  *
- * <p>Other details: this class does not wire event handlers; controllers do that.</p>
+ *
+ *Other details: this class does not wire event handlers; controllers do that.
  *
  * @author Emilio Garcia
  */
@@ -40,11 +40,10 @@ public class ButtonManager {
   // Labels
   private final Label myTitle = new Label();
   private final Label mySpeedLabel = new Label();
-  private final Label myStateStackSizeLabel = new Label();
   private final Label myNeighborStrategy = new Label();
+  private final Label myGridEdge = new Label();
 
   // Buttons
-  private final Button myUploadButton = new Button();
   private final Button myForwardButton = new Button();
   private final Button myBackButton = new Button();
   private final Button myStartButton = new Button();
@@ -58,19 +57,19 @@ public class ButtonManager {
   private final Button mySettingsButton = new Button();
   private final Button myRotateLeftButton = new Button();
   private final Button myRotateRightButton = new Button();
-  private final Button myMultiSimButton = new Button();
   private final ChoiceBox<String> myNeighborChoices = new ChoiceBox<>();
+  private final ChoiceBox<String> myGridEdgeChoices = new ChoiceBox<>();
 
   /**
    * Creates a button manager and applies the initial language.
    *
-   * <p>Purpose: initializes all labels and buttons with localized text.</p>
+   *Purpose: initializes all labels and buttons with localized text.
    *
-   * <p>Assumptions: {@code bundle} is non-null and contains the expected keys.</p>
+   *Assumptions: {@code bundle} is non-null and contains the expected keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI text
    */
@@ -79,19 +78,20 @@ public class ButtonManager {
     applyLanguage(bundle);
     myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
     buildNeighborChoices();
+    buildGridEdgeChoices();
 
   }
 
   /**
    * Applies localized text to all controls owned by this manager.
    *
-   * <p>Purpose: updates labels and button text when the language changes.</p>
+   *Purpose: updates labels and button text when the language changes.
    *
-   * <p>Assumptions: {@code bundle} contains all required keys.</p>
+   *Assumptions: {@code bundle} contains all required keys.
    *
-   * <p>Exceptions: {@link java.util.MissingResourceException} if required keys are missing.</p>
+   *Exceptions: {@link java.util.MissingResourceException} if required keys are missing.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param bundle localization bundle for UI text
    */
@@ -99,7 +99,6 @@ public class ButtonManager {
     myBundle = bundle;
 
     myTitle.setText(myBundle.getString(APP_TITLE));
-    myUploadButton.setText(myBundle.getString(BUTTON_UPLOAD_CONFIG));
     myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
     myBackButton.setText(myBundle.getString(BUTTON_STEP_BACKWARD));
     myStartButton.setText(myBundle.getString(BUTTON_START));
@@ -113,23 +112,20 @@ public class ButtonManager {
     myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
     myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
     myChangeDirectionButton.setText(myBundle.getString(BUTTON_CHANGE_DIRECTION));
-    myMultiSimButton.setText(myBundle.getString(BUTTON_MULTI_SIM));
-
-
-    myStateStackSizeLabel.setText(myBundle.getString(LABEL_GENERATION_UNSET));
     myNeighborStrategy.setText(myBundle.getString(LABEL_NEIGHBOR));
+    myGridEdge.setText(myBundle.getString(LABEL_EDGE));
   }
 
   /**
    * Formats and sets the current speed label using the bundle key {@code label.currentSpeed}.
    *
-   * <p>Purpose: keeps the displayed speed multiplier in sync with controller state.</p>
+   *Purpose: keeps the displayed speed multiplier in sync with controller state.
    *
-   * <p>Assumptions: {@code speedMultiplier} is positive.</p>
+   *Assumptions: {@code speedMultiplier} is positive.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
-   * <p>Return value: none.</p>
+   *Return value: none.
    *
    * @param speedMultiplier current speed multiplier (e.g., 0.5, 1.0, 2.0)
    */
@@ -141,16 +137,23 @@ public class ButtonManager {
   /**
    * Returns the buttons shown in the upload row.
    *
-   * <p>Purpose: enables {@link SimulationView} to assemble its upload row layout.</p>
+   *Purpose: enables {@link SimulationView} to assemble its upload row layout.
    *
-   * <p>Assumptions: button order is meaningful to the UI layout.</p>
+   *Assumptions: button order is meaningful to the UI layout.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return ordered list of upload-row buttons
    */
   public List<Node> getUploadRowNodes() {
-    return List.of(mySaveButton, mySettingsButton, myNeighborStrategy, myNeighborChoices);
+    return List.of(
+        mySaveButton,
+        mySettingsButton,
+        myNeighborStrategy,
+        myNeighborChoices,
+        myGridEdge,
+        myGridEdgeChoices
+    );
   }
 
   private void buildNeighborChoices(){
@@ -158,19 +161,27 @@ public class ButtonManager {
         ResourcePaths.VON_NEUMANN,
         ResourcePaths.MOORE,
         ResourcePaths.MOORE_RADIUS_2,
-        ResourcePaths.DIAGONAL,
-        ResourcePaths.TOROIDAL
+        ResourcePaths.DIAGONAL
+    );
+  }
+
+  private void buildGridEdgeChoices() {
+    myGridEdgeChoices.getItems().addAll(
+        ResourcePaths.FINITE,
+        ResourcePaths.TOROIDAL,
+        ResourcePaths.CYLINDRICAL,
+        ResourcePaths.MIRRORED
     );
   }
 
   /**
    * Returns the nodes shown in the control bar.
    *
-   * <p>Purpose: exposes the control bar elements in a consistent order.</p>
+   *Purpose: exposes the control bar elements in a consistent order.
    *
-   * <p>Assumptions: the calling view is responsible for layout spacing and alignment.</p>
+   *Assumptions: the calling view is responsible for layout spacing and alignment.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return ordered list of control-bar nodes
    */
@@ -196,9 +207,9 @@ public class ButtonManager {
   /**
    * Returns the title label.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return label used for the app title
    */
@@ -206,29 +217,19 @@ public class ButtonManager {
   /**
    * Returns the speed label.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return label displaying the speed multiplier
    */
   public Label getSpeedLabel() { return mySpeedLabel; }
   /**
-   * Returns the generation label.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return label displaying the current generation/stack size
-   */
-  public Label getStateStackSizeLabel() { return myStateStackSizeLabel; }
-  /**
    * Returns the step-forward button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that advances one step
    */
@@ -236,9 +237,9 @@ public class ButtonManager {
   /**
    * Returns the step-backward button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that steps backward
    */
@@ -246,9 +247,9 @@ public class ButtonManager {
   /**
    * Returns the start button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that starts the simulation
    */
@@ -256,9 +257,9 @@ public class ButtonManager {
   /**
    * Returns the pause button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that pauses the simulation
    */
@@ -266,9 +267,9 @@ public class ButtonManager {
   /**
    * Returns the speed-up button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that increases speed
    */
@@ -276,9 +277,9 @@ public class ButtonManager {
   /**
    * Returns the slow-down button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that decreases speed
    */
@@ -286,9 +287,9 @@ public class ButtonManager {
   /**
    * Returns the save button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that saves current state to XML
    */
@@ -296,9 +297,9 @@ public class ButtonManager {
   /**
    * Returns the reset button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that resets the simulation
    */
@@ -306,9 +307,9 @@ public class ButtonManager {
   /**
    * Returns the direction toggle button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that toggles forward/backward stepping
    */
@@ -316,9 +317,9 @@ public class ButtonManager {
   /**
    * Returns the outline toggle button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that toggles grid outlines
    */
@@ -326,9 +327,9 @@ public class ButtonManager {
   /**
    * Returns the settings button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that opens the settings splash
    */
@@ -336,9 +337,9 @@ public class ButtonManager {
   /**
    * Returns the rotate-left button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that rotates grid left
    */
@@ -346,13 +347,15 @@ public class ButtonManager {
   /**
    * Returns the rotate-right button.
    *
-   * <p>Assumptions: none.</p>
+   *Assumptions: none.
    *
-   * <p>Exceptions: none.</p>
+   *Exceptions: none.
    *
    * @return button that rotates grid right
    */
   public Button getRotateRightButton() { return myRotateRightButton; }
 
   public ChoiceBox<String> getNeighborChoices() { return myNeighborChoices; }
+
+  public ChoiceBox<String> getGridEdgeChoices() { return myGridEdgeChoices; }
 }

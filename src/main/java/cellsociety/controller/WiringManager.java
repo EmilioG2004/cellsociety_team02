@@ -7,7 +7,7 @@ import static cellsociety.view.constants.SimulationUiConstants.MAX_SPEED;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.controller.multiview.SimulationSlot;
-import cellsociety.view.LanguageApplier;
+import cellsociety.view.utils.LanguageApplier;
 import cellsociety.view.SimulationView;
 import java.util.List;
 import java.util.ResourceBundle;
