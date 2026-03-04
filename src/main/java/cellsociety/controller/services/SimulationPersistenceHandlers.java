@@ -6,7 +6,7 @@ import static cellsociety.view.constants.ResourcePaths.BUNDLE_FOLDER;
 import cellsociety.config.SimulationPreferences;
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.view.SimulationView;
-import cellsociety.view.constants.ResourcePaths;
+import cellsociety.view.ThemeApplier;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +28,7 @@ public class SimulationPersistenceHandlers {
   private final NeighborStrategyFactory myNeighborStrategyFactory;
   private final SimulationLoadingService myLoadingService;
   private final SimulationSavingService mySavingService;
+  private final ThemeApplier myThemeApplier;
   private final Runnable myPopulationDataChangedCallback;
   private final IntConsumer mySetSlotCountCallback;
 
@@ -44,6 +45,7 @@ public class SimulationPersistenceHandlers {
     myNeighborStrategyFactory = neighborStrategyFactory;
     myLoadingService = new SimulationLoadingService();
     mySavingService = new SimulationSavingService();
+    myThemeApplier = new ThemeApplier();
     myPopulationDataChangedCallback = populationDataChangedCallback;
     mySetSlotCountCallback = setSlotCountCallback;
   }
@@ -129,11 +131,11 @@ public class SimulationPersistenceHandlers {
 
   private void loadPreferences(List<SimulationSlot> slots, SimulationPreferences desiredPreferences) {
     int theme = desiredPreferences.getTheme();
-    String themeChoice = mapThemeCodeToChoice(theme);
+    String themeChoice = myThemeApplier.toThemeChoice(theme);
     String language = desiredPreferences.getLanguage();
     String languageBundle = BUNDLE_FOLDER + language;
     double speed = desiredPreferences.getSimulationSpeed();
-    mySimView.applyTheme(myScene, themeChoice);
+    myThemeApplier.apply(myScene, themeChoice);
     mySimView.getMySettings().getMyThemes().setValue(themeChoice);
     mySimView.applyLanguage(ResourceBundle.getBundle(languageBundle));
     mySimView.getMySettings().getMyLanguages().setValue(language);
@@ -142,9 +144,4 @@ public class SimulationPersistenceHandlers {
     }
   }
 
-  private String mapThemeCodeToChoice(int themeCode) {
-    if (themeCode == 1) return ResourcePaths.THEME_DARK;
-    if (themeCode == 2) return ResourcePaths.THEME_DUKE;
-    return ResourcePaths.THEME_LIGHT;
-  }
 }

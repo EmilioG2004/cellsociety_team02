@@ -4,7 +4,6 @@ import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
 import cellsociety.config.SimulationConfig;
-import cellsociety.view.constants.ResourcePaths;
 import cellsociety.view.dialogs.AboutDialog;
 import cellsociety.view.dialogs.SettingsSplash;
 import java.util.ResourceBundle;
@@ -46,20 +45,9 @@ import java.io.File;
  * @author Emilio Garcia
  */
 public class SimulationView {
-  private static final String BASE_CSS =
-      SimulationView.class.getResource(ResourcePaths.CSS_BASE).toExternalForm();
-
-  private static final String LIGHT_CSS =
-      SimulationView.class.getResource(ResourcePaths.CSS_LIGHT).toExternalForm();
-
-  private static final String DARK_CSS =
-      SimulationView.class.getResource(ResourcePaths.CSS_DARK).toExternalForm();
-
-  private static final String DUKE_CSS =
-      SimulationView.class.getResource(ResourcePaths.CSS_DUKE).toExternalForm();
-
   private ResourceBundle myBundle;
   private final ButtonManager myButtons;
+  private final ThemeApplier myThemeApplier;
 
   private final StackPane myRoot = new StackPane();
   private final BorderPane myMain = new BorderPane();
@@ -93,6 +81,7 @@ public class SimulationView {
   public SimulationView(ResourceBundle bundle){
     myBundle = bundle;
     myButtons = new ButtonManager(myBundle);
+    myThemeApplier = new ThemeApplier();
     myRoot.getStyleClass().add("app-root");
     myMain.getStyleClass().add("main-pane");
     applyLanguage(myBundle);
@@ -412,12 +401,7 @@ public class SimulationView {
    * @param themeChoice theme name (e.g., "Light", "Dark", "Duke")
    */
   public void applyTheme(Scene scene, String themeChoice) {
-    String themeCss = switch (themeChoice) {
-      case ResourcePaths.THEME_DARK -> DARK_CSS;
-      case ResourcePaths.THEME_DUKE -> DUKE_CSS;
-      default -> LIGHT_CSS;
-    };
-    scene.getStylesheets().setAll(BASE_CSS, themeCss);
+    myThemeApplier.apply(scene, themeChoice);
   }
 
   /**
