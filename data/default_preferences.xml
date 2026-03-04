@@ -1,0 +1,49 @@
+<simulationState>
+  <preferences>
+    <theme>0</theme>
+    <simulationSpeed>1.0</simulationSpeed>
+    <language>English</language>
+    <colorMaps>
+      <colorMap type="GameOfLife">
+        <colorEntry state="0" color="#FFFFFF"/>
+        <colorEntry state="1" color="#000000"/>
+      </colorMap>
+      <colorMap type="SpreadingOfFire">
+        <colorEntry state="0" color="#1B1B1B"/>
+        <colorEntry state="1" color="#2ECC71"/>
+        <colorEntry state="2" color="#E74C3C"/>
+      </colorMap>
+      <colorMap type="Segregation">
+        <colorEntry state="0" color="#FFFFFF"/>
+        <colorEntry state="1" color="#4363D8"/>
+        <colorEntry state="2" color="#F58231"/>
+      </colorMap>
+      <colorMap type="FallingSand">
+        <colorEntry state="0" color="#000000"/>
+        <colorEntry state="1" color="#9E9E9E"/>
+        <colorEntry state="2" color="#FFE119"/>
+        <colorEntry state="3" color="#46F0F0"/>
+      </colorMap>
+      <colorMap type="Percolotion">
+        <colorEntry state="0" color="#111111"/>
+        <colorEntry state="1" color="#FFFFFF"/>
+        <colorEntry state="2" color="#00A6FF"/>
+      </colorMap>
+      <colorMap type="Langton1984">
+        <colorEntry state="0" color="#FFFFFF"/>
+        <colorEntry state="1" color="#E6194B"/>
+        <colorEntry state="2" color="#3CB44B"/>
+        <colorEntry state="3" color="#4363D8"/>
+        <colorEntry state="4" color="#FFE119"/>
+        <colorEntry state="5" color="#F58231"/>
+        <colorEntry state="6" color="#911EB4"/>
+        <colorEntry state="7" color="#46F0F0"/>
+      </colorMap>
+      <colorMap type="WaTorWorld">
+        <colorEntry state="0" color="#1F77B4"/>
+        <colorEntry state="1" color="#FFD700"/>
+        <colorEntry state="2" color="#E74C3C"/>
+      </colorMap>
+    </colorMaps>
+  </preferences>
+</simulationState>
