@@ -27,7 +27,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_emptyGrid_returnsSimulation() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 0, 0, new int[][]{}, new HashMap<>());
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 0, 0, new int[][]{}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
     assertEquals(0, sim.getReadOnlyGrid().getRows());
@@ -37,7 +37,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_allDeadGrid_returnsAllDead() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 3, 3,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
@@ -53,7 +53,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_singleAliveCell_returnsAlive() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 1, 1,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 1, 1,
         new int[][]{{1}}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
@@ -66,7 +66,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_blinkerPattern_correctStates() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 3, 3,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 1, 0}, {0, 1, 0}, {0, 1, 0}}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
@@ -87,7 +87,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_allAliveGrid() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 2, 2,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 2, 2,
         new int[][]{{1, 1}, {1, 1}}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     ReadOnlyGrid grid = sim.getReadOnlyGrid();
@@ -102,7 +102,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_gridSmallerThanDeclaredDimensions_throws() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 10, 10,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 10, 10,
         new int[][]{{0, 0, 0}, {0, 0, 0}}, new HashMap<>());
     assertThrows(IllegalArgumentException.class, () -> SimulationFactory.createSimulation(config));
   }
@@ -110,7 +110,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_invalidStateValue_throws() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 1, 1,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 1, 1,
         new int[][]{{5}}, new HashMap<>());
     assertThrows(IllegalArgumentException.class, () -> SimulationFactory.createSimulation(config));
   }
@@ -119,7 +119,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_returnsSimulationWithReadOnlyGridAndRule() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 3, 3,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 3, 3,
         new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     assertNotNull(sim);
@@ -132,7 +132,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_gameOfLife_returnsConwayRule() {
     SimulationConfig config = new SimulationConfig(
-        "GameOfLife", CONWAY_RULE_CLASS, null, "Test", "Author", "Desc", 1, 1,
+        "GameOfLife", CONWAY_RULE_CLASS, null, null, "Test", "Author", "Desc", 1, 1,
         new int[][]{{0}}, new HashMap<>());
     SimulationModel sim = SimulationFactory.createSimulation(config);
     assertEquals(ConwayGameOfLifeRule.class, sim.getRule().getClass());
@@ -142,7 +142,7 @@ public class SimulationFactoryTest {
   @Test
   void createSimulation_unknownRuleClass_throwsWithClearMessage() {
     SimulationConfig config = new SimulationConfig(
-        "InvalidType", "not.a.RealRuleClass", null, "Test", "Author", "Desc", 1, 1,
+        "InvalidType", "not.a.RealRuleClass", null, null, "Test", "Author", "Desc", 1, 1,
         new int[][]{{0}}, new HashMap<>());
     IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
         () -> SimulationFactory.createSimulation(config));

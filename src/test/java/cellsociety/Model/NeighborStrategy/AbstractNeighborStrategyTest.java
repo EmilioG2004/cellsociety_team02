@@ -3,6 +3,7 @@ package cellsociety.Model.NeighborStrategy;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import cellsociety.Model.GridEdge.CylindricalEdge;
 import cellsociety.Model.GridEdge.FiniteEdge;
 import cellsociety.Model.GridEdge.GridEdge;
 import cellsociety.Model.GridEdge.MirroredEdge;
@@ -58,5 +59,13 @@ class AbstractNeighborStrategyTest {
     MirroredEdge mirrored = new MirroredEdge();
     s.setGridEdge(mirrored);
     assertSame(mirrored, s.getGridEdge());
+  }
+
+  @Test
+  void setGridEdge_toCylindrical_usesCylindricalEdge() {
+    TestStrategy s = new TestStrategy();
+    CylindricalEdge cylindrical = new CylindricalEdge();
+    s.setGridEdge(cylindrical);
+    assertSame(cylindrical, s.getGridEdge());
   }
 }
