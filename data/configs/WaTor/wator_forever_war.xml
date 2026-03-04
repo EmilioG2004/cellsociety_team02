@@ -1,0 +1,29 @@
+<simulation type="WaTor" class="cellsociety.Model.GameRules.WaTorRule">
+  <metadata>
+    <title>WaTor Forever War</title>
+    <author>Ixa Sigler</author>
+    <description>
+      War never changes...
+    </description>
+  </metadata>
+
+  <grid rows="120" cols="120">
+    <randomByCount>
+      <state id="0" count="1200"/>
+      <state id="1" count="380"/>
+      <state id="2" count="20"/>
+    </randomByCount>
+
+    <pattern row="2" col="5">
+      <states>
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+      </states>
+    </pattern>
+
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

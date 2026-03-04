@@ -1,0 +1,22 @@
+<simulation type="Percolation" class="cellsociety.Model.GameRules.PercolationRule">
+  <metadata>
+    <title>Percolation Simple</title>
+    <author>Ixa Sigler</author>
+    <description>It's just epic, ok?</description>
+  </metadata>
+
+  <grid rows="200" cols="200">
+    <randomByCount>
+      <state id="1" proportion="0.66"/>
+    </randomByCount>
+
+    <pattern row="0" col="0">
+      <states>
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+      </states>
+    </pattern>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>

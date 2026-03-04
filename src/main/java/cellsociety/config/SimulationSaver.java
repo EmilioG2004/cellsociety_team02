@@ -1,7 +1,5 @@
 package cellsociety.config;
 
-import javafx.scene.paint.Color;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -16,25 +14,40 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static cellsociety.config.ConfigXmlConstants.*;
 
 /**
- * General saver for:
- *  - SimulationPreferences (preferences file)
- *  - SimulationState (preferences + active simulations)
+ * Saves either:
+ *  - {@link SimulationPreferences} (preferences-only file), or
+ *  - {@link SimulationState} (preferences + active simulations).
  *
- * Delegates simulation XML building to ConfigSaver.
- * Uses ColorMapProvider as the sole source of truth for color maps.
+ * Reuses {@link ConfigSaver} for writing individual <simulation> elements so the simulation XML
+ * shape stays consistent across the codebase. Color maps are serialized from {@link ColorMapProvider}
+ * so saved files reflect the currently-registered rendering scheme.
  * @author Ixa Sigler
  */
-public class SimulationSaver {
+public class SimulationSaver implements XmlSaver<SimulationState> {
+
+  private static final Logger LOG = LogManager.getLogger(SimulationSaver.class);
 
   private final ConfigSaver configSaver = new ConfigSaver();
 
-  /** Save only preferences to a file. */
+  /**
+   * Writes a preferences-only file (theme/language/speed + any registered color maps).
+   * Useful for persisting UI settings even when no simulations are currently loaded.
+   */
   public void savePreferences(SimulationPreferences prefs, File outFile) {
-    if (prefs == null) throw new IllegalArgumentException("prefs cannot be null");
-    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+    if (prefs == null) {
+      LOG.error("prefs cannot be null");
+      throw new IllegalArgumentException("prefs cannot be null");
+    }
+    if (outFile == null) {
+      LOG.error("outFile cannot be null");
+      throw new IllegalArgumentException("outFile cannot be null");
+    }
 
     validatePreferences(prefs);
 
@@ -44,19 +57,32 @@ public class SimulationSaver {
       doc.appendChild(root);
       writeXml(doc, outFile);
     } catch (Exception e) {
+      LOG.error("Failed to save preferences to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save preferences to " + outFile.getPath(), e);
     }
   }
 
-  /** Save full simulation state (preferences + all active simulations). */
+  /**
+   * Writes a full session file: preferences plus the list of active simulations.
+   * This is used by "Save Session" behavior to restore both UI settings and the open simulations.
+   */
   public void saveState(SimulationState state, File outFile) {
-    if (state == null) throw new IllegalArgumentException("state cannot be null");
-    if (outFile == null) throw new IllegalArgumentException("outFile cannot be null");
+    if (state == null) {
+      LOG.error("state cannot be null");
+      throw new IllegalArgumentException("state cannot be null");
+    }
+    if (outFile == null) {
+      LOG.error("outFile cannot be null");
+      throw new IllegalArgumentException("outFile cannot be null");
+    }
 
     validatePreferences(state.getPreferences());
 
     List<SimulationConfig> configs = state.getActiveSimulations();
-    if (configs == null) throw new IllegalArgumentException("activeSimulations cannot be null");
+    if (configs == null) {
+      LOG.error("activeSimulations cannot be null");
+      throw new IllegalArgumentException("activeSimulations cannot be null");
+    }
 
     try {
       Document doc = newDocument();
@@ -65,15 +91,16 @@ public class SimulationSaver {
       // preferences section
       root.appendChild(buildPreferencesElement(doc, state.getPreferences()));
 
-      // simulations section
+      // simulations section (each config becomes one <simulation>)
       Element simsEl = doc.createElement(CONFIG_SIMULATIONS);
 
       for (SimulationConfig cfg : configs) {
         if (cfg == null) {
+          LOG.error("activeSimulations contains null config");
           throw new IllegalArgumentException("activeSimulations contains null config");
         }
 
-        // Reuse ConfigSaver to generate <simulation> element
+        // Delegate per-simulation serialization to ConfigSaver to avoid duplicated XML logic
         Element simElement = configSaver.buildSimulationElement(doc, cfg);
         simsEl.appendChild(simElement);
       }
@@ -84,10 +111,24 @@ public class SimulationSaver {
       writeXml(doc, outFile);
 
     } catch (Exception e) {
+      LOG.error("Failed to save simulation state to {}", outFile.getPath(), e);
       throw new RuntimeException("Failed to save simulation state to " + outFile.getPath(), e);
     }
   }
 
+  /**
+   * Implements {@link XmlSaver#save(Object, File)} by delegating to {@link #saveState(SimulationState, File)}.
+   * Preserves the existing method name for teammates while satisfying the interface contract.
+   */
+  @Override
+  public void save(SimulationState state, File outFile) {
+    saveState(state, outFile);
+  }
+
+  /**
+   * Builds the <preferences> element for either a preferences-only file
+   * or the preferences section inside a full session save.
+   */
   private Element buildPreferencesElement(Document doc, SimulationPreferences prefs) {
     Element root = doc.createElement(CONFIG_PREFERENCES);
 
@@ -100,6 +141,7 @@ public class SimulationSaver {
     root.appendChild(textElement(doc, CONFIG_LANGUAGE,
         prefs.getLanguage()));
 
+    // Persist whatever color maps are currently registered so the session reproduces the same look.
     appendColorMapsIfAny(doc, root, ColorMapProvider.getAllColorMaps());
 
     return root;
@@ -113,8 +155,8 @@ public class SimulationSaver {
    *   </colorMap>
    * </colorMaps>
    *
-   * Uses ColorMapProvider's structure: Map<String, Map<Integer, Color>>
-   * and serializes colors as #RRGGBB.
+   * Color values are stored as strings so the saved format stays UI-agnostic, but are expected
+   * to be valid JavaFX colors (validated on load).
    */
   private void appendColorMapsIfAny(
       Document doc,
@@ -128,6 +170,7 @@ public class SimulationSaver {
     for (Map.Entry<String, Map<Integer, String>> typeEntry : colorMapsByType.entrySet()) {
       String type = trimmed(typeEntry.getKey());
       if (type.isEmpty()) {
+        LOG.error("ColorMapProvider contains blank simulationType key");
         throw new IllegalArgumentException("ColorMapProvider contains blank simulationType key");
       }
 
@@ -137,11 +180,13 @@ public class SimulationSaver {
       colorMapsEl.appendChild(buildColorMapElement(doc, type, map));
     }
 
+    // Only include <colorMaps> if at least one <colorMap> was written.
     if (colorMapsEl.getChildNodes().getLength() > 0) {
       preferencesEl.appendChild(colorMapsEl);
     }
   }
 
+  /** Builds one <colorMap type="..."> block containing many <colorEntry> nodes. */
   private Element buildColorMapElement(Document doc, String type, Map<Integer, String> map) {
     Element colorMapEl = doc.createElement(CONFIG_COLOR_MAP);
     colorMapEl.setAttribute(CONFIG_COLOR_MAP_TYPE_ATTR, type);
@@ -149,11 +194,13 @@ public class SimulationSaver {
     for (Map.Entry<Integer, String> entry : map.entrySet()) {
       Integer state = entry.getKey();
       if (state == null) {
+        LOG.error("color map for type '{}' contains null state key", type);
         throw new IllegalArgumentException("color map for type '" + type + "' contains null state key");
       }
 
       String c = entry.getValue();
       if (c == null) {
+        LOG.error("color map for type '{}' has null color for state {}", type, state);
         throw new IllegalArgumentException("color map for type '" + type + "' has null color for state " + state);
       }
 
@@ -167,16 +214,21 @@ public class SimulationSaver {
     return colorMapEl;
   }
 
-
   private void validatePreferences(SimulationPreferences prefs) {
-    if (prefs.getTheme() == null)
+    if (prefs.getTheme() == null) {
+      LOG.error("theme cannot be null");
       throw new IllegalArgumentException("theme cannot be null");
+    }
 
-    if (trimmed(prefs.getLanguage()).isEmpty())
+    if (trimmed(prefs.getLanguage()).isEmpty()) {
+      LOG.error("language is blank");
       throw new IllegalArgumentException("language is blank");
+    }
 
-    if (prefs.getSimulationSpeed() <= 0)
+    if (prefs.getSimulationSpeed() <= 0) {
+      LOG.error("simulationSpeed must be > 0");
       throw new IllegalArgumentException("simulationSpeed must be > 0");
+    }
   }
 
   private Document newDocument() throws Exception {

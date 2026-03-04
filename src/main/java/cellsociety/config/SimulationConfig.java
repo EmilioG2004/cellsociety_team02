@@ -1,10 +1,11 @@
 package cellsociety.config;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
  * Immutable snapshot of a simulation configuration: rule class, metadata, grid size, initial states, and parameters.
- * Typically produced by {@link ConfigLoader} and consumed by {@link cellsociety.Model.Simulation.factory.SimulationFactory}.
+ * Typically produced by {@link ConfigLoader} and consumed by SimulationFactory.
  */
 public final class SimulationConfig {
 
@@ -60,7 +61,7 @@ public final class SimulationConfig {
     this.description = description;
     this.rows = rows;
     this.cols = cols;
-    this.initialStates = initialStates;
+    this.initialStates = deepCopy(initialStates);
     this.parameters = Map.copyOf(parameters);
   }
 
@@ -103,10 +104,19 @@ public final class SimulationConfig {
   }
 
   public int [][] getInitialStates() {
-    return initialStates;
+    return deepCopy(initialStates);
   }
 
   public Map<String, Double> getParameters() {
     return parameters;
+  }
+
+  private static int[][] deepCopy(int[][] src) {
+    if (src == null) return null;
+    int[][] copy = new int[src.length][];
+    for (int r = 0; r < src.length; r++) {
+      copy[r] = (src[r] == null) ? null : Arrays.copyOf(src[r], src[r].length);
+    }
+    return copy;
   }
 }
