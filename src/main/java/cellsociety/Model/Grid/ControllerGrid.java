@@ -4,8 +4,8 @@ import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 
 /**
  * Grid interface for the controller: extends the rendering-only {@link ViewGrid} with
- * neighbor-strategy access so the controller can read and change the neighborhood type
- * (e.g. Moore vs Von Neumann) at runtime.
+ * neighbor-strategy mutation so the controller can change the neighborhood type
+ * (e.g. Moore vs Von Neumann) at runtime. The read-only getter lives on {@link ReadOnlyGrid}.
  *
  * @author Michael Lei
  */

@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author Michael Lei
  */
-public class VonNeumannNeighborStrategy implements NeighborStrategy {
+public class VonNeumannNeighborStrategy extends AbstractNeighborStrategy {
 
     private static final List<int[]> VON_NEUMANN_OFFSETS = List.of(
         new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_SAME_ROW_OR_COL }, // N

@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author Michael Lei
  */
-public class MooreNeighborStrategy implements NeighborStrategy {
+public class MooreNeighborStrategy extends AbstractNeighborStrategy {
 
     private static final List<int[]> MOORE_OFFSETS = List.of(
             new int[] { OFFSET_PREV_ROW_OR_COL, OFFSET_PREV_ROW_OR_COL }, // NW

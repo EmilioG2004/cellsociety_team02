@@ -2,11 +2,13 @@ package cellsociety.controller;
 
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_BACKWARD;
 import static cellsociety.view.constants.BundleKeys.BUTTON_DIRECTION_FORWARD;
+import static cellsociety.view.constants.SimulationUiConstants.MAX_SPEED;
+
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.ConfigSaver;
 import cellsociety.controller.multiview.SimulationSlot;
+import cellsociety.view.LanguageApplier;
 import cellsociety.view.SimulationView;
-import cellsociety.view.constants.ResourcePaths;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -40,6 +42,7 @@ public class WiringManager {
   private final Runnable mySaveAllCallback;
   private final Runnable myLoadCallback;
   private final Runnable myPopulationChangedCallback;
+  private final LanguageApplier myLanguageApplier;
 
   /**
    * Creates a wiring manager with callbacks for both single-sim and multi-sim modes.
@@ -61,6 +64,7 @@ public class WiringManager {
     mySaveAllCallback = saveAllCallback;
     myLoadCallback = loadCallback;
     myPopulationChangedCallback = populationChangedCallback;
+    myLanguageApplier = new LanguageApplier();
   }
 
   /**
@@ -172,7 +176,7 @@ public class WiringManager {
   private void wireSpeedUp(List<SimulationSlot> mySlots) {
     mySimView.getMyButtons().getSpeedUpButton().setOnAction(e -> {
       double currentSpeed = getReferenceSpeed(mySlots);
-      if (currentSpeed >= 4) return;
+      if (currentSpeed >= MAX_SPEED) return;
       for (SimulationSlot slot : mySlots) {
         if (slot.hasSimulation()) {
           slot.setSpeed(slot.getStepsPerSecond() * 2.0);
@@ -249,11 +253,7 @@ public class WiringManager {
 
 
   private ResourceBundle loadLanguageBundle(String choice) {
-    return switch (choice) {
-      case ResourcePaths.LANGUAGE_SPANISH -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_SPANISH);
-      case ResourcePaths.LANGUAGE_PORTUGUESE -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_PORTUGUESE);
-      default -> ResourceBundle.getBundle(ResourcePaths.BUNDLE_ENGLISH);
-    };
+    return myLanguageApplier.resolveBundle(choice);
   }
 
   private double getReferenceSpeed(List<SimulationSlot> mySlots) {
