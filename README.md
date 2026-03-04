@@ -39,6 +39,7 @@ This project implements a cellular automata simulator.
  * Assumptions or Simplifications
  * We support changing a cell state by clicking while the sim is running, but we assume that the full sequence (user clicks a cell in the view, the presenter calls the driver to update the cell state in the model, and the presenter triggers a re-render, for example the renderer re-rendering the grid) completes between two step-driven renders, that is between successive ticks of the sim driver’s scheduler. We do not explicitly synchronize click handling with the driver’s tick. In practice we rely on this happening within one step interval.
  * Click to toggle cell state is implemented by cycling the cell to the next state in that simulation’s cycle (for example dead, alive, dead). As a simplification, we do not preserve other cell data when toggling. Any rule-specific or cell-specific data (for example agent, age, sugar) is lost or reset. Only the state in the cycle changes.
+ * XML configuration files are assumed to be valid and follow the expected schema (correct tags, attributes, and grid dimensions).
 
  * Known Bugs:
 
@@ -49,6 +50,7 @@ This project implements a cellular automata simulator.
  * Noteworthy Features
  * Full support for advancing a simulation in both directions, forward and backward, either by single stepping or by driving.
  * Dynamic cell state update by clicking. Users can click a cell to cycle it to the next state in that simulation’s cycle (dead to alive to dead). They can effectively modify the starting state of any simulation by clicking cells to change their state before pressing start. It can be done both when the sim is paused and when it is running. (See Assumptions for the simplification that cell data beyond the cycle state is lost when toggling.)
+ * Simulations can be fully saved and restored using session files that store both user preferences and all active simulations.
 
 ### Design Decisions
 
@@ -82,7 +84,19 @@ We introduce separate interfaces so each package receives only what it needs, re
  * Multi-simulation controls are routed through the existing top control bar to avoid duplicating UI controls in each panel and to maintain a consistent interaction model.
  * The multi-simulation view uses render-only panels (no per-panel controls beyond loading) to separate visualization from control logic and minimize UI complexity.
 
+**ConfigLoader and ConfigSaver**
+* **ConfigLoader** reads a single `<simulation>` configuration file and produces a `SimulationConfig`. It parses metadata, grid dimensions, initial states, and optional rule parameters. Grid parsing is delegated to `ConfigGridParser` so grid initialization logic (explicit states, random counts, patterns) is separated from higher-level configuration loading.
+* **ConfigSaver** performs the reverse operation, writing a `SimulationConfig` back to a `<simulation>` XML structure. Centralizing this logic ensures exported configs follow a consistent format and avoids duplicated XML-writing code.
+
+**SimulationLoader and SimulationSaver**
+* **SimulationLoader** reads a full `<simulationState>` session file containing preferences and any active simulations. Individual simulations are parsed by delegating to `ConfigLoader`, so session loading does not duplicate simulation-parsing logic.
+* **SimulationSaver** writes the same session structure. It serializes preferences and reuses `ConfigSaver` to write each simulation, ensuring the same XML format is used whether a simulation is saved individually or as part of a session.
+
+**Configuration objects and color maps**
+* `SimulationConfig`, `SimulationState`, and `SimulationPreferences` are immutable configuration objects returned by loaders. They contain only data and expose getters but no setters, with defensive copies used for mutable fields like the grid array.
+* Color mappings are stored in `ColorMapProvider`, which acts as a registry mapping simulation types to state→color mappings. Colors are stored as hex strings so the configuration layer remains independent of the UI framework.
 
 
 ### Assignment Impressions
 
+Ixa - This was a really fun but also really stressful project. I liked working on the backend and I learned a lot about structuring data files as well as clean separation between reading/writing and working with multiple other "wings" of the program.
