@@ -6,6 +6,7 @@ import static cellsociety.view.constants.SimulationUiConstants.MAX_SLOTS;
 import cellsociety.controller.multiview.SimulationSlot;
 import cellsociety.controller.multiview.SlotManager;
 import cellsociety.controller.services.ErrorHandler;
+import cellsociety.controller.services.GridEdgeFactory;
 import cellsociety.controller.services.NeighborStrategyFactory;
 import cellsociety.controller.services.PopulationSyncService;
 import cellsociety.controller.services.SimulationDialogService;
@@ -50,10 +51,12 @@ public class SimulationController {
   private final List<SimulationSlot> mySlots;
   private final SlotManager mySlotManager;
   private final NeighborStrategyFactory myNeighborStrategyFactory;
+  private final GridEdgeFactory myGridEdgeFactory;
   private final PopulationSyncService myPopulationSyncService;
   private final SimulationDialogService myDialogService;
   private final SimulationPersistenceHandlers myPersistenceHandlers;
   private Optional<String> mySelectedNeighborChoice = Optional.empty();
+  private Optional<String> mySelectedGridEdgeChoice = Optional.empty();
 
 
   /**
@@ -78,6 +81,7 @@ public class SimulationController {
     mySlots = new ArrayList<>();
     mySlotManager = new SlotManager(mySimView);
     myNeighborStrategyFactory = new NeighborStrategyFactory();
+    myGridEdgeFactory = new GridEdgeFactory();
     myPopulationSyncService = new PopulationSyncService();
     myDialogService = new SimulationDialogService(mySimView);
     myScene = scene;
@@ -90,6 +94,7 @@ public class SimulationController {
 
     myWires.wireAll(mySlots, this::handleSplashLoad);
     wireNeighborSelection();
+    wireGridEdgeSelection();
   }
 
   private void buildSlotChoices() {
@@ -178,8 +183,23 @@ public class SimulationController {
     });
   }
 
+  private void wireGridEdgeSelection() {
+    ChoiceBox<String> gridEdgeChoices = mySimView.getMyButtons().getGridEdgeChoices();
+    gridEdgeChoices.setOnAction(e -> {
+      String selected = gridEdgeChoices.getValue();
+      if (selected == null) throw new IllegalArgumentException("No grid edge selected.");
+      mySelectedGridEdgeChoice = Optional.of(selected);
+      applyGridEdgeChoiceToLoadedSimulations(selected);
+    });
+  }
+
   private void applyNeighborChoiceToLoadedSimulations(String selectedChoice) {
     myNeighborStrategyFactory.applyToLoadedSimulations(mySlots, selectedChoice);
+    handlePopulationDataChanged();
+  }
+
+  private void applyGridEdgeChoiceToLoadedSimulations(String selectedChoice) {
+    myGridEdgeFactory.applyToLoadedSimulations(mySlots, selectedChoice);
     handlePopulationDataChanged();
   }
 

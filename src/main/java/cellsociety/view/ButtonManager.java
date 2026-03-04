@@ -42,6 +42,7 @@ public class ButtonManager {
   private final Label mySpeedLabel = new Label();
   private final Label myStateStackSizeLabel = new Label();
   private final Label myNeighborStrategy = new Label();
+  private final Label myGridEdge = new Label();
 
   // Buttons
   private final Button myUploadButton = new Button();
@@ -60,6 +61,7 @@ public class ButtonManager {
   private final Button myRotateRightButton = new Button();
   private final Button myMultiSimButton = new Button();
   private final ChoiceBox<String> myNeighborChoices = new ChoiceBox<>();
+  private final ChoiceBox<String> myGridEdgeChoices = new ChoiceBox<>();
 
   /**
    * Creates a button manager and applies the initial language.
@@ -79,6 +81,7 @@ public class ButtonManager {
     applyLanguage(bundle);
     myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
     buildNeighborChoices();
+    buildGridEdgeChoices();
 
   }
 
@@ -118,6 +121,7 @@ public class ButtonManager {
 
     myStateStackSizeLabel.setText(myBundle.getString(LABEL_GENERATION_UNSET));
     myNeighborStrategy.setText(myBundle.getString(LABEL_NEIGHBOR));
+    myGridEdge.setText(myBundle.getString(LABEL_EDGE));
   }
 
   /**
@@ -150,7 +154,14 @@ public class ButtonManager {
    * @return ordered list of upload-row buttons
    */
   public List<Node> getUploadRowNodes() {
-    return List.of(mySaveButton, mySettingsButton, myNeighborStrategy, myNeighborChoices);
+    return List.of(
+        mySaveButton,
+        mySettingsButton,
+        myNeighborStrategy,
+        myNeighborChoices,
+        myGridEdge,
+        myGridEdgeChoices
+    );
   }
 
   private void buildNeighborChoices(){
@@ -158,7 +169,13 @@ public class ButtonManager {
         ResourcePaths.VON_NEUMANN,
         ResourcePaths.MOORE,
         ResourcePaths.MOORE_RADIUS_2,
-        ResourcePaths.DIAGONAL,
+        ResourcePaths.DIAGONAL
+    );
+  }
+
+  private void buildGridEdgeChoices() {
+    myGridEdgeChoices.getItems().addAll(
+        ResourcePaths.FINITE,
         ResourcePaths.TOROIDAL
     );
   }
@@ -355,4 +372,6 @@ public class ButtonManager {
   public Button getRotateRightButton() { return myRotateRightButton; }
 
   public ChoiceBox<String> getNeighborChoices() { return myNeighborChoices; }
+
+  public ChoiceBox<String> getGridEdgeChoices() { return myGridEdgeChoices; }
 }

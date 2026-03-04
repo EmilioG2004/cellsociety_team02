@@ -37,5 +37,8 @@ public final class ResourcePaths {
   public static final String MOORE_RADIUS_2 = "MooreRadius2";
   public static final String DIAGONAL = "Diagonal";
   public static final String VON_NEUMANN = "VonNeumann";
+
+  // Grid edge policies
+  public static final String FINITE = "Finite";
   public static final String TOROIDAL = "Toroidal";
 }

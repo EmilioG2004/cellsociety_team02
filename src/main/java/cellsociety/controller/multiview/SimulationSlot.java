@@ -56,19 +56,6 @@ public class SimulationSlot {
   }
 
   /**
-   * Returns this slot's index.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return zero-based slot index
-   */
-  public int getIndex() {
-    return myIndex;
-  }
-
-  /**
    * Returns the panel's node for embedding in layouts.
    *
    * <p>Assumptions: none.</p>

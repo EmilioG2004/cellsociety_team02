@@ -1,11 +1,9 @@
 package cellsociety.controller.services;
 
 import cellsociety.Model.Grid.ControllerGrid;
-import cellsociety.Model.Grid.ViewGrid;
 import cellsociety.Model.NeighborStrategy.DiagonalNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategy;
 import cellsociety.Model.NeighborStrategy.MooreNeighborStrategyRadius2;
-import cellsociety.Model.GridEdge.ToroidalEdge;
 import cellsociety.Model.NeighborStrategy.NeighborStrategy;
 import cellsociety.Model.NeighborStrategy.VonNeumannNeighborStrategy;
 import cellsociety.controller.multiview.SimulationSlot;
@@ -40,7 +38,7 @@ public class NeighborStrategyFactory {
       return;
     }
     ControllerGrid grid = slot.getPresenter().getDriver().getSimulation().getControllerGrid();
-    NeighborStrategy updatedStrategy = create(selectedChoice, grid.getNeighborStrategy());
+    NeighborStrategy updatedStrategy = create(selectedChoice);
     grid.setNeighborStrategy(updatedStrategy);
   }
 
@@ -48,10 +46,9 @@ public class NeighborStrategyFactory {
    * Builds a neighbor strategy for the selected choice.
    *
    * @param selectedChoice canonical choice value from UI
-   * @param currentStrategy current strategy on the grid, used for toroidal base selection
    * @return neighbor strategy instance
    */
-  public NeighborStrategy create(String selectedChoice, NeighborStrategy currentStrategy) {
+  public NeighborStrategy create(String selectedChoice) {
     if (ResourcePaths.VON_NEUMANN.equals(selectedChoice)) {
       return new VonNeumannNeighborStrategy();
     }
@@ -60,10 +57,6 @@ public class NeighborStrategyFactory {
     }
     if (ResourcePaths.MOORE_RADIUS_2.equals(selectedChoice)) {
       return new MooreNeighborStrategyRadius2();
-    }
-    if (ResourcePaths.TOROIDAL.equals(selectedChoice)) {
-      currentStrategy.setGridEdge(new ToroidalEdge());
-      return currentStrategy;
     }
     return new MooreNeighborStrategy();
   }
