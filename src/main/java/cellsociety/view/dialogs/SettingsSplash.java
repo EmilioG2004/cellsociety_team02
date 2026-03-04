@@ -3,6 +3,7 @@ package cellsociety.view.dialogs;
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.SPACING_MEDIUM;
 
+import cellsociety.view.LanguageApplier;
 import cellsociety.view.constants.SimulationUiConstants;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
@@ -45,6 +46,7 @@ public class SettingsSplash extends StackPane {
   private final ChoiceBox<String> myThemes = new ChoiceBox<>();
   private final Button myApplyChanges;
   private final Button myLoadButton;
+  private final LanguageApplier myLanguageApplier = new LanguageApplier();
   /**
    * Creates the settings splash and builds the dialog content.
    *
@@ -97,15 +99,12 @@ public class SettingsSplash extends StackPane {
    * <p>Return value: none.</p>
    */
   public void buildDropdowns(){
-    myLanguages.getItems().addAll(
-        ResourcePaths.LANGUAGE_ENGLISH,
-        ResourcePaths.LANGUAGE_SPANISH,
-        ResourcePaths.LANGUAGE_PORTUGUESE);
+    myLanguages.getItems().addAll(myLanguageApplier.getLanguageChoices());
     myThemes.getItems().addAll(
         ResourcePaths.THEME_LIGHT,
         ResourcePaths.THEME_DARK,
         ResourcePaths.THEME_DUKE);
-    myLanguages.setValue(ResourcePaths.LANGUAGE_ENGLISH);
+    myLanguages.setValue(myLanguageApplier.getDefaultLanguage());
     myThemes.setValue(ResourcePaths.THEME_LIGHT);
   }
 
@@ -134,12 +133,7 @@ public class SettingsSplash extends StackPane {
       @Override
       public String toString(String value) {
         if (value == null) return "";
-        return switch (value) {
-          case ResourcePaths.LANGUAGE_ENGLISH -> bundle.getString(LANGUAGE_ENGLISH);
-          case ResourcePaths.LANGUAGE_SPANISH -> bundle.getString(LANGUAGE_SPANISH);
-          case ResourcePaths.LANGUAGE_PORTUGUESE -> bundle.getString(LANGUAGE_PORTUGUESE);
-          default -> value;
-        };
+        return myLanguageApplier.toDisplayName(value, bundle);
       }
 
       @Override

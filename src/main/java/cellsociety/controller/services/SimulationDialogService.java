@@ -23,7 +23,14 @@ public class SimulationDialogService {
    */
   public void showAboutForSlot(List<SimulationSlot> slots, int slotIndex) {
     SimulationSlot slot = getRequiredLoadedSlot(slots, slotIndex);
-    mySimView.showAboutSplash(slot.getConfig());
+    String currentNeighborStrategy = slot.getPresenter()
+        .getDriver()
+        .getSimulation()
+        .getControllerGrid()
+        .getNeighborStrategy()
+        .getClass()
+        .getSimpleName();
+    mySimView.showAboutSplash(slot.getConfig(), currentNeighborStrategy);
   }
 
   /**

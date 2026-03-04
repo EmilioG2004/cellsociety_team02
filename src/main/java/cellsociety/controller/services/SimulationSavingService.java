@@ -7,6 +7,7 @@ import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.config.SimulationState;
 import cellsociety.controller.multiview.SimulationSlot;
+import cellsociety.view.ThemeApplier;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,15 +21,18 @@ public class SimulationSavingService {
 
   private final ConfigSaver myConfigSaver;
   private final SimulationSaver mySimulationSaver;
+  private final ThemeApplier myThemeApplier;
 
   public SimulationSavingService() {
     myConfigSaver = new ConfigSaver();
     mySimulationSaver = new SimulationSaver();
+    myThemeApplier = new ThemeApplier();
   }
 
   public SimulationSavingService(ConfigSaver configSaver, SimulationSaver simulationSaver) {
     myConfigSaver = configSaver;
     mySimulationSaver = simulationSaver;
+    myThemeApplier = new ThemeApplier();
   }
 
   public void saveConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid, File saveDestination) {
@@ -84,7 +88,7 @@ public class SimulationSavingService {
 
   public SimulationPreferences buildPreferences(String themeChoice, String languageChoice,
       List<SimulationSlot> slots) {
-    int theme = mapThemeToCode(themeChoice);
+    int theme = myThemeApplier.toThemeCode(themeChoice);
     double speed = getReferenceSpeed(slots);
     String language = languageChoice;
     if (language == null || language.isBlank()) {
@@ -120,12 +124,6 @@ public class SimulationSavingService {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
       throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
     }
-  }
-
-  private int mapThemeToCode(String themeChoice) {
-    if (ResourcePaths.THEME_DARK.equals(themeChoice)) return 1;
-    if (ResourcePaths.THEME_DUKE.equals(themeChoice)) return 2;
-    return 0;
   }
 
   private double getReferenceSpeed(List<SimulationSlot> slots) {

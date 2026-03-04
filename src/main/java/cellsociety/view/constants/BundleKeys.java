@@ -69,6 +69,7 @@ public final class BundleKeys {
   public static final String ABOUT_AUTHOR = "about.author";
   public static final String ABOUT_DESCRIPTION = "about.description";
   public static final String ABOUT_PARAMETERS = "about.parameters";
+  public static final String ABOUT_NEIGHBOR_STRATEGY = "about.neighborStrategy";
 
   // Error messages
   public static final String ERROR_TITLE = "error.title";
