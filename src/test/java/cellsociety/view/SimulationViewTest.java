@@ -232,6 +232,7 @@ public class SimulationViewTest extends DukeApplicationTest {
         "TestSimulation",
         "cellsociety.Model.GameRules.ConwayGameOfLifeRule",
         "cellsociety.Model.NeighborStrategy.MooreNeighborStrategy",
+        "cellsociety.Model.GridEdge.FiniteEdge",
         "Test Title",
         "Test Author",
         "Test Description",
