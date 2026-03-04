@@ -1,0 +1,22 @@
+<simulation type="SpreadingOfFire" class="cellsociety.Model.GameRules.SpreadingOfFireRule">
+  <metadata>
+    <title>Fire Burns Out</title>
+    <author>cellsociety</author>
+    <description>probCatch=1, probTree=0. One fire with four adjacent trees.</description>
+  </metadata>
+
+  <grid rows="5" cols="5">
+    <states>
+      0,0,0,0,0
+      0,0,1,0,0
+      0,1,2,1,0
+      0,0,1,0,0
+      0,0,0,0,0
+    </states>
+  </grid>
+
+  <parameters>
+    <param name="probCatch" value="1.0"/>
+    <param name="probTree" value="0.0"/>
+  </parameters>
+</simulation>

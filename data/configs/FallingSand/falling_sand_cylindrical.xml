@@ -1,0 +1,20 @@
+<simulation type="FallingSand" class="cellsociety.Model.GameRules.FallingSandRule"
+            gridEdge="cellsociety.Model.GridEdge.CylindricalEdge">
+  <metadata>
+    <title>Sand Cylindrical</title>
+    <author>cellsociety</author>
+    <description>Moore; wrap left-right, clip top-bottom.</description>
+  </metadata>
+
+  <grid rows="20" cols="20">
+    <randomByCount>
+      <state id="0" proportion="0.7"/>
+      <state id="1" proportion="0.15"/>
+      <state id="2" proportion="0.1"/>
+      <state id="3" proportion="0.05"/>
+    </randomByCount>
+  </grid>
+
+  <parameters>
+  </parameters>
+</simulation>
