@@ -49,15 +49,11 @@ public class SugarScape2Rule extends SugarScapeRule {
 
   @Override
   public Grid getNextGrid(RuleGrid currentGrid) {
-    // Base movement, metabolism, and sugar grow-back
     Grid next = super.getNextGrid(currentGrid);
     int rows = next.getRows();
     int cols = next.getCols();
 
-    // Age all agents; remove those that reach maxAge
     ageAgents(next, rows, cols);
-
-    // Reproduction phase
     reproduce(next, rows, cols);
 
     return next;
