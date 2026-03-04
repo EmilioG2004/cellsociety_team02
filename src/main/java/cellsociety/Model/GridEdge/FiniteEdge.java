@@ -17,7 +17,7 @@ public class FiniteEdge implements GridEdge {
       int nr = pos[0];
       int nc = pos[1];
       if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-        result.add(pos);
+        result.add(new int[]{nr, nc});
       }
     }
     return result;
