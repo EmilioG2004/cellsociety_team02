@@ -90,7 +90,7 @@ public class SimulationSavingService {
     if (language == null || language.isBlank()) {
       language = ResourcePaths.LANGUAGE_ENGLISH;
     }
-    return new SimulationPreferences(theme, language, speed, new HashMap<Integer, String>());
+    return new SimulationPreferences(theme, language, speed);
   }
 
   public SimulationConfig buildConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid) {

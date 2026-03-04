@@ -2,6 +2,7 @@ package cellsociety.controller.services;
 
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.model.SimulationModel;
+import cellsociety.config.ColorMapProvider;
 import cellsociety.config.ConfigLoader;
 import cellsociety.config.SimulationConfig;
 import cellsociety.config.SimulationLoader;
@@ -63,6 +64,7 @@ public class SimulationLoadingService {
     SimulationSlot slot = slots.get(slotIndex);
     slot.setSimulation(sim);
     slot.setConfig(config);
+    slot.applyStateColors(ColorMapProvider.getColorMap(config.getSimulationType()));
     selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(slot, choice));
   }
 
@@ -86,6 +88,7 @@ public class SimulationLoadingService {
       SimulationModel currentSim = SimulationFactory.createSimulation(currentConfig);
       currentSlot.setSimulation(currentSim);
       currentSlot.setConfig(currentConfig);
+      currentSlot.applyStateColors(ColorMapProvider.getColorMap(currentConfig.getSimulationType()));
       selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(currentSlot, choice));
     }
     return desiredState.getPreferences();

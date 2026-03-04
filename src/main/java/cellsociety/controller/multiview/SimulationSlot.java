@@ -3,6 +3,7 @@ package cellsociety.controller.multiview;
 import cellsociety.Model.Simulation.factory.SimulationFactory;
 import cellsociety.Model.Simulation.model.SimulationModel;
 import cellsociety.config.SimulationConfig;
+import java.util.Map;
 import cellsociety.view.multiview.SimulationPanel;
 import javafx.scene.Node;
 
@@ -285,6 +286,13 @@ public class SimulationSlot {
    */
   public double getStepsPerSecond() {
     return myPresenter.getDriver().getStepsPerSecond();
+  }
+
+  public void applyStateColors(Map<Integer, String> stateColors) {
+    myPanel.applyStateColors(stateColors);
+    if (hasSimulation()) {
+      myPanel.render(myPresenter.getDriver().getSimulation().getViewGrid());
+    }
   }
 
   public SimulationPanel getMyPanel() { return myPanel; }
