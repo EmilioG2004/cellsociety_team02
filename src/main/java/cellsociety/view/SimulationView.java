@@ -6,7 +6,6 @@ import static cellsociety.view.constants.SimulationUiConstants.*;
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.dialogs.AboutDialog;
 import cellsociety.view.dialogs.SettingsSplash;
-import cellsociety.view.gridviews.GridView;
 import cellsociety.view.utils.ThemeApplier;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
@@ -32,7 +31,7 @@ import java.io.File;
  *  before attempting to render, and apply themes on a live {@link Scene}.</p>
  *
  * <p>Dependencies: {@link ButtonManager} for controls, JavaFX layout panes,
- * {@link GridView} implementations for rendering, and dialog components
+ * {@link cellsociety.view.gridviews.GridView} implementations for rendering, and dialog components
  * {@link AboutDialog} and {@link SettingsSplash}.</p>
  *
  * <p>Example usage:</p>
@@ -57,8 +56,6 @@ public class SimulationView {
   private StackPane centerPane;
   private final AboutDialog myAboutDialog = new AboutDialog();
   private final SettingsSplash mySettings = new SettingsSplash();
-
-  private GridView myGridView;
 
   // Multi-sim dashboard UI
   private VBox myMultiRoot;
@@ -209,13 +206,6 @@ public class SimulationView {
     return card;
   }
 
-  private void buildBottom(){
-    HBox bottomBox = new HBox();
-    bottomBox.getChildren().addAll(myButtons.getRotateLeftButton(), myButtons.getRotateRightButton());
-    bottomBox.setAlignment(Pos.BOTTOM_CENTER);
-    myMain.setBottom(bottomBox);
-  }
-
   /**
    * Shows a file chooser for opening a simulation configuration.
    *
@@ -351,17 +341,6 @@ public class SimulationView {
    * @return about dialog UI
    */
   public AboutDialog getMyAboutDialog() { return myAboutDialog; }
-
-  /**
-   * Returns the current grid view instance.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return grid view, or {@code null} if not yet created
-   */
-  private GridView getMyGridView() { return myGridView; }
 
   public void setSpeedLabel(double speedMultiplier) { myButtons.setSpeedLabel(speedMultiplier); }
 

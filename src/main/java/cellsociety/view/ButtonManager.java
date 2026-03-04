@@ -40,12 +40,10 @@ public class ButtonManager {
   // Labels
   private final Label myTitle = new Label();
   private final Label mySpeedLabel = new Label();
-  private final Label myStateStackSizeLabel = new Label();
   private final Label myNeighborStrategy = new Label();
   private final Label myGridEdge = new Label();
 
   // Buttons
-  private final Button myUploadButton = new Button();
   private final Button myForwardButton = new Button();
   private final Button myBackButton = new Button();
   private final Button myStartButton = new Button();
@@ -59,7 +57,6 @@ public class ButtonManager {
   private final Button mySettingsButton = new Button();
   private final Button myRotateLeftButton = new Button();
   private final Button myRotateRightButton = new Button();
-  private final Button myMultiSimButton = new Button();
   private final ChoiceBox<String> myNeighborChoices = new ChoiceBox<>();
   private final ChoiceBox<String> myGridEdgeChoices = new ChoiceBox<>();
 
@@ -102,7 +99,6 @@ public class ButtonManager {
     myBundle = bundle;
 
     myTitle.setText(myBundle.getString(APP_TITLE));
-    myUploadButton.setText(myBundle.getString(BUTTON_UPLOAD_CONFIG));
     myForwardButton.setText(myBundle.getString(BUTTON_STEP_FORWARD));
     myBackButton.setText(myBundle.getString(BUTTON_STEP_BACKWARD));
     myStartButton.setText(myBundle.getString(BUTTON_START));
@@ -116,10 +112,6 @@ public class ButtonManager {
     myRotateRightButton.setText(myBundle.getString(BUTTON_ROTATE_RIGHT));
     myRotateLeftButton.setText(myBundle.getString(BUTTON_ROTATE_LEFT));
     myChangeDirectionButton.setText(myBundle.getString(BUTTON_CHANGE_DIRECTION));
-    myMultiSimButton.setText(myBundle.getString(BUTTON_MULTI_SIM));
-
-
-    myStateStackSizeLabel.setText(myBundle.getString(LABEL_GENERATION_UNSET));
     myNeighborStrategy.setText(myBundle.getString(LABEL_NEIGHBOR));
     myGridEdge.setText(myBundle.getString(LABEL_EDGE));
   }
@@ -230,16 +222,6 @@ public class ButtonManager {
    * @return label displaying the speed multiplier
    */
   public Label getSpeedLabel() { return mySpeedLabel; }
-  /**
-   * Returns the generation label.
-   *
-   * <p>Assumptions: none.</p>
-   *
-   * <p>Exceptions: none.</p>
-   *
-   * @return label displaying the current generation/stack size
-   */
-  private Label getStateStackSizeLabel() { return myStateStackSizeLabel; }
   /**
    * Returns the step-forward button.
    *
