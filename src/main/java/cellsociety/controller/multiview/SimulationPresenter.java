@@ -106,7 +106,7 @@ public class SimulationPresenter {
     syncPopulationAtCurrentGeneration();
   }
 
-  public Map<Integer, Integer> getCurrentStateCounts() {
+  private Map<Integer, Integer> getCurrentStateCounts() {
     if (!myDriver.hasSimulation()) {
       throw new IllegalStateException("No simulation loaded.");
     }

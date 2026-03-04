@@ -131,7 +131,7 @@ public class SimulationController {
    *
    * @param desired requested number of slots
    */
-  public void setSlotCount(int desired) {
+  private void setSlotCount(int desired) {
     mySlotManager.setSlotCount(
         mySlots,
         desired,
@@ -220,5 +220,5 @@ public class SimulationController {
     myPopulationSyncService.syncLoadedSlots(mySlots);
   }
 
-  public void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
+  private void setMyBundle(ResourceBundle bundle) { myBundle = bundle; }
 }

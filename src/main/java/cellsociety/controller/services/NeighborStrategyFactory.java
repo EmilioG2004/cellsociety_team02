@@ -48,7 +48,7 @@ public class NeighborStrategyFactory {
    * @param selectedChoice canonical choice value from UI
    * @return neighbor strategy instance
    */
-  public NeighborStrategy create(String selectedChoice) {
+  private NeighborStrategy create(String selectedChoice) {
     if (ResourcePaths.VON_NEUMANN.equals(selectedChoice)) {
       return new VonNeumannNeighborStrategy();
     }

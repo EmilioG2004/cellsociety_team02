@@ -361,7 +361,7 @@ public class SimulationView {
    *
    * @return grid view, or {@code null} if not yet created
    */
-  public GridView getMyGridView() { return myGridView; }
+  private GridView getMyGridView() { return myGridView; }
 
   public void setSpeedLabel(double speedMultiplier) { myButtons.setSpeedLabel(speedMultiplier); }
 

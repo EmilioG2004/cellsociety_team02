@@ -98,7 +98,7 @@ public class SettingsSplash extends StackPane {
    *
    * <p>Return value: none.</p>
    */
-  public void buildDropdowns(){
+  private void buildDropdowns(){
     myLanguages.getItems().addAll(myLanguageApplier.getLanguageChoices());
     myThemes.getItems().addAll(
         ResourcePaths.THEME_LIGHT,

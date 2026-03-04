@@ -39,7 +39,7 @@ public class GridEdgeFactory {
   /**
    * Builds a grid edge policy for the selected choice.
    */
-  public GridEdge create(String selectedChoice) {
+  private GridEdge create(String selectedChoice) {
     if (ResourcePaths.FINITE.equals(selectedChoice)) {
       return new FiniteEdge();
     }

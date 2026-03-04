@@ -34,14 +34,14 @@ public class SimulationSavingService {
     myThemeApplier = new ThemeApplier();
   }
 
-  public void saveConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid, File saveDestination) {
+  private void saveConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid, File saveDestination) {
     if (saveDestination == null) {
       throw new IllegalArgumentException("No Save Destination Selected.");
     }
     myConfigSaver.saveConfig(buildConfigSnapshot(baseConfig, grid), saveDestination);
   }
 
-  public void saveState(List<SimulationConfig> snapshots, SimulationPreferences preferences,
+  private void saveState(List<SimulationConfig> snapshots, SimulationPreferences preferences,
       File saveDestination) {
     if (saveDestination == null) {
       throw new IllegalArgumentException("No Save Destination Selected.");
@@ -74,7 +74,7 @@ public class SimulationSavingService {
     saveState(snapshots, preferences, saveDestination);
   }
 
-  public List<SimulationConfig> buildSimulationSnapshots(List<SimulationSlot> slots) {
+  private List<SimulationConfig> buildSimulationSnapshots(List<SimulationSlot> slots) {
     List<SimulationConfig> active = new ArrayList<>();
     for (SimulationSlot slot : slots) {
       if (!slot.hasSimulation()) continue;
@@ -85,7 +85,7 @@ public class SimulationSavingService {
     return active;
   }
 
-  public SimulationPreferences buildPreferences(String themeChoice, String languageChoice,
+  private SimulationPreferences buildPreferences(String themeChoice, String languageChoice,
       List<SimulationSlot> slots) {
     int theme = myThemeApplier.toThemeCode(themeChoice);
     double speed = getReferenceSpeed(slots);
@@ -96,7 +96,7 @@ public class SimulationSavingService {
     return new SimulationPreferences(theme, language, speed);
   }
 
-  public SimulationConfig buildConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid) {
+  private SimulationConfig buildConfigSnapshot(SimulationConfig baseConfig, ViewGrid grid) {
     if (baseConfig == null) {
       throw new IllegalArgumentException("Base configuration is required.");
     }

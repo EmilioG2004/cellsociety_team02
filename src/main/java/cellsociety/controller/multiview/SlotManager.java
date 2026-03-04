@@ -45,14 +45,14 @@ public class SlotManager {
     rebuildTileChildren(slots);
   }
 
-  public void rebuildTileChildren(List<SimulationSlot> slots) {
+  private void rebuildTileChildren(List<SimulationSlot> slots) {
     mySimView.getMultiSimTile().getChildren().clear();
     for (SimulationSlot slot : slots) {
       mySimView.getMultiSimTile().getChildren().add(slot.getNode());
     }
   }
 
-  public void checkIndex(List<SimulationSlot> slots, int slotIndex) {
+  private void checkIndex(List<SimulationSlot> slots, int slotIndex) {
     if (slotIndex < 0 || slotIndex >= slots.size()) {
       throw new IndexOutOfBoundsException("Invalid slot index: " + slotIndex);
     }

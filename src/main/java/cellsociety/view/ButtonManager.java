@@ -239,7 +239,7 @@ public class ButtonManager {
    *
    * @return label displaying the current generation/stack size
    */
-  public Label getStateStackSizeLabel() { return myStateStackSizeLabel; }
+  private Label getStateStackSizeLabel() { return myStateStackSizeLabel; }
   /**
    * Returns the step-forward button.
    *

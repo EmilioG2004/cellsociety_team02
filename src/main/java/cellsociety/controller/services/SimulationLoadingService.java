@@ -36,7 +36,7 @@ public class SimulationLoadingService {
     mySimulationLoader = simulationLoader;
   }
 
-  public SimulationConfig loadConfig(File xmlFile)
+  private SimulationConfig loadConfig(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
     if (xmlFile == null) {
       throw new IllegalArgumentException("No file selected.");
@@ -44,7 +44,7 @@ public class SimulationLoadingService {
     return myConfigLoader.loadConfig(xmlFile);
   }
 
-  public SimulationState loadState(File xmlFile)
+  private SimulationState loadState(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
     if (xmlFile == null) {
       throw new IllegalArgumentException("No file selected.");
