@@ -1,4 +1,4 @@
-package cellsociety.view;
+package cellsociety.view.gridviews;
 
 import cellsociety.Model.Grid.ViewGrid;
 import java.util.HashMap;

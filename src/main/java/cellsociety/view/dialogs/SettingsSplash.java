@@ -3,7 +3,7 @@ package cellsociety.view.dialogs;
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.SPACING_MEDIUM;
 
-import cellsociety.view.LanguageApplier;
+import cellsociety.view.utils.LanguageApplier;
 import cellsociety.view.constants.SimulationUiConstants;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;

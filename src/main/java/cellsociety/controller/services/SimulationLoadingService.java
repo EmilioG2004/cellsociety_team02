@@ -56,7 +56,8 @@ public class SimulationLoadingService {
    * Loads one config file and installs it into the target slot.
    */
   public void loadConfigIntoSlot(int slotIndex, File xmlFile, List<SimulationSlot> slots,
-      Optional<String> selectedNeighborChoice, NeighborStrategyFactory neighborStrategyFactory)
+      Optional<String> selectedNeighborChoice, NeighborStrategyFactory neighborStrategyFactory,
+      Optional<String> selectedGridEdgeChoice, GridEdgeFactory gridEdgeFactory)
       throws ParserConfigurationException, IOException, SAXException {
     checkSlotIndex(slots, slotIndex);
     SimulationConfig config = loadConfig(xmlFile);
@@ -66,6 +67,7 @@ public class SimulationLoadingService {
     slot.setConfig(config);
     slot.applyStateColors(ColorMapProvider.getColorMap(config.getSimulationType()));
     selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(slot, choice));
+    selectedGridEdgeChoice.ifPresent(choice -> gridEdgeFactory.applyToSlot(slot, choice));
   }
 
   /**
@@ -75,7 +77,8 @@ public class SimulationLoadingService {
    */
   public SimulationPreferences loadStateIntoSlots(File xmlFile, List<SimulationSlot> slots,
       IntConsumer setSlotCount, Consumer<Integer> setSlotChoice, Optional<String> selectedNeighborChoice,
-      NeighborStrategyFactory neighborStrategyFactory)
+      NeighborStrategyFactory neighborStrategyFactory, Optional<String> selectedGridEdgeChoice,
+      GridEdgeFactory gridEdgeFactory)
       throws ParserConfigurationException, IOException, SAXException {
     SimulationState desiredState = loadState(xmlFile);
     int activeSims = desiredState.getActiveSimulations().size();
@@ -91,6 +94,7 @@ public class SimulationLoadingService {
       currentSlot.setConfig(currentConfig);
       currentSlot.applyStateColors(ColorMapProvider.getColorMap(currentConfig.getSimulationType()));
       selectedNeighborChoice.ifPresent(choice -> neighborStrategyFactory.applyToSlot(currentSlot, choice));
+      selectedGridEdgeChoice.ifPresent(choice -> gridEdgeFactory.applyToSlot(currentSlot, choice));
     }
     return desiredState.getPreferences();
   }

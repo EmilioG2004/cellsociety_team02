@@ -6,6 +6,8 @@ import static cellsociety.view.constants.SimulationUiConstants.*;
 import cellsociety.config.SimulationConfig;
 import cellsociety.view.dialogs.AboutDialog;
 import cellsociety.view.dialogs.SettingsSplash;
+import cellsociety.view.gridviews.GridView;
+import cellsociety.view.utils.ThemeApplier;
 import java.util.ResourceBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

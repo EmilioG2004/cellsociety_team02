@@ -3,8 +3,8 @@ package cellsociety.view.multiview;
 import static cellsociety.view.constants.BundleKeys.*;
 import static cellsociety.view.constants.SimulationUiConstants.*;
 
-import cellsociety.view.GridPaneView;
-import cellsociety.view.GridView;
+import cellsociety.view.gridviews.GridPaneView;
+import cellsociety.view.gridviews.GridView;
 import cellsociety.view.SimulationView;
 import java.text.MessageFormat;
 import java.util.HashMap;

@@ -85,7 +85,7 @@ public class SimulationController {
     myPopulationSyncService = new PopulationSyncService();
     myDialogService = new SimulationDialogService(mySimView);
     myScene = scene;
-    myPersistenceHandlers = new SimulationPersistenceHandlers(mySimView, myScene, myErrorHandler, myNeighborStrategyFactory, this::handlePopulationDataChanged, this::setSlotCount
+    myPersistenceHandlers = new SimulationPersistenceHandlers(mySimView, myScene, myErrorHandler, myNeighborStrategyFactory, myGridEdgeFactory, this::handlePopulationDataChanged, this::setSlotCount
     );
     myWires = new WiringManager(mySimView, myScene, this::setMyBundle, this::handleSaveAll, this::handleLoadState, this::handlePopulationDataChanged);
 
@@ -111,7 +111,11 @@ public class SimulationController {
    * Called when the user clicks "Load Simulation" in the settings/splash panel.
    */
   private void handleSplashLoad() {
-    myPersistenceHandlers.handleSplashLoad(mySlots, mySelectedNeighborChoice);
+    myPersistenceHandlers.handleSplashLoad(
+        mySlots,
+        mySelectedNeighborChoice,
+        mySelectedGridEdgeChoice
+    );
   }
 
   /**
@@ -142,11 +146,20 @@ public class SimulationController {
   }
 
   private void handleLoadState(){
-    myPersistenceHandlers.handleLoadState(mySlots, mySelectedNeighborChoice);
+    myPersistenceHandlers.handleLoadState(
+        mySlots,
+        mySelectedNeighborChoice,
+        mySelectedGridEdgeChoice
+    );
   }
 
   private void handleLoadForSlot(int slotIndex) {
-    myPersistenceHandlers.handleLoadForSlot(slotIndex, mySlots, mySelectedNeighborChoice);
+    myPersistenceHandlers.handleLoadForSlot(
+        slotIndex,
+        mySlots,
+        mySelectedNeighborChoice,
+        mySelectedGridEdgeChoice
+    );
   }
 
   private void handleSaveForSlot(int slotIndex) {

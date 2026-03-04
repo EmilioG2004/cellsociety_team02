@@ -7,10 +7,9 @@ import cellsociety.config.SimulationPreferences;
 import cellsociety.config.SimulationSaver;
 import cellsociety.config.SimulationState;
 import cellsociety.controller.multiview.SimulationSlot;
-import cellsociety.view.ThemeApplier;
+import cellsociety.view.utils.ThemeApplier;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import cellsociety.view.constants.ResourcePaths;
 

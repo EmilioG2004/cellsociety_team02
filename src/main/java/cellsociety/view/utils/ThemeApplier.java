@@ -1,4 +1,4 @@
-package cellsociety.view;
+package cellsociety.view.utils;
 
 import static cellsociety.view.constants.ResourcePaths.CSS_BASE;
 import static cellsociety.view.constants.ResourcePaths.CSS_DARK;
@@ -8,6 +8,7 @@ import static cellsociety.view.constants.ResourcePaths.THEME_DARK;
 import static cellsociety.view.constants.ResourcePaths.THEME_DUKE;
 import static cellsociety.view.constants.ResourcePaths.THEME_LIGHT;
 
+import cellsociety.view.SimulationView;
 import java.util.Map;
 import javafx.scene.Scene;
 

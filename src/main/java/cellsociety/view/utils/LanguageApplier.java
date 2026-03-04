@@ -1,4 +1,4 @@
-package cellsociety.view;
+package cellsociety.view.utils;
 
 import static cellsociety.view.constants.ResourcePaths.BUNDLE_ENGLISH;
 import static cellsociety.view.constants.ResourcePaths.BUNDLE_PORTUGUESE;
