@@ -23,19 +23,6 @@ public class SimulationLoader {
 
   private final ConfigLoader configLoader = new ConfigLoader();
 
-  public SimulationPreferences loadPreferences(File xmlFile)
-      throws ParserConfigurationException, IOException, SAXException {
-
-    Document doc = parse(xmlFile);
-
-    Element root = doc.getDocumentElement();
-    if (root == null || !CONFIG_PREFERENCES.equals(root.getTagName())) {
-      throw new IllegalArgumentException("Expected root <" + CONFIG_PREFERENCES + "> in " + xmlFile.getName());
-    }
-
-    return parsePreferencesElement(root);
-  }
-
   public SimulationState loadState(File xmlFile)
       throws ParserConfigurationException, IOException, SAXException {
 
@@ -49,13 +36,14 @@ public class SimulationLoader {
     Element prefsEl = getFirstChildElementByTag(root, CONFIG_PREFERENCES);
     SimulationPreferences prefs = parsePreferencesElement(prefsEl);
 
-    Element simsEl = getFirstChildElementByTag(root, CONFIG_SIMULATIONS);
-    NodeList simNodes = simsEl.getElementsByTagName(CONFIG_SIMULATION);
+    Element simsEl = getOptionalFirstChildElementByTag(root, CONFIG_SIMULATIONS);
+    NodeList simNodes = (simsEl == null) ? null : simsEl.getElementsByTagName(CONFIG_SIMULATION);
 
     List<SimulationConfig> configs = new ArrayList<>();
-    for (int i = 0; i < simNodes.getLength(); i++) {
-      Element simEl = (Element) simNodes.item(i);
-      configs.add(configLoader.loadConfig(simEl));
+    if (simNodes != null) {
+      for (int i = 0; i < simNodes.getLength(); i++) {
+        configs.add(configLoader.loadConfig((Element) simNodes.item(i)));
+      }
     }
 
     return new SimulationState(configs, prefs);

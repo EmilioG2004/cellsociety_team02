@@ -20,12 +20,29 @@ public final class ColorMapProvider {
 
   private static final int MAX_STATE = 32;
 
+  private static final String[] CONTRAST_PALETTE = {
+      "#E6194B", // red
+      "#3CB44B", // green
+      "#4363D8", // blue
+      "#FFE119", // yellow
+      "#F58231", // orange
+      "#911EB4", // purple
+      "#46F0F0", // cyan
+      "#F032E6", // magenta
+      "#BCF60C", // lime
+      "#FABEBE", // pink
+      "#008080", // teal
+      "#E6BEFF", // lavender
+      "#9A6324", // brown
+      "#FFFAC8", // beige
+      "#800000", // maroon
+      "#AAFFC3"  // mint
+  };
+
   static {
-    // hsv rainbow stored as hex strings
-    for (int i = 0; i < MAX_STATE; i++) {
-      double t = (double) i / (MAX_STATE - 1);
-      double hue = 300 * t;
-      DEFAULT_MAP.put(i, hsbToHex(hue, 0.9, 0.9));
+    DEFAULT_MAP.put(0, "#FFFFFF");
+    for (int i = 1; i < MAX_STATE; i++) {
+      DEFAULT_MAP.put(i, CONTRAST_PALETTE[i % CONTRAST_PALETTE.length]);
     }
   }
 
